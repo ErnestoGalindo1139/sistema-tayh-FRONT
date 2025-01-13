@@ -1,7 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
-import { HomePage } from '../pages/HomePage';
+// import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 import React from 'react';
+import AdminPage from '../pages/AdminPage';
 
 export const SistemaTayhRoutes = (): React.JSX.Element => {
   return (
@@ -9,7 +10,7 @@ export const SistemaTayhRoutes = (): React.JSX.Element => {
       {/* Aqui va el NavbarComponent */}
 
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<AdminPage />} />
         <Route path="/login" element={<LoginPage />} />
       </Routes>
 
