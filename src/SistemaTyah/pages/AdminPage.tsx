@@ -6,6 +6,7 @@ import { HomePage } from './HomePage';
 import { Image } from '@chakra-ui/react';
 import { px } from 'framer-motion';
 import { ClientesAdmin } from './ClientesAdmin';
+import { EnviosAdmin } from './EnviosAdmin';
 
 export default function AdminPage(): React.JSX.Element {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -52,8 +53,8 @@ export default function AdminPage(): React.JSX.Element {
         return <HomePage />;
       case 2:
         return <ClientesAdmin />;
-      // case 3:
-      //   return <ProductosAdmin />;
+      case 3:
+        return <EnviosAdmin />;
       // case 4:
       //   return <InventarioAdmin />;
       // case 5:
@@ -136,7 +137,7 @@ export default function AdminPage(): React.JSX.Element {
 
       <main className="main-content dark:bg-[#19232c]">
         <header className="header dark:bg-[#19232c]">
-          <h1 className="dark:text-white">
+          <h1 className="dark:text-white text-[1.6rem]">
             Bienvenido al Panel de Administración
           </h1>
         </header>

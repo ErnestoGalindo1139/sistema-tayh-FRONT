@@ -26,7 +26,7 @@ import { RetweetIcon } from '../icons/RetweetIcon';
 import { Tooltip, Label, Select, TextInput, Button } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
 
-export const ClientesAdmin = (): React.JSX.Element => {
+export const EnviosAdmin = (): React.JSX.Element => {
   const [clientes, setClientes] = useState<IClientes[]>([]);
   const [cliente, setCliente] = useState<IClientes>();
 
@@ -263,14 +263,12 @@ export const ClientesAdmin = (): React.JSX.Element => {
           {/* contenedor */}
           <div className="flex items-center justify-between">
             <div className="dark:text-white">
-              <h2 className="font-bold text-[2.5rem]">Clientes</h2>
-              <p className="text-[1.6rem]">
-                Aquí puedes gestionar los Clientes.
-              </p>
+              <h2 className="font-bold text-[2.5rem]">Envios</h2>
+              <p className="text-[1.6rem]">Aquí puedes gestionar los Envios.</p>
             </div>
 
             <Tooltip
-              content="Agregar Cliente"
+              content="Agregar Envio"
               className="text-[1.3rem]"
               placement="bottom"
             >

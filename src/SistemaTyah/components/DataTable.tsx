@@ -97,7 +97,7 @@ export const DataTable = <T,>({
                 .map((column) => (
                   <th
                     key={String(column.id)}
-                    className="p-4 border-b border-gray-300 text-center cursor-pointer"
+                    className="p-4 border-b border-gray-300 text-center cursor-pointer text-[1.6rem]"
                     onClick={() => handleSort(column.id)}
                   >
                     {column.texto}
@@ -106,7 +106,7 @@ export const DataTable = <T,>({
                   </th>
                 ))}
               {actions && (
-                <th className="p-4 border-b border-gray-300 text-center">
+                <th className="p-4 border-b border-gray-300 text-center text-[1.6rem]">
                   Acciones
                 </th>
               )}
@@ -117,7 +117,7 @@ export const DataTable = <T,>({
               <tr>
                 <td
                   colSpan={columns.length + (actions ? 1 : 0)}
-                  className="text-center p-4"
+                  className="text-center p-4 text-[1.6rem]"
                 >
                   No se encontraron registros.
                 </td>
@@ -137,7 +137,7 @@ export const DataTable = <T,>({
                             className="p-4 border-b border-gray-300 text-center"
                           >
                             <span
-                              className={`inline-block w-[100%] px-2 py-1 rounded-[0.3rem] text-white font-bold ${
+                              className={`inline-block w-[100%] px-2 py-1 rounded-[0.3rem] text-white font-bold text-[1.6rem] ${
                                 cellValue ? 'bg-green-500' : 'bg-red-500'
                               }`}
                             >
@@ -151,7 +151,7 @@ export const DataTable = <T,>({
                         return (
                           <td
                             key={String(column.id)}
-                            className="p-2 border-b border-gray-300 dark:text-white"
+                            className="p-2 border-b border-gray-300 dark:text-white text-[1.6rem]"
                           >
                             {typeof cellValue === 'string'
                               ? `$${cellValue}`
@@ -163,7 +163,7 @@ export const DataTable = <T,>({
                       return (
                         <td
                           key={String(column.id)}
-                          className="p-2 border-b border-gray-300 dark:text-white"
+                          className="p-2 border-b border-gray-300 dark:text-white text-[1.6rem]"
                         >
                           {typeof cellValue === 'string' ||
                           typeof cellValue === 'number'
@@ -199,7 +199,7 @@ export const DataTable = <T,>({
       {/* Paginación */}
       <div className="flex flex-wrap items-center justify-between mt-4 gap-4">
         {/* Información de los registros mostrados */}
-        <div className="text-left font-bold dark:text-white">
+        <div className="text-left font-bold dark:text-white text-[1.6rem]">
           Mostrando {currentData.length} de {data.length} registros
         </div>
 
@@ -207,14 +207,17 @@ export const DataTable = <T,>({
         <div className="flex flex-wrap items-center gap-2">
           {/* Selector de tamaño de página */}
           <div className="flex items-center">
-            <label htmlFor="rowsPerPage" className="mr-2 dark:text-white">
+            <label
+              htmlFor="rowsPerPage"
+              className="mr-2 dark:text-white text-[1.6rem]"
+            >
               Tamaño de Página:
             </label>
             <select
               id="rowsPerPage"
               value={rowsPerPage}
               onChange={handleRowsPerPageChange}
-              className="border border-gray-300 rounded-md w-16"
+              className="border border-gray-300 rounded-md w-[6.4rem] text-[1.6rem]"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -228,31 +231,31 @@ export const DataTable = <T,>({
             <button
               onClick={goToFirstPage}
               disabled={currentPage === 1}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
             >
               ⏮
             </button>
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
             >
               ⬅️
             </button>
-            <div className="dark:text-white">
+            <div className="dark:text-white text-[1.6rem]">
               Página {currentPage} de {totalPages}
             </div>
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
             >
               ➡️
             </button>
             <button
               onClick={goToLastPage}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
             >
               ⏭
             </button>
