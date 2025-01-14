@@ -21,6 +21,7 @@ import {
   getClientes,
   updateClientes,
 } from '../helpers/apiClientes';
+// import { Datepicker } from 'flowbite-react';
 
 interface ModalClientesProps {
   isOpen: boolean;
@@ -456,6 +457,7 @@ export const ModalClientes = ({
               </div>
               <div className="w-full">
                 <FormLabel>Fecha de Cumpleaños Empresa</FormLabel>
+                {/* <Datepicker language="es-MX" /> */}
                 <Input
                   isDisabled={sn_Visualizar}
                   ref={fh_CumpleanosEmpresaRef}
