@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../ThemeContext';
-import { Tooltip } from '@chakra-ui/react';
+import { Tooltip } from 'flowbite-react';
 
 interface DataTableProps<T> {
   data: T[];
@@ -177,11 +177,15 @@ export const DataTable = <T,>({
                       <div className="flex items-center justify-center gap-[4px]">
                         {actions.map((action, actionIndex) => (
                           <Tooltip
-                            label={action.texto}
-                            aria-label={action.texto}
+                            content={action.texto}
                             key={actionIndex}
+                            className="text-[1.2rem]"
+                            placement="bottom"
                           >
-                            <button onClick={() => action.onClick(row)}>
+                            <button
+                              onClick={() => action.onClick(row)}
+                              className="text-[1.6rem]"
+                            >
                               {action.icono}
                             </button>
                           </Tooltip>
