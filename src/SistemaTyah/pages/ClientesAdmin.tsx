@@ -146,7 +146,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
       },
     },
     {
-      icono: <EditIcon className="text-green-500" />,
+      icono: <EditIcon className="text-[#a22694]" />,
       texto: 'Editar',
       onClick: (row: IClientes): void => {
         setSn_Editar(true);
@@ -257,7 +257,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
 
   return (
     <>
-      {isLoading && <WaitScreen message="cargando..." />}
+      {/* {isLoading && <WaitScreen message="cargando..." />} */}
       <div className={isDarkMode ? 'dark' : ''}>
         <section className="content dark:bg-[#020405]">
           {/* contenedor */}
@@ -295,7 +295,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
               </legend>
               <div className="grid grid-cols-2 md:grid-cols-2 gap-y-4 gap-x-[2.5rem]">
                 <div className="dark:text-white">
-                  <Label className="text-[1.6rem]">Folio</Label>
+                  <Label className="text-[1.6rem] font-bold">Folio</Label>
                   <TextInput
                     type="text"
                     placeholder="Folio del Cliente"
@@ -304,12 +304,16 @@ export const ClientesAdmin = (): React.JSX.Element => {
                     onChange={(e) =>
                       setFiltros({ ...filtros, id_Cliente: e.target.value })
                     }
-                    style={{ fontSize: '1.4rem' }}
+                    style={{
+                      fontSize: '1.4rem',
+                      border: '1px solid #b9b9b9',
+                      backgroundColor: '#ffffff',
+                    }}
                     sizing="lg"
                   />
                 </div>
                 <div className="dark:text-white">
-                  <Label className="text-[1.6rem]">Nombre</Label>
+                  <Label className="text-[1.6rem] font-bold">Nombre</Label>
                   <TextInput
                     type="text"
                     placeholder="Nombre del Cliente"
@@ -318,12 +322,16 @@ export const ClientesAdmin = (): React.JSX.Element => {
                     onChange={(e) =>
                       setFiltros({ ...filtros, nb_Cliente: e.target.value })
                     }
-                    style={{ fontSize: '1.4rem' }}
+                    style={{
+                      fontSize: '1.4rem',
+                      border: '1px solid #b9b9b9',
+                      backgroundColor: '#ffffff',
+                    }}
                     sizing="lg"
                   />
                 </div>
                 <div>
-                  <Label className="text-[1.6rem] dark:text-white">
+                  <Label className="text-[1.6rem] dark:text-white font-bold">
                     Mes Cumpleaños
                   </Label>
 
@@ -336,7 +344,11 @@ export const ClientesAdmin = (): React.JSX.Element => {
                       })
                     }
                     sizing="lg"
-                    style={{ fontSize: '1.4rem' }}
+                    style={{
+                      fontSize: '1.4rem',
+                      border: '1px solid #b9b9b9',
+                      backgroundColor: '#ffffff',
+                    }}
                   >
                     <option value="01">Enero</option>
                     <option value="02">Febrero</option>
@@ -353,7 +365,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-[1.6rem] dark:text-white">
+                  <Label className="text-[1.6rem] dark:text-white font-semibold">
                     Estatus
                   </Label>
                   <Select
@@ -373,7 +385,11 @@ export const ClientesAdmin = (): React.JSX.Element => {
                       });
                     }}
                     sizing="lg"
-                    style={{ fontSize: '1.4rem' }}
+                    style={{
+                      fontSize: '1.4rem',
+                      border: '1px solid #b9b9b9',
+                      backgroundColor: '#ffffff',
+                    }}
                   >
                     <option className="dark:text-black" value="">
                       Todos

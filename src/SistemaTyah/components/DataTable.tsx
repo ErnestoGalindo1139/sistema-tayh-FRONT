@@ -134,10 +134,10 @@ export const DataTable = <T,>({
                         return (
                           <td
                             key={String(column.id)}
-                            className="p-4 border-b border-gray-300 text-center"
+                            className=" border-b border-gray-300 text-center"
                           >
                             <span
-                              className={`inline-block w-[100%] px-2 py-1 rounded-[0.3rem] text-white font-bold text-[1.6rem] ${
+                              className={`inline-block w-[80%] py-1 rounded-[0.3rem] text-white font-bold text-[1.5rem] ${
                                 cellValue ? 'bg-green-500' : 'bg-red-500'
                               }`}
                             >
@@ -235,16 +235,16 @@ export const DataTable = <T,>({
             <button
               onClick={goToFirstPage}
               disabled={currentPage === 1}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
+              className="px-2 py-1 rounded-md disabled:opacity-50 text-[1.6rem] text-white bg-[#22c5ea] w-[3rem]"
             >
               ⏮
             </button>
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
+              className="px-2 py-1 rounded-md disabled:opacity-50 text-[1.6rem] text-white bg-[#22c5ea] rotate-180"
             >
-              ⬅️
+              ➜
             </button>
             <div className="dark:text-white text-[1.6rem]">
               Página {currentPage} de {totalPages}
@@ -252,14 +252,14 @@ export const DataTable = <T,>({
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
+              className="px-2 py-1 rounded-md disabled:opacity-50 text-[1.6rem]   text-white bg-[#22c5ea]"
             >
-              ➡️
+              ➜
             </button>
             <button
               onClick={goToLastPage}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 border border-gray-300 rounded-md disabled:opacity-50 text-[1.6rem]"
+              className="px-2 py-1 rounded-md disabled:opacity-50 text-[1.6rem] text-white bg-[#22c5ea] w-[3rem]"
             >
               ⏭
             </button>
