@@ -12,7 +12,7 @@ export const WaitScreen: React.FC<WaitScreenProps> = ({
     <div className="wait-screen">
       <div className="wait-content">
         <div className="spinner"></div>
-        <p>{message}</p>
+        <p className="text-[1.6rem]">{message}</p>
       </div>
     </div>
   );

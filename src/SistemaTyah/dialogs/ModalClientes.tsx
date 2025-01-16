@@ -21,6 +21,7 @@ import {
   getClientes,
   updateClientes,
 } from '../helpers/apiClientes';
+import { Datepicker, Label, TextInput } from 'flowbite-react';
 // import { Datepicker } from 'flowbite-react';
 
 interface ModalClientesProps {
@@ -313,11 +314,16 @@ export const ModalClientes = ({
         isCentered
         motionPreset="scale"
         lockFocusAcrossFrames={true}
-        size="4xl"
+        size="w-full"
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
+        <ModalContent
+          maxWidth="1200px"
+          height="auto"
+          className="p-[1rem] mt-[4rem]"
+          style={{ marginTop: '4rem' }}
+        >
+          <ModalHeader fontSize="4xl">
             {sn_Visualizar ? 'Visualizar' : sn_Editar ? 'Editar' : 'Agregar'}{' '}
             Cliente
           </ModalHeader>
@@ -325,9 +331,9 @@ export const ModalClientes = ({
           <ModalBody pb={6}>
             <FormControl className="flex justify-center gap-4">
               <div className="w-full">
-                <FormLabel>Nombre del Cliente</FormLabel>
-                <Input
-                  isDisabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Nombre del Cliente</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={nb_ClienteRef}
                   placeholder="Nombre del cliente"
                   required
@@ -337,13 +343,16 @@ export const ModalClientes = ({
                   name="nb_Cliente"
                   value={formClientes.nb_Cliente}
                   onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${nombreValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  // className={`mb-2 w-full border ${nombreValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
               <div className="w-full">
-                <FormLabel>Dirección del Cliente</FormLabel>
-                <Input
-                  isDisabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Dirección del Cliente</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={de_DireccionRef}
                   placeholder="Dirección del Cliente"
                   required
@@ -353,13 +362,16 @@ export const ModalClientes = ({
                   name="de_Direccion"
                   value={formClientes.de_Direccion}
                   onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${direccionValida ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  // className={`mt-2 mb-2 w-full border ${direccionValida ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
               <div className="w-full">
-                <FormLabel>Correo Electrónico</FormLabel>
-                <Input
-                  isDisabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Correo Electrónico</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={de_CorreoElectronicoRef}
                   placeholder="correo@gmail.com"
                   required
@@ -369,15 +381,18 @@ export const ModalClientes = ({
                   name="de_CorreoElectronico"
                   value={formClientes.de_CorreoElectronico}
                   onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${correoValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  // className={`mt-2 mb-2 w-full border ${correoValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
             </FormControl>
             <FormControl className="flex justify-center gap-4">
               <div className="w-full">
-                <FormLabel>Teléfono Red Local</FormLabel>
-                <Input
-                  isDisabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Teléfono Red Local</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={nu_TelefonoRedLocalRef}
                   placeholder="Teléfono de red local"
                   required
@@ -386,19 +401,22 @@ export const ModalClientes = ({
                   name="nu_TelefonoRedLocal"
                   value={formClientes.nu_TelefonoRedLocal}
                   onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${
-                    telefonoRedLocalValido
-                      ? 'border-[#656ed3e1]'
-                      : 'border-red-500'
-                  } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
-                    telefonoRedLocalValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
-                  } text-black`}
+                  // className={`mt-2 mb-2 w-full border ${
+                  //   telefonoRedLocalValido
+                  //     ? 'border-[#656ed3e1]'
+                  //     : 'border-red-500'
+                  // } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
+                  //   telefonoRedLocalValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
+                  // } text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
               <div className="w-full">
-                <FormLabel>Teléfono Celular</FormLabel>
-                <Input
-                  isDisabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Teléfono Celular</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={nu_TelefonoCelularRef}
                   placeholder="Teléfono celular"
                   required
@@ -407,19 +425,22 @@ export const ModalClientes = ({
                   name="nu_TelefonoCelular"
                   value={formClientes.nu_TelefonoCelular}
                   onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${
-                    telefonoCelularValido
-                      ? 'border-[#656ed3e1]'
-                      : 'border-red-500'
-                  } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
-                    telefonoCelularValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
-                  } text-black`}
+                  // className={`mt-2 mb-2 w-full border ${
+                  //   telefonoCelularValido
+                  //     ? 'border-[#656ed3e1]'
+                  //     : 'border-red-500'
+                  // } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
+                  //   telefonoCelularValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
+                  // } text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
               <div className="w-full">
-                <FormLabel>Teléfono WhatsApp</FormLabel>
-                <Input
-                  isDisabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Teléfono WhatsApp</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={nu_TelefonoWhatsAppRef}
                   placeholder="Teléfono WhatsApp"
                   required
@@ -428,38 +449,48 @@ export const ModalClientes = ({
                   name="nu_TelefonoWhatsApp"
                   value={formClientes.nu_TelefonoWhatsApp}
                   onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${
-                    telefonoWhatsAppValido
-                      ? 'border-[#656ed3e1]'
-                      : 'border-red-500'
-                  } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
-                    telefonoWhatsAppValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
-                  } text-black`}
+                  // className={`mt-2 mb-2 w-full border ${
+                  //   telefonoWhatsAppValido
+                  //     ? 'border-[#656ed3e1]'
+                  //     : 'border-red-500'
+                  // } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
+                  //   telefonoWhatsAppValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
+                  // } text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
             </FormControl>
 
             <FormControl className="flex justify-center gap-4">
               <div className="w-full">
-                <FormLabel>Fecha de Cumpleaños Cliente</FormLabel>
-                <Input
-                  isDisabled={sn_Visualizar}
-                  ref={fh_CumpleanosRef}
+                <Label className="text-[1.6rem]">
+                  Fecha de Cumpleaños Cliente
+                </Label>
+                <Datepicker
+                  disabled={sn_Visualizar}
+                  // ref={fh_CumpleanosRef}
                   placeholder="Fecha de cumpleaños Cliente"
                   required
                   type="date"
                   id="fh_Cumpleanos"
                   name="fh_Cumpleanos"
-                  value={formClientes.fh_Cumpleanos}
-                  onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${cumpleanosValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${cumpleanosValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  // value={formClientes.fh_Cumpleanos}
+                  // onChange={handleInputChange}
+                  // className={`mt-2 mb-2 w-full border ${cumpleanosValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${cumpleanosValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  language="es-MX"
+                  style={{ fontSize: '1.4rem', height: '4rem' }}
                 />
               </div>
               <div className="w-full">
-                <FormLabel>Fecha de Cumpleaños Empresa</FormLabel>
+                <Label className="text-[1.6rem]">
+                  Fecha de Cumpleaños Empresa
+                </Label>
                 {/* <Datepicker language="es-MX" /> */}
-                <Input
-                  isDisabled={sn_Visualizar}
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={fh_CumpleanosEmpresaRef}
                   placeholder="Fecha de cumpleaños"
                   required
@@ -468,21 +499,23 @@ export const ModalClientes = ({
                   name="fh_CumpleanosEmpresa"
                   value={formClientes.fh_CumpleanosEmpresa}
                   onChange={handleInputChange}
-                  className={`mt-2 mb-2 w-full border ${cumpleanosEmpresaValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${cumpleanosEmpresaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  // className={`mt-2 mb-2 w-full border ${cumpleanosEmpresaValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${cumpleanosEmpresaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
             </FormControl>
 
             <FormControl>
               <FormLabel className="mt-4">
-                <strong className="text-xl">Redes Sociales</strong>
+                <strong className="text-[1.6rem]">Redes Sociales</strong>
               </FormLabel>
               {formClientes.redesSociales.map((red, index) => (
-                <Box key={index} className="flex gap-4 mb-2">
-                  <Input
-                    placeholder="Nombre de la Red Social (e.g., Facebook)"
+                <Box key={index} className="flex gap-4 mb-2 items-center">
+                  <TextInput
+                    placeholder="Nombre de la Red Social"
                     type="text"
-                    width="150px"
                     value={red.de_RedSocial}
                     onChange={(e) =>
                       handleRedSocialChange(
@@ -492,9 +525,12 @@ export const ModalClientes = ({
                       )
                     }
                     disabled={sn_Visualizar}
-                    className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
+                    // className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
+                    className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-shrink"
+                    style={{ fontSize: '1.4rem' }}
+                    sizing="lg"
                   />
-                  <Input
+                  <TextInput
                     placeholder="Enlace de la Red Social (e.g., https://facebook.com/usuario)"
                     type="url"
                     value={red.de_Enlace}
@@ -502,12 +538,18 @@ export const ModalClientes = ({
                       handleRedSocialChange(index, 'de_Enlace', e.target.value)
                     }
                     disabled={sn_Visualizar}
-                    className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
+                    // className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
+                    className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-1"
+                    style={{ fontSize: '1.4rem' }}
+                    sizing="lg"
                   />
                   <Button
                     colorScheme="red"
                     onClick={() => removeRedSocial(index)}
                     disabled={sn_Visualizar}
+                    className="text-[1.6rem]"
+                    fontSize="xl"
+                    size="lg"
                   >
                     Eliminar
                   </Button>
@@ -518,6 +560,8 @@ export const ModalClientes = ({
                 onClick={addRedSocial}
                 disabled={sn_Visualizar}
                 mt={4}
+                fontSize="xl"
+                size="lg"
               >
                 Agregar Red Social
               </Button>
@@ -530,10 +574,19 @@ export const ModalClientes = ({
               colorScheme="blue"
               mr={3}
               onClick={guardarCliente}
+              fontSize="2xl"
+              size="lg"
             >
               Guardar
             </Button>
-            <Button onClick={onClose}>Cancelar</Button>
+            <Button
+              onClick={onClose}
+              fontSize="2xl"
+              size="lg"
+              colorScheme="orange"
+            >
+              Cancelar
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
