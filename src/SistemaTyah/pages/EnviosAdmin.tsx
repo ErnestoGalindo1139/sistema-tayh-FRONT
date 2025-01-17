@@ -5,50 +5,29 @@ import { EditIcon } from '../icons/EditIcon';
 import { EyeIcon } from '../icons/EyeIcon';
 import { AddIcon } from '../icons/AddIcon';
 import { useDisclosure } from '@chakra-ui/react';
-// import { ModalProductos } from '../components/ModalProductos';
-// import { ModalConfirmacion } from '../components/ModalConfirmacion';
-// import { WaitScreen } from '../components/WaitScreen';
-// import { deleteProducto, getProductos } from '../helpers/apIClientess';
 import { useTheme } from '../../ThemeContext';
-// import { getCategorias } from '../helpers/apiCategorias';
-import {
-  IApiError,
-  // IFiltrosProductos,
-  // IFormCategorias,
-  IClientes,
-  IFiltrosClientes,
-} from '../interfaces/interfaces';
+import { IApiError } from '../interfaces/interfacesApi';
 import { WaitScreen } from '../components/WaitScreen';
 import { deleteClientes, getClientes } from '../helpers/apiClientes';
 import { ModalClientes } from '../dialogs/ModalClientes';
 import { ModalConfirmacion } from '../dialogs/ModalConfirmacion';
 import { RetweetIcon } from '../icons/RetweetIcon';
-import { Tooltip, Label, Select, TextInput, Button } from 'flowbite-react';
+import { Tooltip, Label, TextInput } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
+import { IEnvios, IFiltrosEnvios } from '../interfaces/interfacesEnvios';
+import { getEnvios } from '../helpers/apiEnvios';
 
 export const EnviosAdmin = (): React.JSX.Element => {
-  const [clientes, setClientes] = useState<IClientes[]>([]);
-  const [cliente, setCliente] = useState<IClientes>();
+  const [envios, setEnvios] = useState<IEnvios[]>([]);
+  const [envio, setEnvio] = useState<IEnvios>();
 
-  const [filtros, setFiltros] = useState<IFiltrosClientes>({
-    id_Cliente: '',
-    nb_Cliente: '',
+  const [filtros, setFiltros] = useState<IFiltrosEnvios>({
+    id_Envio: '',
+    nb_Destinatario: '',
     de_Direccion: '',
     de_CorreoElectronico: '',
-    de_FolioCliente: '',
-    nb_Atendio: '',
-    id_UsuarioRegistra: '',
-    id_UsuarioModifica: '',
-    id_UsuarioElimina: '',
-    fh_Cumpleanos: '',
-    fh_CumpleanosEmpresa: '',
-    nu_TelefonoRedLocal: '',
     nu_TelefonoCelular: '',
-    nu_TelefonoWhatsApp: '',
-    fh_Registro: '',
-    fh_Modificacion: '',
-    fh_Eliminacion: '',
-    sn_Activo: true,
+    de_FolioGuia: '',
   });
 
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
@@ -70,11 +49,11 @@ export const EnviosAdmin = (): React.JSX.Element => {
   } = useDisclosure();
 
   useEffect(() => {
-    const fetchClientes = async (): Promise<void> => {
+    const fetchEnvios = async (): Promise<void> => {
       try {
         setIsLoading(true);
-        const clientesData = await getClientes(filtros);
-        setClientes(clientesData.body);
+        const enviosData = await getEnvios(filtros);
+        setEnvios(enviosData.body);
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';
@@ -88,59 +67,36 @@ export const EnviosAdmin = (): React.JSX.Element => {
       }
     };
 
-    fetchClientes();
+    fetchEnvios();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchCategorias = async (): Promise<void> => {
-  //     try {
-  //       const categoriasData = await getCategorias({});
-  //       setCategorias(categoriasData.body);
-  //     } catch (error) {
-  //       const errorMessage =
-  //         (error as IApiError).message || 'Ocurrió un error desconocido';
-  //       Toast.fire({
-  //         icon: 'error',
-  //         title: 'Ocurrió un Error',
-  //         text: errorMessage,
-  //       });
-  //     }
-  //   };
-
-  //   fetchCategorias();
-  // }, []);
-
-  const columns: { id: keyof IClientes; texto: string; visible: boolean }[] = [
-    { id: 'id_Cliente', texto: 'Folio', visible: true },
-    { id: 'nb_Cliente', texto: 'Nombre del Cliente', visible: true },
-    { id: 'de_Direccion', texto: 'Dirección', visible: true },
-    { id: 'de_CorreoElectronico', texto: 'Correo', visible: false },
-    { id: 'nb_Atendio', texto: 'Precio', visible: false },
-    { id: 'id_UsuarioRegistra', texto: 'Usuario Registra', visible: false },
-    { id: 'id_UsuarioModifica', texto: 'Usuario Modifica', visible: false },
-    { id: 'id_UsuarioElimina', texto: 'Usuario Elimina', visible: false },
-    { id: 'fh_CumpleanosFormat', texto: 'Cumpleaños Cliente', visible: true },
+  const columns: {
+    id: keyof IEnvios;
+    texto: string;
+    visible: boolean;
+  }[] = [
+    { id: 'id_Envio', texto: 'Envio', visible: true },
+    { id: 'id_Cliente', texto: 'Cliente', visible: true },
+    { id: 'nb_Destinatario', texto: 'Destinatario', visible: true },
+    { id: 'de_Direccion', texto: 'Direccion', visible: true },
     {
-      id: 'fh_CumpleanosEmpresaFormat',
-      texto: 'Cumpleaños Empresa',
-      visible: true,
+      id: 'de_CorreoElectronico',
+      texto: 'CorreoElectronico',
+      visible: false,
     },
-    { id: 'fh_Registro', texto: 'Fecha Registro', visible: true },
-    { id: 'fh_Modificacion', texto: 'Fecha Modificación', visible: false },
-    { id: 'fh_Eliminacion', texto: 'Fecha Eliminación', visible: false },
-    { id: 'sn_Activo', texto: 'Activo', visible: true },
+    { id: 'nu_TelefonoCelular', texto: 'TelefonoCelular', visible: false },
   ];
 
   const actions = [
     {
       icono: <EyeIcon className="text-blue-500" />,
       texto: 'Visualizar',
-      onClick: (row: IClientes): void => {
+      onClick: (row: IEnvios): void => {
         setSn_Editar(false);
         setSn_Visualizar(true);
         limpiarCliente();
         openModal();
-        setCliente({
+        setEnvio({
           ...row,
         });
       },
@@ -148,12 +104,12 @@ export const EnviosAdmin = (): React.JSX.Element => {
     {
       icono: <EditIcon className="text-green-500" />,
       texto: 'Editar',
-      onClick: (row: IClientes): void => {
+      onClick: (row: IEnvios): void => {
         setSn_Editar(true);
         setSn_Visualizar(false);
         limpiarCliente();
         openModal();
-        setCliente({
+        setEnvio({
           ...row,
         });
       },
@@ -161,39 +117,28 @@ export const EnviosAdmin = (): React.JSX.Element => {
     {
       icono: <RetweetIcon className="text-black" />,
       texto: 'Activar / Inactivar',
-      onClick: (row: IClientes): void => {
+      onClick: (row: IEnvios): void => {
         setSn_Editar(false);
         setSn_Visualizar(false);
-        setCliente({ ...row });
+        setEnvio({ ...row });
         openConfirm();
       },
     },
   ];
 
   const limpiarCliente = (): void => {
-    setCliente({
+    setEnvio({
+      id_Envio: '',
       id_Cliente: '',
-      nb_Cliente: '',
+      nb_Destinatario: '',
       de_Direccion: '',
       de_CorreoElectronico: '',
-      de_FolioCliente: '',
-      nb_Atendio: '',
-      id_UsuarioRegistra: '',
-      id_UsuarioModifica: '',
-      id_UsuarioElimina: '',
-      fh_Cumpleanos: '',
-      fh_CumpleanosEmpresa: '',
-      redesSociales: [],
-      nu_TelefonoRedLocal: '',
       nu_TelefonoCelular: '',
-      nu_TelefonoWhatsApp: '',
-      fh_Registro: '',
-      fh_Modificacion: '',
-      fh_Eliminacion: '',
-      sn_Activo: false,
+      de_FolioGuia: '',
     });
   };
 
+  setIsLoading(true);
   const eliminarCliente = async (id_Cliente: string): Promise<void> => {
     const payload = {
       id_Cliente,
@@ -220,8 +165,8 @@ export const EnviosAdmin = (): React.JSX.Element => {
       });
 
       // Actualizar los clientes
-      const clientesData = await getClientes(filtros);
-      setClientes(clientesData.body);
+      const enviosData = await getEnvios(filtros);
+      setEnvios(enviosData.body);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -236,12 +181,13 @@ export const EnviosAdmin = (): React.JSX.Element => {
       closeConfirm();
     }
   };
+  setIsLoading(false);
 
   const buscarClientes = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const clientesData = await getClientes(filtros);
-      setClientes(clientesData.body);
+      const enviosData = await getEnvios(filtros);
+      setEnvios(enviosData.body);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -257,7 +203,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
 
   return (
     <>
-      {isLoading && <WaitScreen message="cargando..." />}
+      {/* {isLoading && <WaitScreen message="cargando..." />} */}
       <div className={isDarkMode ? 'dark' : ''}>
         <section className="content dark:bg-[#020405]">
           {/* contenedor */}
@@ -293,28 +239,31 @@ export const EnviosAdmin = (): React.JSX.Element => {
               </legend>
               <div className="grid grid-cols-2 md:grid-cols-2 gap-y-4 gap-x-[2.5rem]">
                 <div className="dark:text-white">
-                  <Label className="text-[1.6rem]">Folio</Label>
+                  <Label className="text-[1.6rem]">Destinatario</Label>
                   <TextInput
                     type="text"
-                    placeholder="Folio del Cliente"
+                    placeholder="Nombre del cliente"
                     className="dark:text-white text-[1.4rem]"
-                    value={filtros.id_Cliente}
+                    value={filtros.nb_Destinatario}
                     onChange={(e) =>
-                      setFiltros({ ...filtros, id_Cliente: e.target.value })
+                      setFiltros({
+                        ...filtros,
+                        nb_Destinatario: e.target.value,
+                      })
                     }
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
                   />
                 </div>
                 <div className="dark:text-white">
-                  <Label className="text-[1.6rem]">Nombre</Label>
+                  <Label className="text-[1.6rem]">Dirección</Label>
                   <TextInput
                     type="text"
-                    placeholder="Nombre del Cliente"
+                    placeholder="Escribe su dirección"
                     className="dark:text-white"
-                    value={filtros.nb_Cliente}
+                    value={filtros.de_Direccion}
                     onChange={(e) =>
-                      setFiltros({ ...filtros, nb_Cliente: e.target.value })
+                      setFiltros({ ...filtros, de_Direccion: e.target.value })
                     }
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
@@ -322,67 +271,60 @@ export const EnviosAdmin = (): React.JSX.Element => {
                 </div>
                 <div>
                   <Label className="text-[1.6rem] dark:text-white">
-                    Mes Cumpleaños
+                    Correo Electronico
                   </Label>
-
-                  <Select
-                    value={filtros.fh_Cumpleanos}
+                  <TextInput
+                    type="text"
+                    placeholder="Escriba un correo electronico"
+                    className="dark:text-white text-[1.4rem]"
+                    value={filtros.de_CorreoElectronico}
                     onChange={(e) =>
                       setFiltros({
                         ...filtros,
-                        fh_Cumpleanos: e.target.value,
+                        de_CorreoElectronico: e.target.value,
                       })
                     }
-                    sizing="lg"
                     style={{ fontSize: '1.4rem' }}
-                  >
-                    <option value="01">Enero</option>
-                    <option value="02">Febrero</option>
-                    <option value="03">Marzo</option>
-                    <option value="04">Abril</option>
-                    <option value="05">Mayo</option>
-                    <option value="06">Junio</option>
-                    <option value="07">Julio</option>
-                    <option value="08">Agosto</option>
-                    <option value="09">Septiembre</option>
-                    <option value="10">Octubre</option>
-                    <option value="11">Noviembre</option>
-                    <option value="12">Diciembre</option>
-                  </Select>
+                    sizing="lg"
+                  />
                 </div>
                 <div>
                   <Label className="text-[1.6rem] dark:text-white">
-                    Estatus
+                    Telefono de Red Local
                   </Label>
-                  <Select
-                    value={
-                      filtros.sn_Activo === null
-                        ? ''
-                        : filtros.sn_Activo
-                          ? '1'
-                          : '0'
-                    }
-                    className="dark:text-white"
-                    onChange={(e) => {
-                      const value = e.target.value;
+                  <TextInput
+                    type="number"
+                    placeholder="Ej. 6692884736"
+                    className="dark:text-white text-[1.4rem]"
+                    value={filtros.nu_TelefonoCelular}
+                    onChange={(e) =>
                       setFiltros({
                         ...filtros,
-                        sn_Activo: value === '' ? null : value === '1',
-                      });
-                    }}
-                    sizing="lg"
+                        nu_TelefonoCelular: e.target.value,
+                      })
+                    }
                     style={{ fontSize: '1.4rem' }}
-                  >
-                    <option className="dark:text-black" value="">
-                      Todos
-                    </option>
-                    <option className="dark:text-black" value="1">
-                      Activo
-                    </option>
-                    <option className="dark:text-black" value="0">
-                      Inactivo
-                    </option>
-                  </Select>
+                    sizing="lg"
+                  />
+                </div>
+                <div>
+                  <Label className="text-[1.6rem] dark:text-white">
+                    Telefono Celular
+                  </Label>
+                  <TextInput
+                    type="number"
+                    placeholder="Ej. 6692884736"
+                    className="dark:text-white text-[1.4rem]"
+                    value={filtros.nu_TelefonoCelular}
+                    onChange={(e) =>
+                      setFiltros({
+                        ...filtros,
+                        nu_TelefonoCelular: e.target.value,
+                      })
+                    }
+                    style={{ fontSize: '1.4rem' }}
+                    sizing="lg"
+                  />
                 </div>
               </div>
 
@@ -399,16 +341,16 @@ export const EnviosAdmin = (): React.JSX.Element => {
           </div>
 
           <div className="table-container dark:bg-transparent">
-            <DataTable data={clientes} columns={columns} actions={actions} />
+            <DataTable data={envios} columns={columns} actions={actions} />
           </div>
 
-          <ModalClientes
+          {/* <ModalClientes 
             isOpen={isModalOpen}
             onClose={closeModal}
-            actualizarClientes={setClientes}
+            actualizarClientes={setEnvios}
             row={
-              cliente
-                ? cliente
+              envio
+                ? envio
                 : {
                     id_Cliente: '',
                     nb_Cliente: '',
@@ -433,16 +375,16 @@ export const EnviosAdmin = (): React.JSX.Element => {
             }
             sn_Editar={sn_Editar}
             sn_Visualizar={sn_Visualizar}
-          />
+          /> */}
 
-          <ModalConfirmacion
+          {/* <ModalConfirmacion 
             isOpen={isConfirmOpen}
             onClose={closeConfirm}
-            onConfirm={() => eliminarCliente(cliente?.id_Cliente || '')}
-            descripcion={cliente?.nb_Cliente || ''}
+            onConfirm={() => eliminarCliente(envio?.id_Cliente || '')}
+            descripcion={envio?.nb_Cliente || ''}
             objeto="Cliente"
-            activo={cliente?.sn_Activo || false}
-          />
+            // activo={envio?.sn_Activo || false}
+          /> */}
         </section>
       </div>
     </>

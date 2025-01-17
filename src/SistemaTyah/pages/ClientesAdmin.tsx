@@ -11,13 +11,8 @@ import { useDisclosure } from '@chakra-ui/react';
 // import { deleteProducto, getProductos } from '../helpers/apIClientess';
 import { useTheme } from '../../ThemeContext';
 // import { getCategorias } from '../helpers/apiCategorias';
-import {
-  IApiError,
-  // IFiltrosProductos,
-  // IFormCategorias,
-  IClientes,
-  IFiltrosClientes,
-} from '../interfaces/interfaces';
+import { IApiError } from '../interfaces/interfacesApi';
+import { IClientes, IFiltrosClientes } from '../interfaces/interfacesClientes';
 import { WaitScreen } from '../components/WaitScreen';
 import { deleteClientes, getClientes } from '../helpers/apiClientes';
 import { ModalClientes } from '../dialogs/ModalClientes';
@@ -25,6 +20,8 @@ import { ModalConfirmacion } from '../dialogs/ModalConfirmacion';
 import { RetweetIcon } from '../icons/RetweetIcon';
 import { Tooltip, Label, Select, TextInput, Button } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
+import { eliminarClienteHelper } from '../helpers/clientes/eliminarClienteHelper';
+import { buscarClientesHelper } from '../helpers/clientes/buscarClientesHelper';
 
 export const ClientesAdmin = (): React.JSX.Element => {
   const [clientes, setClientes] = useState<IClientes[]>([]);
@@ -195,63 +192,27 @@ export const ClientesAdmin = (): React.JSX.Element => {
   };
 
   const eliminarCliente = async (id_Cliente: string): Promise<void> => {
-    const payload = {
-      id_Cliente,
-    };
-
     setIsLoading(true);
+    const clientesData = await eliminarClienteHelper(id_Cliente, filtros);
 
-    try {
-      const response = await deleteClientes(payload);
-
-      if (!response.success) {
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: response.message,
-        });
-        return;
-      }
-
-      Toast.fire({
-        icon: 'success',
-        title: 'Operación exitosa',
-        text: response.message,
-      });
-
-      // Actualizar los clientes
-      const clientesData = await getClientes(filtros);
+    if (clientesData.success) {
       setClientes(clientesData.body);
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
-      Toast.fire({
-        icon: 'error',
-        title: 'Ocurrió un Error',
-        text: errorMessage,
-      });
-    } finally {
       setIsLoading(false);
       closeConfirm();
+    } else {
+      return;
     }
   };
 
-  const buscarClientes = async (): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const clientesData = await getClientes(filtros);
+  const buscarClientes = async (filtros: IFiltrosClientes): Promise<void> => {
+    setIsLoading(false);
+    const clientesData = await buscarClientesHelper(filtros);
+
+    if (clientesData.success) {
       setClientes(clientesData.body);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      Toast.fire({
-        icon: 'error',
-        title: 'Ocurrió un Error',
-        text: errorMessage,
-      });
-    } finally {
       setIsLoading(false);
+    } else {
+      return;
     }
   };
 
@@ -410,7 +371,10 @@ export const ClientesAdmin = (): React.JSX.Element => {
                   className="text-[1.3rem]"
                   placement="bottom"
                 >
-                  <SearchIcon className="text-[#1769d8] text-[1.8rem]" />
+                  <SearchIcon
+                    className="text-[#1769d8] text-[1.8rem]"
+                    onClick={() => buscarClientes(filtros)}
+                  />
                 </Tooltip>
               </div>
             </fieldset>

@@ -1,8 +1,5 @@
-import {
-  ApiResponse,
-  IClientes,
-  IFormClientes,
-} from '../interfaces/interfaces';
+import { IClientes, IFormClientes } from '../interfaces/interfacesClientes';
+import { ApiResponse } from '../interfaces/interfacesApi';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -10,8 +7,6 @@ const BASE_URL = 'http://localhost:3000';
 export const getClientes = async (
   filtros: Partial<IClientes>
 ): Promise<ApiResponse<IClientes[]>> => {
-  console.log(filtros);
-
   try {
     const response = await fetch(`${BASE_URL}/getClientes`, {
       method: 'POST',
