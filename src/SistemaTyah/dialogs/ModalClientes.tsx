@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import Toast from '../components/Toast';
 import { WaitScreen } from '../components/WaitScreen';
-import { IApiError, IClientes, IFormClientes } from '../interfaces/interfaces';
+import { IApiError, IClientes, IFormClientes } from '../interfaces/interfacesClientes';
 import {
   createClientes,
   getClientes,
