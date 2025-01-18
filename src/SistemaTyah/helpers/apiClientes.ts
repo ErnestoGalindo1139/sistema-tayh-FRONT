@@ -29,6 +29,7 @@ export const createClientes = async (
   cliente: IFormClientes
 ): Promise<ApiResponse<IFormClientes>> => {
   try {
+    console.log(cliente);
     const response = await fetch(`${BASE_URL}/createClientes`, {
       method: 'POST',
       headers: {

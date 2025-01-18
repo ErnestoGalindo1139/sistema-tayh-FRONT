@@ -5,23 +5,19 @@ import { EditIcon } from '../icons/EditIcon';
 import { EyeIcon } from '../icons/EyeIcon';
 import { AddIcon } from '../icons/AddIcon';
 import { useDisclosure } from '@chakra-ui/react';
-// import { ModalProductos } from '../components/ModalProductos';
-// import { ModalConfirmacion } from '../components/ModalConfirmacion';
-// import { WaitScreen } from '../components/WaitScreen';
-// import { deleteProducto, getProductos } from '../helpers/apIClientess';
 import { useTheme } from '../../ThemeContext';
-// import { getCategorias } from '../helpers/apiCategorias';
 import { IApiError } from '../interfaces/interfacesApi';
 import { IClientes, IFiltrosClientes } from '../interfaces/interfacesClientes';
 import { WaitScreen } from '../components/WaitScreen';
-import { deleteClientes, getClientes } from '../helpers/apiClientes';
+import { getClientes } from '../helpers/apiClientes';
 import { ModalClientes } from '../dialogs/ModalClientes';
 import { ModalConfirmacion } from '../dialogs/ModalConfirmacion';
 import { RetweetIcon } from '../icons/RetweetIcon';
-import { Tooltip, Label, Select, TextInput, Button } from 'flowbite-react';
+import { Tooltip, Label, Select, TextInput } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
 import { eliminarClienteHelper } from '../helpers/clientes/eliminarClienteHelper';
 import { buscarClientesHelper } from '../helpers/clientes/buscarClientesHelper';
+import { mesesData } from '../data/mesesData';
 
 export const ClientesAdmin = (): React.JSX.Element => {
   const [clientes, setClientes] = useState<IClientes[]>([]);
@@ -109,7 +105,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
 
   const columns: { id: keyof IClientes; texto: string; visible: boolean }[] = [
     { id: 'id_Cliente', texto: 'Folio', visible: true },
-    { id: 'nb_Cliente', texto: 'Nombre del Cliente', visible: true },
+    { id: 'nb_Cliente', texto: 'Cliente', visible: true },
     { id: 'de_Direccion', texto: 'Dirección', visible: true },
     { id: 'de_CorreoElectronico', texto: 'Correo', visible: false },
     { id: 'nb_Atendio', texto: 'Precio', visible: false },
@@ -205,7 +201,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
   };
 
   const buscarClientes = async (filtros: IFiltrosClientes): Promise<void> => {
-    setIsLoading(false);
+    setIsLoading(true);
     const clientesData = await buscarClientesHelper(filtros);
 
     if (clientesData.success) {
@@ -218,7 +214,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
 
   return (
     <>
-      {/* {isLoading && <WaitScreen message="cargando..." />} */}
+      {isLoading && <WaitScreen message="cargando..." />}
       <div className={isDarkMode ? 'dark' : ''}>
         <section className="content dark:bg-[#020405]">
           {/* contenedor */}
@@ -311,18 +307,12 @@ export const ClientesAdmin = (): React.JSX.Element => {
                       backgroundColor: '#ffffff',
                     }}
                   >
-                    <option value="01">Enero</option>
-                    <option value="02">Febrero</option>
-                    <option value="03">Marzo</option>
-                    <option value="04">Abril</option>
-                    <option value="05">Mayo</option>
-                    <option value="06">Junio</option>
-                    <option value="07">Julio</option>
-                    <option value="08">Agosto</option>
-                    <option value="09">Septiembre</option>
-                    <option value="10">Octubre</option>
-                    <option value="11">Noviembre</option>
-                    <option value="12">Diciembre</option>
+                    <option value="">Todos</option>
+                    {mesesData.map((mes) => (
+                      <option key={mes.id} value={mes.id}>
+                        {mes.texto}
+                      </option>
+                    ))}
                   </Select>
                 </div>
                 <div>
@@ -381,7 +371,12 @@ export const ClientesAdmin = (): React.JSX.Element => {
           </div>
 
           <div className="table-container dark:bg-transparent">
-            <DataTable data={clientes} columns={columns} actions={actions} />
+            <DataTable
+              data={clientes}
+              columns={columns}
+              actions={actions}
+              initialRowsPerPage={5}
+            />
           </div>
 
           <ModalClientes
