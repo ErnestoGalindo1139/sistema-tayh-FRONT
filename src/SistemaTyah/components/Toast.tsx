@@ -26,6 +26,9 @@ class ToastComponent {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
+      customClass: {
+        popup: 'text-[1.5rem]', // Clase personalizada para el popup
+      },
       didOpen: (toast) => {
         toast.onmouseenter = Swal.stopTimer;
         toast.onmouseleave = Swal.resumeTimer;

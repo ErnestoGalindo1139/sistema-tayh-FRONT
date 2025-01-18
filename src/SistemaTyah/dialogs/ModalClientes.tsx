@@ -1,10 +1,9 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
   FormControl,
   FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -15,13 +14,14 @@ import {
 } from '@chakra-ui/react';
 import Toast from '../components/Toast';
 import { WaitScreen } from '../components/WaitScreen';
-import { IApiError, IClientes, IFormClientes } from '../interfaces/interfacesClientes';
+import { IClientes, IFormClientes } from '../interfaces/interfacesClientes';
 import {
   createClientes,
   getClientes,
   updateClientes,
 } from '../helpers/apiClientes';
 import { Datepicker, Label, TextInput } from 'flowbite-react';
+import { IApiError } from '../interfaces/interfacesApi';
 // import { Datepicker } from 'flowbite-react';
 
 interface ModalClientesProps {
@@ -71,8 +71,8 @@ export const ModalClientes = ({
     id_UsuarioRegistra: '',
     id_UsuarioModifica: '',
     id_UsuarioElimina: '',
-    fh_Cumpleanos: '',
-    fh_CumpleanosEmpresa: '',
+    fh_Cumpleanos: '2002-11-21',
+    fh_CumpleanosEmpresa: '2002-11-21',
     redesSociales: [],
     nu_TelefonoRedLocal: '',
     nu_TelefonoCelular: '',
@@ -139,8 +139,39 @@ export const ModalClientes = ({
     });
   };
 
+  const handleDateChange = (date: Date | null, fieldName: string): void => {
+    if (date) {
+      // Ajusta la fecha para evitar el desfase de zona horaria (mantener en zona local)
+      const localDate = new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000
+      ); // Ajuste de zona horaria
+
+      // Convierte la fecha a formato 'yyyy-MM-dd'
+      const formattedDate = localDate.toISOString().split('T')[0];
+
+      // Actualiza el estado del campo correspondiente
+      setFormClientes({
+        ...formClientes,
+        [fieldName]: formattedDate, // Usa el nombre del campo dinámicamente
+      });
+    } else {
+      setFormClientes({
+        ...formClientes,
+        [fieldName]: '', // Si no hay fecha seleccionada, limpia el campo correspondiente
+      });
+    }
+  };
+
+  // Convertir el string de fecha 'yyyy-MM-dd' a un objeto Date antes de pasarlo al Datepicker
+  const getDateForPicker = (dateString: string): Date | null => {
+    if (!dateString) return null; // Si no hay valor, retorna null
+    const [year, month, day] = dateString.split('-');
+    return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day) + 1)); // Convertir string 'yyyy-MM-dd' a un objeto Date ajustado a UTC
+  };
+
+  // Función para manejar otros cambios de input (no fecha)
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target;
     setFormClientes({ ...formClientes, [name]: value });
@@ -198,18 +229,6 @@ export const ModalClientes = ({
         'Correo del Cliente'
       ) ||
       !validarCampo(
-        formClientes.fh_Cumpleanos,
-        fh_CumpleanosRef,
-        setCumpleanosValido,
-        'Cumpleaños del Cliente'
-      ) ||
-      !validarCampo(
-        formClientes.fh_CumpleanosEmpresa,
-        fh_CumpleanosEmpresaRef,
-        setCumpleanosEmpresaValido,
-        'Cumpleaños de la Empresa'
-      ) ||
-      !validarCampo(
         formClientes.nu_TelefonoRedLocal,
         nu_TelefonoRedLocalRef,
         setTelefonoRedLocalValido,
@@ -226,6 +245,18 @@ export const ModalClientes = ({
         nu_TelefonoWhatsAppRef,
         setTelefonoWhatsAppValido,
         'Teléfono para WhatsApp'
+      ) ||
+      !validarCampo(
+        formClientes.fh_Cumpleanos,
+        fh_CumpleanosRef,
+        setCumpleanosValido,
+        'Cumpleaños del Cliente'
+      ) ||
+      !validarCampo(
+        formClientes.fh_CumpleanosEmpresa,
+        fh_CumpleanosEmpresaRef,
+        setCumpleanosEmpresaValido,
+        'Cumpleaños de la Empresa'
       )
     ) {
       return;
@@ -253,7 +284,7 @@ export const ModalClientes = ({
         Toast.fire({
           icon: 'error',
           title: 'Ocurrió un Error',
-          text: 'No se pudo procesar la solicitud',
+          text: response.message,
         });
         return;
       }
@@ -279,7 +310,7 @@ export const ModalClientes = ({
       });
     } finally {
       setIsLoading(false);
-      onClose(); // Cierra el modal o limpia el formulario
+      // onClose(); // Cierra el modal o limpia el formulario
     }
   };
 
@@ -329,7 +360,7 @@ export const ModalClientes = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl className="flex justify-center gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Nombre del Cliente</Label>
                 <TextInput
@@ -363,7 +394,7 @@ export const ModalClientes = ({
                   value={formClientes.de_Direccion}
                   onChange={handleInputChange}
                   // className={`mt-2 mb-2 w-full border ${direccionValida ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
                 />
@@ -382,13 +413,13 @@ export const ModalClientes = ({
                   value={formClientes.de_CorreoElectronico}
                   onChange={handleInputChange}
                   // className={`mt-2 mb-2 w-full border ${correoValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
                 />
               </div>
             </FormControl>
-            <FormControl className="flex justify-center gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Teléfono Red Local</Label>
                 <TextInput
@@ -396,7 +427,7 @@ export const ModalClientes = ({
                   ref={nu_TelefonoRedLocalRef}
                   placeholder="Teléfono de red local"
                   required
-                  type="text"
+                  type="number"
                   id="nu_TelefonoRedLocal"
                   name="nu_TelefonoRedLocal"
                   value={formClientes.nu_TelefonoRedLocal}
@@ -408,7 +439,7 @@ export const ModalClientes = ({
                   // } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
                   //   telefonoRedLocalValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
                   // } text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${telefonoRedLocalValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
                 />
@@ -420,7 +451,7 @@ export const ModalClientes = ({
                   ref={nu_TelefonoCelularRef}
                   placeholder="Teléfono celular"
                   required
-                  type="text"
+                  type="number"
                   id="nu_TelefonoCelular"
                   name="nu_TelefonoCelular"
                   value={formClientes.nu_TelefonoCelular}
@@ -432,7 +463,7 @@ export const ModalClientes = ({
                   // } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
                   //   telefonoCelularValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
                   // } text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${telefonoCelularValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
                 />
@@ -444,7 +475,7 @@ export const ModalClientes = ({
                   ref={nu_TelefonoWhatsAppRef}
                   placeholder="Teléfono WhatsApp"
                   required
-                  type="text"
+                  type="number"
                   id="nu_TelefonoWhatsApp"
                   name="nu_TelefonoWhatsApp"
                   value={formClientes.nu_TelefonoWhatsApp}
@@ -456,30 +487,28 @@ export const ModalClientes = ({
                   // } rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${
                   //   telefonoWhatsAppValido ? 'ring-[#656ed3e1]' : 'ring-red-500'
                   // } text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${telefonoWhatsAppValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
                 />
               </div>
             </FormControl>
 
-            <FormControl className="flex justify-center gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="w-full">
                 <Label className="text-[1.6rem]">
                   Fecha de Cumpleaños Cliente
                 </Label>
                 <Datepicker
                   disabled={sn_Visualizar}
-                  // ref={fh_CumpleanosRef}
                   placeholder="Fecha de cumpleaños Cliente"
+                  ref={fh_CumpleanosRef}
                   required
-                  type="date"
                   id="fh_Cumpleanos"
                   name="fh_Cumpleanos"
-                  // value={formClientes.fh_Cumpleanos}
-                  // onChange={handleInputChange}
-                  // className={`mt-2 mb-2 w-full border ${cumpleanosValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${cumpleanosValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  value={getDateForPicker(formClientes.fh_Cumpleanos)} // Convertimos el string a Date ajustado a UTC
+                  onChange={(date) => handleDateChange(date, 'fh_Cumpleanos')}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   language="es-MX"
                   style={{ fontSize: '1.4rem', height: '4rem' }}
                 />
@@ -489,20 +518,20 @@ export const ModalClientes = ({
                   Fecha de Cumpleaños Empresa
                 </Label>
                 {/* <Datepicker language="es-MX" /> */}
-                <TextInput
+                <Datepicker
                   disabled={sn_Visualizar}
+                  placeholder="Fecha de cumpleaños Empresa"
                   ref={fh_CumpleanosEmpresaRef}
-                  placeholder="Fecha de cumpleaños"
                   required
-                  type="date"
                   id="fh_CumpleanosEmpresa"
                   name="fh_CumpleanosEmpresa"
-                  value={formClientes.fh_CumpleanosEmpresa}
-                  onChange={handleInputChange}
-                  // className={`mt-2 mb-2 w-full border ${cumpleanosEmpresaValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${cumpleanosEmpresaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  style={{ fontSize: '1.4rem' }}
-                  sizing="lg"
+                  value={getDateForPicker(formClientes.fh_CumpleanosEmpresa)} // Convertimos el string a Date ajustado a UTC
+                  onChange={(date) =>
+                    handleDateChange(date, 'fh_CumpleanosEmpresa')
+                  }
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosEmpresaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                  language="es-MX"
+                  style={{ fontSize: '1.4rem', height: '4rem' }}
                 />
               </div>
             </FormControl>
@@ -512,7 +541,10 @@ export const ModalClientes = ({
                 <strong className="text-[1.6rem]">Redes Sociales</strong>
               </FormLabel>
               {formClientes.redesSociales.map((red, index) => (
-                <Box key={index} className="flex gap-4 mb-2 items-center">
+                <Box
+                  key={index}
+                  className="grid grid-cols-1 mt-[1rem] md:grid-cols-3 gap-4 md:mt-0"
+                >
                   <TextInput
                     placeholder="Nombre de la Red Social"
                     type="text"
