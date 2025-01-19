@@ -16,6 +16,7 @@ import { Tooltip, Label, TextInput } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
 import { IEnvios, IFiltrosEnvios } from '../interfaces/interfacesEnvios';
 import { getEnvios } from '../helpers/apiEnvios';
+import { ModalEnvios } from '../dialogs/ModalEnvios';
 
 export const EnviosAdmin = (): React.JSX.Element => {
   const [envios, setEnvios] = useState<IEnvios[]>([]);
@@ -27,6 +28,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
     de_Direccion: '',
     de_CorreoElectronico: '',
     nu_TelefonoCelular: '',
+    nu_TelefonoRedLocal: '',
     de_FolioGuia: '',
   });
 
@@ -74,17 +76,39 @@ export const EnviosAdmin = (): React.JSX.Element => {
     id: keyof IEnvios;
     texto: string;
     visible: boolean;
+    width: string;
   }[] = [
-    { id: 'id_Envio', texto: 'Envio', visible: true },
-    { id: 'id_Cliente', texto: 'Cliente', visible: true },
-    { id: 'nb_Destinatario', texto: 'Destinatario', visible: true },
-    { id: 'de_Direccion', texto: 'Direccion', visible: true },
+    { id: 'id_Envio', texto: 'Envio', visible: true, width: '5%' },
+    {
+      id: 'id_Cliente',
+      texto: 'Cliente',
+      visible: true,
+      width: '5%',
+    },
+    {
+      id: 'nb_Destinatario',
+      texto: 'Destinatario',
+      visible: true,
+      width: '30%',
+    },
+    {
+      id: 'de_Direccion',
+      texto: 'Direccion',
+      visible: true,
+      width: '',
+    },
     {
       id: 'de_CorreoElectronico',
       texto: 'CorreoElectronico',
       visible: false,
+      width: '',
     },
-    { id: 'nu_TelefonoCelular', texto: 'TelefonoCelular', visible: false },
+    {
+      id: 'nu_TelefonoCelular',
+      texto: 'TelefonoCelular',
+      visible: false,
+      width: '',
+    },
   ];
 
   const actions = [
@@ -100,6 +124,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
           ...row,
         });
       },
+      width: '8%',
     },
     {
       icono: <EditIcon className="text-green-500" />,
@@ -128,77 +153,15 @@ export const EnviosAdmin = (): React.JSX.Element => {
 
   const limpiarCliente = (): void => {
     setEnvio({
-      id_Envio: '',
-      id_Cliente: '',
+      id_Envio: 0,
+      id_Cliente: 0,
       nb_Destinatario: '',
       de_Direccion: '',
       de_CorreoElectronico: '',
       nu_TelefonoCelular: '',
+      nu_TelefonoRedLocal: '',
       de_FolioGuia: '',
     });
-  };
-
-  setIsLoading(true);
-  const eliminarCliente = async (id_Cliente: string): Promise<void> => {
-    const payload = {
-      id_Cliente,
-    };
-
-    setIsLoading(true);
-
-    try {
-      const response = await deleteClientes(payload);
-
-      if (!response.success) {
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: response.message,
-        });
-        return;
-      }
-
-      Toast.fire({
-        icon: 'success',
-        title: 'Operación exitosa',
-        text: response.message,
-      });
-
-      // Actualizar los clientes
-      const enviosData = await getEnvios(filtros);
-      setEnvios(enviosData.body);
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
-      Toast.fire({
-        icon: 'error',
-        title: 'Ocurrió un Error',
-        text: errorMessage,
-      });
-    } finally {
-      setIsLoading(false);
-      closeConfirm();
-    }
-  };
-  setIsLoading(false);
-
-  const buscarClientes = async (): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const enviosData = await getEnvios(filtros);
-      setEnvios(enviosData.body);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      Toast.fire({
-        icon: 'error',
-        title: 'Ocurrió un Error',
-        text: errorMessage,
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
@@ -344,46 +307,35 @@ export const EnviosAdmin = (): React.JSX.Element => {
             <DataTable data={envios} columns={columns} actions={actions} />
           </div>
 
-          {/* <ModalClientes 
+          <ModalEnvios
             isOpen={isModalOpen}
             onClose={closeModal}
-            actualizarClientes={setEnvios}
+            actualizarEnvios={setEnvios}
             row={
               envio
                 ? envio
                 : {
-                    id_Cliente: '',
-                    nb_Cliente: '',
+                    id_Envio: 0,
+                    id_Cliente: 0,
+                    nb_Destinatario: '',
                     de_Direccion: '',
                     de_CorreoElectronico: '',
-                    de_FolioCliente: '',
-                    nb_Atendio: '',
-                    id_UsuarioRegistra: '',
-                    id_UsuarioModifica: '',
-                    id_UsuarioElimina: '',
-                    fh_Cumpleanos: '',
-                    fh_CumpleanosEmpresa: '',
-                    redesSociales: [],
-                    nu_TelefonoRedLocal: '',
                     nu_TelefonoCelular: '',
-                    nu_TelefonoWhatsApp: '',
-                    fh_Registro: '',
-                    fh_Modificacion: '',
-                    fh_Eliminacion: '',
-                    sn_Activo: true,
+                    nu_TelefonoRedLocal: '',
+                    de_FolioGuia: '',
                   }
             }
             sn_Editar={sn_Editar}
             sn_Visualizar={sn_Visualizar}
-          /> */}
+          />
 
-          {/* <ModalConfirmacion 
+          {/* <ModalConfirmacion
             isOpen={isConfirmOpen}
             onClose={closeConfirm}
-            onConfirm={() => eliminarCliente(envio?.id_Cliente || '')}
-            descripcion={envio?.nb_Cliente || ''}
+            // onConfirm={() => eliminarCliente(envio?.id_Cliente || '')}
+            descripcion={envio?.nb_Destinatario || ''}
             objeto="Cliente"
-            // activo={envio?.sn_Activo || false}
+            activo={envio?.sn_Activo || false}
           /> */}
         </section>
       </div>
