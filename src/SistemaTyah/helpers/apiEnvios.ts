@@ -1,14 +1,12 @@
 import { ApiResponse } from '../interfaces/interfacesApi';
-import { IEnvios } from '../interfaces/interfacesEnvios';
+import { IEnvios, IFiltrosEnvios } from '../interfaces/interfacesEnvios';
 
 const BASE_URL = 'http://localhost:3000';
 
 // Obtener categorias
 export const getEnvios = async (
-  filtros: Partial<IEnvios>
+  filtros: Partial<IFiltrosEnvios>
 ): Promise<ApiResponse<IEnvios[]>> => {
-  console.log(filtros);
-
   try {
     const response = await fetch(`${BASE_URL}/getEnvios`, {
       method: 'POST',

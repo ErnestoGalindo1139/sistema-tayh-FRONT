@@ -9,6 +9,7 @@ interface DataTableProps<T> {
     texto: string;
     icono: React.JSX.Element;
     onClick: (row: T) => void;
+    width?: string;
   }[];
   initialRowsPerPage?: number;
 }
@@ -103,7 +104,10 @@ export const DataTable = <T,>({
               </Table.HeadCell>
             ))}
           {actions && (
-            <Table.HeadCell className="lg:text-[1.2rem] text-center lg:p-[1.8rem] bg-gray-200 p-[1rem]  text-[1rem] capitalize">
+            <Table.HeadCell
+              className="lg:text-[1.2rem] text-center lg:p-[1.8rem] bg-gray-200 p-[1rem]  text-[1rem] capitalize"
+              style={{ width: actions[0].width || 'auto' }}
+            >
               Acciones
             </Table.HeadCell>
           )}
@@ -166,7 +170,10 @@ export const DataTable = <T,>({
                     );
                   })}
                 {actions && (
-                  <Table.Cell className="py-3 px-6 text-[1.5rem]">
+                  <Table.Cell
+                    className="py-3 px-6 text-[1.5rem]"
+                    style={{ width: actions[0].width || 'auto' }}
+                  >
                     <div className="flex justify-center gap-2">
                       {actions.map((action, actionIndex) => (
                         <Tooltip
