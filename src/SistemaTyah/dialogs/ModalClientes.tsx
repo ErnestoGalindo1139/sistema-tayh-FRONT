@@ -21,10 +21,9 @@ import {
   getClientes,
   updateClientes,
 } from '../helpers/apiClientes';
-
-import { Datepicker, Label, TextInput } from 'flowbite-react';
+import { Datepicker, DatepickerRef, Label, TextInput } from 'flowbite-react';
 import { IApiError } from '../interfaces/interfacesApi';
-// import { Datepicker } from 'flowbite-react';
+import { customDatePickerTheme } from '../themes/customDatePickerTheme';
 
 interface ModalClientesProps {
   isOpen: boolean;
@@ -47,8 +46,8 @@ export const ModalClientes = ({
   const nb_ClienteRef = useRef<HTMLInputElement>(null);
   const de_DireccionRef = useRef<HTMLInputElement>(null);
   const de_CorreoElectronicoRef = useRef<HTMLInputElement>(null);
-  const fh_CumpleanosRef = useRef<HTMLInputElement>(null);
-  const fh_CumpleanosEmpresaRef = useRef<HTMLInputElement>(null);
+  const fh_CumpleanosRef = useRef<DatepickerRef>(null);
+  const fh_CumpleanosEmpresaRef = useRef<DatepickerRef>(null);
   const nu_TelefonoRedLocalRef = useRef<HTMLInputElement>(null);
   const nu_TelefonoCelularRef = useRef<HTMLInputElement>(null);
   const nu_TelefonoWhatsAppRef = useRef<HTMLInputElement>(null);
@@ -517,6 +516,7 @@ export const ModalClientes = ({
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   language="es-MX"
                   style={{ fontSize: '1.4rem', height: '4rem' }}
+                  theme={customDatePickerTheme}
                   autoHide={false}
                 />
               </div>
@@ -539,6 +539,7 @@ export const ModalClientes = ({
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosEmpresaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   language="es-MX"
                   style={{ fontSize: '1.4rem', height: '4rem' }}
+                  theme={customDatePickerTheme}
                   autoHide={false}
                 />
               </div>
