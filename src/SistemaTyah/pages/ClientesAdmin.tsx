@@ -103,25 +103,71 @@ export const ClientesAdmin = (): React.JSX.Element => {
   //   fetchCategorias();
   // }, []);
 
-  const columns: { id: keyof IClientes; texto: string; visible: boolean }[] = [
-    { id: 'id_Cliente', texto: 'Folio', visible: true },
-    { id: 'nb_Cliente', texto: 'Cliente', visible: true },
-    { id: 'de_Direccion', texto: 'Dirección', visible: true },
-    { id: 'de_CorreoElectronico', texto: 'Correo', visible: false },
-    { id: 'nb_Atendio', texto: 'Precio', visible: false },
-    { id: 'id_UsuarioRegistra', texto: 'Usuario Registra', visible: false },
-    { id: 'id_UsuarioModifica', texto: 'Usuario Modifica', visible: false },
-    { id: 'id_UsuarioElimina', texto: 'Usuario Elimina', visible: false },
-    { id: 'fh_CumpleanosFormat', texto: 'Cumpleaños Cliente', visible: true },
+  const columns: {
+    id: keyof IClientes;
+    texto: string;
+    visible: boolean;
+    width: string;
+  }[] = [
+    { id: 'id_Cliente', texto: 'Folio', visible: true, width: '5%' },
+    { id: 'nb_Cliente', texto: 'Cliente', visible: true, width: '15%' },
+    { id: 'de_Direccion', texto: 'Dirección', visible: true, width: '20%' },
+    {
+      id: 'de_CorreoElectronico',
+      texto: 'Correo',
+      visible: true,
+      width: '10%',
+    },
+    { id: 'nb_Atendio', texto: 'Precio', visible: false, width: '10%' },
+    {
+      id: 'id_UsuarioRegistra',
+      texto: 'Usuario Registra',
+      visible: false,
+      width: '10%',
+    },
+    {
+      id: 'id_UsuarioModifica',
+      texto: 'Usuario Modifica',
+      visible: false,
+      width: '10%',
+    },
+    {
+      id: 'id_UsuarioElimina',
+      texto: 'Usuario Elimina',
+      visible: false,
+      width: '10%',
+    },
+    {
+      id: 'fh_CumpleanosFormat',
+      texto: 'Cumpleaños Cliente',
+      visible: true,
+      width: '10%',
+    },
     {
       id: 'fh_CumpleanosEmpresaFormat',
       texto: 'Cumpleaños Empresa',
       visible: true,
+      width: '10%',
     },
-    { id: 'fh_Registro', texto: 'Fecha Registro', visible: true },
-    { id: 'fh_Modificacion', texto: 'Fecha Modificación', visible: false },
-    { id: 'fh_Eliminacion', texto: 'Fecha Eliminación', visible: false },
-    { id: 'sn_Activo', texto: 'Activo', visible: true },
+    {
+      id: 'fh_Registro',
+      texto: 'Fecha Registro',
+      visible: true,
+      width: '10%',
+    },
+    {
+      id: 'fh_Modificacion',
+      texto: 'Fecha Modificación',
+      visible: false,
+      width: '10%',
+    },
+    {
+      id: 'fh_Eliminacion',
+      texto: 'Fecha Eliminación',
+      visible: false,
+      width: '10%',
+    },
+    { id: 'sn_Activo', texto: 'Activo', visible: true, width: '10%' },
   ];
 
   const actions = [
@@ -355,14 +401,14 @@ export const ClientesAdmin = (): React.JSX.Element => {
                 </div>
               </div>
 
-              <div className="flex justify-end mt-[2rem] cursor-pointer">
+              <div className="flex justify-end mt-[2rem]">
                 <Tooltip
                   content="Buscar"
                   className="text-[1.3rem]"
                   placement="bottom"
                 >
                   <SearchIcon
-                    className="text-[#1769d8] text-[1.8rem]"
+                    className="text-[#1769d8] text-[1.8rem] cursor-pointer"
                     onClick={() => buscarClientes(filtros)}
                   />
                 </Tooltip>
@@ -375,7 +421,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
               data={clientes}
               columns={columns}
               actions={actions}
-              initialRowsPerPage={5}
+              initialRowsPerPage={10}
             />
           </div>
 

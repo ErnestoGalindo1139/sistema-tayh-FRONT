@@ -4,7 +4,7 @@ import { useTheme } from '../../ThemeContext';
 
 interface DataTableProps<T> {
   data: T[];
-  columns: { id: keyof T; texto: string; visible: boolean }[];
+  columns: { id: keyof T; texto: string; visible: boolean; width: string }[];
   actions?: {
     texto: string;
     icono: React.JSX.Element;
@@ -95,6 +95,7 @@ export const DataTable = <T,>({
                 key={String(column.id)}
                 className="cursor-pointer lg:text-[1.2rem] text-center lg:p-[1.8rem] bg-gray-200 p-[1rem]  text-[1rem] capitalize"
                 onClick={() => handleSort(column.id)}
+                style={{ width: column.width || 'auto' }} // Asignar el width aquí
               >
                 {column.texto}
                 {sortColumn === column.id &&
@@ -130,11 +131,13 @@ export const DataTable = <T,>({
                   .map((column) => {
                     const cellValue = row[column.id];
                     const displayValue = String(row[column.id] ?? 'N/A'); // Convertirlo siempre a string
+
                     if (column.id === 'sn_Activo') {
                       return (
                         <Table.Cell
                           key={String(column.id)}
                           className="border-b border-gray-300 text-center text-[1.5rem] p-0"
+                          style={{ width: column.width || 'auto' }} // Asignar el width aquí
                         >
                           <span
                             className={`inline-block w-[80%] py-[0.7rem] rounded-[0.3rem] text-white font-bold ${
@@ -149,12 +152,16 @@ export const DataTable = <T,>({
                     return (
                       <Table.Cell
                         key={String(column.id)}
-                        className="py-3 px-6 text-[1.5rem] text-gray-600"
+                        className="py-3 px-6 text-[1.5rem] text-gray-600 leading-[2rem]"
+                        style={{ width: column.width || 'auto' }} // Asignar el width aquí
                       >
-                        {String(column.id).startsWith('im_') &&
-                        typeof row[column.id] === 'number'
-                          ? `$${row[column.id]}`
-                          : displayValue}
+                        <Tooltip
+                          content={displayValue}
+                          placement="bottom"
+                          className="text-[1.2rem] leading-[2rem]"
+                        >
+                          <span className="leading-[2rem]">{displayValue}</span>
+                        </Tooltip>
                       </Table.Cell>
                     );
                   })}
@@ -166,6 +173,7 @@ export const DataTable = <T,>({
                           key={actionIndex}
                           content={action.texto}
                           placement="bottom"
+                          className="w-auto text-center"
                         >
                           <button
                             onClick={() => action.onClick(row)}
