@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
@@ -20,6 +21,7 @@ import {
   getClientes,
   updateClientes,
 } from '../helpers/apiClientes';
+
 import { Datepicker, Label, TextInput } from 'flowbite-react';
 import { IApiError } from '../interfaces/interfacesApi';
 // import { Datepicker } from 'flowbite-react';
@@ -228,24 +230,24 @@ export const ModalClientes = ({
         setCorreoValido,
         'Correo del Cliente'
       ) ||
-      !validarCampo(
-        formClientes.nu_TelefonoRedLocal,
-        nu_TelefonoRedLocalRef,
-        setTelefonoRedLocalValido,
-        'Teléfono de Red Local'
-      ) ||
-      !validarCampo(
-        formClientes.nu_TelefonoCelular,
-        nu_TelefonoCelularRef,
-        setTelefonoCelularValido,
-        'Teléfono Celular'
-      ) ||
-      !validarCampo(
-        formClientes.nu_TelefonoWhatsApp,
-        nu_TelefonoWhatsAppRef,
-        setTelefonoWhatsAppValido,
-        'Teléfono para WhatsApp'
-      ) ||
+      // !validarCampo(
+      //   formClientes.nu_TelefonoRedLocal,
+      //   nu_TelefonoRedLocalRef,
+      //   setTelefonoRedLocalValido,
+      //   'Teléfono de Red Local'
+      // ) ||
+      // !validarCampo(
+      //   formClientes.nu_TelefonoCelular,
+      //   nu_TelefonoCelularRef,
+      //   setTelefonoCelularValido,
+      //   'Teléfono Celular'
+      // ) ||
+      // !validarCampo(
+      //   formClientes.nu_TelefonoWhatsApp,
+      //   nu_TelefonoWhatsAppRef,
+      //   setTelefonoWhatsAppValido,
+      //   'Teléfono para WhatsApp'
+      // ) ||
       !validarCampo(
         formClientes.fh_Cumpleanos,
         fh_CumpleanosRef,
@@ -268,9 +270,9 @@ export const ModalClientes = ({
 
     setIsLoading(true);
 
-    try {
-      let response;
+    let response;
 
+    try {
       if (sn_Editar) {
         // Si es editar, llama a updateClientes
         response = await updateClientes(payload);
@@ -310,7 +312,9 @@ export const ModalClientes = ({
       });
     } finally {
       setIsLoading(false);
-      // onClose(); // Cierra el modal o limpia el formulario
+      if (response?.success) {
+        onClose(); // Cierra el modal o limpia el formulario
+      }
     }
   };
 
@@ -346,8 +350,16 @@ export const ModalClientes = ({
         motionPreset="scale"
         lockFocusAcrossFrames={true}
         size="w-full"
+        size="w-full"
       >
         <ModalOverlay />
+        <ModalContent
+          maxWidth="1200px"
+          height="auto"
+          className="p-[1rem] mt-[4rem]"
+          style={{ marginTop: '4rem' }}
+        >
+          <ModalHeader fontSize="4xl">
         <ModalContent
           maxWidth="1200px"
           height="auto"
@@ -365,6 +377,9 @@ export const ModalClientes = ({
                 <Label className="text-[1.6rem]">Nombre del Cliente</Label>
                 <TextInput
                   disabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Nombre del Cliente</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={nb_ClienteRef}
                   placeholder="Nombre del cliente"
                   required
@@ -378,9 +393,16 @@ export const ModalClientes = ({
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
+                  // className={`mb-2 w-full border ${nombreValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
                 />
               </div>
               <div className="w-full">
+                <Label className="text-[1.6rem]">Dirección del Cliente</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                 <Label className="text-[1.6rem]">Dirección del Cliente</Label>
                 <TextInput
                   disabled={sn_Visualizar}
@@ -403,6 +425,9 @@ export const ModalClientes = ({
                 <Label className="text-[1.6rem]">Correo Electrónico</Label>
                 <TextInput
                   disabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Correo Electrónico</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={de_CorreoElectronicoRef}
                   placeholder="correo@gmail.com"
                   required
@@ -421,6 +446,9 @@ export const ModalClientes = ({
             </FormControl>
             <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="w-full">
+                <Label className="text-[1.6rem]">Teléfono Red Local</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                 <Label className="text-[1.6rem]">Teléfono Red Local</Label>
                 <TextInput
                   disabled={sn_Visualizar}
@@ -448,6 +476,9 @@ export const ModalClientes = ({
                 <Label className="text-[1.6rem]">Teléfono Celular</Label>
                 <TextInput
                   disabled={sn_Visualizar}
+                <Label className="text-[1.6rem]">Teléfono Celular</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                   ref={nu_TelefonoCelularRef}
                   placeholder="Teléfono celular"
                   required
@@ -469,6 +500,9 @@ export const ModalClientes = ({
                 />
               </div>
               <div className="w-full">
+                <Label className="text-[1.6rem]">Teléfono WhatsApp</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
                 <Label className="text-[1.6rem]">Teléfono WhatsApp</Label>
                 <TextInput
                   disabled={sn_Visualizar}
@@ -507,13 +541,19 @@ export const ModalClientes = ({
                   id="fh_Cumpleanos"
                   name="fh_Cumpleanos"
                   value={getDateForPicker(formClientes.fh_Cumpleanos)} // Convertimos el string a Date ajustado a UTC
-                  onChange={(date) => handleDateChange(date, 'fh_Cumpleanos')}
+                  onChange={(date) => {
+                    handleDateChange(date, 'fh_Cumpleanos');
+                  }}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   language="es-MX"
                   style={{ fontSize: '1.4rem', height: '4rem' }}
+                  autoHide={false}
                 />
               </div>
               <div className="w-full">
+                <Label className="text-[1.6rem]">
+                  Fecha de Cumpleaños Empresa
+                </Label>
                 <Label className="text-[1.6rem]">
                   Fecha de Cumpleaños Empresa
                 </Label>
@@ -526,12 +566,13 @@ export const ModalClientes = ({
                   id="fh_CumpleanosEmpresa"
                   name="fh_CumpleanosEmpresa"
                   value={getDateForPicker(formClientes.fh_CumpleanosEmpresa)} // Convertimos el string a Date ajustado a UTC
-                  onChange={(date) =>
-                    handleDateChange(date, 'fh_CumpleanosEmpresa')
-                  }
+                  onChange={(date) => {
+                    handleDateChange(date, 'fh_CumpleanosEmpresa');
+                  }}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosEmpresaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   language="es-MX"
                   style={{ fontSize: '1.4rem', height: '4rem' }}
+                  autoHide={false}
                 />
               </div>
             </FormControl>
@@ -539,11 +580,12 @@ export const ModalClientes = ({
             <FormControl>
               <FormLabel className="mt-4">
                 <strong className="text-[1.6rem]">Redes Sociales</strong>
+                <strong className="text-[1.6rem]">Redes Sociales</strong>
               </FormLabel>
               {formClientes.redesSociales.map((red, index) => (
                 <Box
                   key={index}
-                  className="grid grid-cols-1 mt-[1rem] md:grid-cols-3 gap-4 md:mt-0"
+                  className="items-center grid grid-cols-1 mt-[1rem] md:grid-cols-[25%_60%_12%] gap-4 md:mt-[1rem]"
                 >
                   <TextInput
                     placeholder="Nombre de la Red Social"
@@ -561,7 +603,12 @@ export const ModalClientes = ({
                     className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-shrink"
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
+                    // className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
+                    className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-shrink"
+                    style={{ fontSize: '1.4rem' }}
+                    sizing="lg"
                   />
+                  <TextInput
                   <TextInput
                     placeholder="Enlace de la Red Social (e.g., https://facebook.com/usuario)"
                     type="url"
@@ -574,12 +621,16 @@ export const ModalClientes = ({
                     className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-1"
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
+                    // className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
+                    className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-1"
+                    style={{ fontSize: '1.4rem' }}
+                    sizing="lg"
                   />
                   <Button
                     colorScheme="red"
                     onClick={() => removeRedSocial(index)}
                     disabled={sn_Visualizar}
-                    className="text-[1.6rem]"
+                    className="text-[1.6rem] h-full"
                     fontSize="xl"
                     size="lg"
                   >
@@ -592,6 +643,8 @@ export const ModalClientes = ({
                 onClick={addRedSocial}
                 disabled={sn_Visualizar}
                 mt={4}
+                fontSize="xl"
+                size="lg"
                 fontSize="xl"
                 size="lg"
               >
@@ -608,8 +661,18 @@ export const ModalClientes = ({
               onClick={guardarCliente}
               fontSize="2xl"
               size="lg"
+              fontSize="2xl"
+              size="lg"
             >
               Guardar
+            </Button>
+            <Button
+              onClick={onClose}
+              fontSize="2xl"
+              size="lg"
+              colorScheme="orange"
+            >
+              Cancelar
             </Button>
             <Button
               onClick={onClose}
