@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
@@ -20,6 +21,7 @@ import {
   getClientes,
   updateClientes,
 } from '../helpers/apiClientes';
+
 import { Datepicker, Label, TextInput } from 'flowbite-react';
 import { IApiError } from '../interfaces/interfacesApi';
 // import { Datepicker } from 'flowbite-react';
@@ -228,24 +230,24 @@ export const ModalClientes = ({
         setCorreoValido,
         'Correo del Cliente'
       ) ||
-      !validarCampo(
-        formClientes.nu_TelefonoRedLocal,
-        nu_TelefonoRedLocalRef,
-        setTelefonoRedLocalValido,
-        'Teléfono de Red Local'
-      ) ||
-      !validarCampo(
-        formClientes.nu_TelefonoCelular,
-        nu_TelefonoCelularRef,
-        setTelefonoCelularValido,
-        'Teléfono Celular'
-      ) ||
-      !validarCampo(
-        formClientes.nu_TelefonoWhatsApp,
-        nu_TelefonoWhatsAppRef,
-        setTelefonoWhatsAppValido,
-        'Teléfono para WhatsApp'
-      ) ||
+      // !validarCampo(
+      //   formClientes.nu_TelefonoRedLocal,
+      //   nu_TelefonoRedLocalRef,
+      //   setTelefonoRedLocalValido,
+      //   'Teléfono de Red Local'
+      // ) ||
+      // !validarCampo(
+      //   formClientes.nu_TelefonoCelular,
+      //   nu_TelefonoCelularRef,
+      //   setTelefonoCelularValido,
+      //   'Teléfono Celular'
+      // ) ||
+      // !validarCampo(
+      //   formClientes.nu_TelefonoWhatsApp,
+      //   nu_TelefonoWhatsAppRef,
+      //   setTelefonoWhatsAppValido,
+      //   'Teléfono para WhatsApp'
+      // ) ||
       !validarCampo(
         formClientes.fh_Cumpleanos,
         fh_CumpleanosRef,
@@ -268,9 +270,9 @@ export const ModalClientes = ({
 
     setIsLoading(true);
 
-    try {
-      let response;
+    let response;
 
+    try {
       if (sn_Editar) {
         // Si es editar, llama a updateClientes
         response = await updateClientes(payload);
@@ -310,7 +312,9 @@ export const ModalClientes = ({
       });
     } finally {
       setIsLoading(false);
-      // onClose(); // Cierra el modal o limpia el formulario
+      if (response?.success) {
+        onClose(); // Cierra el modal o limpia el formulario
+      }
     }
   };
 
@@ -507,10 +511,13 @@ export const ModalClientes = ({
                   id="fh_Cumpleanos"
                   name="fh_Cumpleanos"
                   value={getDateForPicker(formClientes.fh_Cumpleanos)} // Convertimos el string a Date ajustado a UTC
-                  onChange={(date) => handleDateChange(date, 'fh_Cumpleanos')}
+                  onChange={(date) => {
+                    handleDateChange(date, 'fh_Cumpleanos');
+                  }}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   language="es-MX"
                   style={{ fontSize: '1.4rem', height: '4rem' }}
+                  autoHide={false}
                 />
               </div>
               <div className="w-full">
@@ -526,12 +533,13 @@ export const ModalClientes = ({
                   id="fh_CumpleanosEmpresa"
                   name="fh_CumpleanosEmpresa"
                   value={getDateForPicker(formClientes.fh_CumpleanosEmpresa)} // Convertimos el string a Date ajustado a UTC
-                  onChange={(date) =>
-                    handleDateChange(date, 'fh_CumpleanosEmpresa')
-                  }
+                  onChange={(date) => {
+                    handleDateChange(date, 'fh_CumpleanosEmpresa');
+                  }}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cumpleanosEmpresaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   language="es-MX"
                   style={{ fontSize: '1.4rem', height: '4rem' }}
+                  autoHide={false}
                 />
               </div>
             </FormControl>
@@ -543,7 +551,7 @@ export const ModalClientes = ({
               {formClientes.redesSociales.map((red, index) => (
                 <Box
                   key={index}
-                  className="grid grid-cols-1 mt-[1rem] md:grid-cols-3 gap-4 md:mt-0"
+                  className="items-center grid grid-cols-1 mt-[1rem] md:grid-cols-[25%_60%_12%] gap-4 md:mt-[1rem]"
                 >
                   <TextInput
                     placeholder="Nombre de la Red Social"
@@ -579,7 +587,7 @@ export const ModalClientes = ({
                     colorScheme="red"
                     onClick={() => removeRedSocial(index)}
                     disabled={sn_Visualizar}
-                    className="text-[1.6rem]"
+                    className="text-[1.6rem] h-full"
                     fontSize="xl"
                     size="lg"
                   >
