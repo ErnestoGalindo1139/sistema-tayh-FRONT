@@ -7,7 +7,11 @@ import { AddIcon } from '../icons/AddIcon';
 import { useDisclosure } from '@chakra-ui/react';
 import { useTheme } from '../../ThemeContext';
 import { IApiError } from '../interfaces/interfacesApi';
-import { IClientes, IFiltrosClientes } from '../interfaces/interfacesClientes';
+import {
+  IClientes,
+  IFiltrosClientes,
+  IRedSocial,
+} from '../interfaces/interfacesClientes';
 import { WaitScreen } from '../components/WaitScreen';
 import { getClientes } from '../helpers/apiClientes';
 import { ModalClientes } from '../dialogs/ModalClientes';
@@ -179,8 +183,21 @@ export const ClientesAdmin = (): React.JSX.Element => {
         setSn_Visualizar(true);
         limpiarCliente();
         openModal();
+
+        const redesSociales =
+          typeof row.redesSociales === 'string'
+            ? JSON.parse(row.redesSociales || '[]') // Parsear solo si es un string
+            : row.redesSociales || []; // Si es un arreglo, usarlo directamente
+
         setCliente({
           ...row,
+          redesSociales: redesSociales.map(
+            (red: IRedSocial): IRedSocial => ({
+              id_RedSocial: red.id_RedSocial?.toString() || '',
+              de_RedSocial: red.de_RedSocial,
+              de_Enlace: red.de_Enlace,
+            })
+          ),
         });
       },
     },
@@ -192,8 +209,21 @@ export const ClientesAdmin = (): React.JSX.Element => {
         setSn_Visualizar(false);
         limpiarCliente();
         openModal();
+
+        const redesSociales =
+          typeof row.redesSociales === 'string'
+            ? JSON.parse(row.redesSociales || '[]') // Parsear solo si es un string
+            : row.redesSociales || []; // Si es un arreglo, usarlo directamente
+
         setCliente({
           ...row,
+          redesSociales: redesSociales.map(
+            (red: IRedSocial): IRedSocial => ({
+              id_RedSocial: red.id_RedSocial?.toString() || '',
+              de_RedSocial: red.de_RedSocial,
+              de_Enlace: red.de_Enlace,
+            })
+          ),
         });
       },
     },
@@ -229,7 +259,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
       fh_Registro: '',
       fh_Modificacion: '',
       fh_Eliminacion: '',
-      sn_Activo: false,
+      sn_Activo: true,
     });
   };
 
@@ -456,6 +486,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
             }
             sn_Editar={sn_Editar}
             sn_Visualizar={sn_Visualizar}
+            filtros={filtros}
           />
 
           <ModalConfirmacion

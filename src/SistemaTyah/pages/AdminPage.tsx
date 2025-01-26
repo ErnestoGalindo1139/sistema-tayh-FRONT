@@ -7,6 +7,7 @@ import { Image } from '@chakra-ui/react';
 import { px } from 'framer-motion';
 import { ClientesAdmin } from './ClientesAdmin';
 import { EnviosAdmin } from './EnviosAdmin';
+import { PedidosAdmin } from './PedidosAdmin';
 
 export default function AdminPage(): React.JSX.Element {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -55,8 +56,8 @@ export default function AdminPage(): React.JSX.Element {
         return <ClientesAdmin />;
       case 3:
         return <EnviosAdmin />;
-      // case 4:
-      //   return <InventarioAdmin />;
+      case 4:
+        return <PedidosAdmin />;
       // case 5:
       //   return <PedidosAdmin />;
       // case 6:
