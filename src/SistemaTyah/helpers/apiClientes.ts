@@ -1,11 +1,15 @@
-import { IClientes, IFormClientes } from '../interfaces/interfacesClientes';
+import {
+  IClientes,
+  IFiltrosClientes,
+  IFormClientes,
+} from '../interfaces/interfacesClientes';
 import { ApiResponse } from '../interfaces/interfacesApi';
 
 const BASE_URL = 'http://localhost:3000';
 
 // Obtener categorias
 export const getClientes = async (
-  filtros: Partial<IClientes>
+  filtros: Partial<IFiltrosClientes>
 ): Promise<ApiResponse<IClientes[]>> => {
   try {
     const response = await fetch(`${BASE_URL}/getClientes`, {
@@ -99,6 +103,23 @@ export const deleteClientes = async (
     return data; // Devuelve el producto actualizado
   } catch (error) {
     console.error('Error al activar / desactivar cliente:', error);
+    throw error;
+  }
+};
+
+export const getClientesCombo = async (): Promise<ApiResponse<IClientes[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getClientes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data: ApiResponse<IClientes[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener Modelos:', error);
     throw error;
   }
 };
