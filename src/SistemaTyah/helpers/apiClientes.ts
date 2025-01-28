@@ -1,13 +1,14 @@
 import {
   IClientes,
   IFiltrosClientes,
+  IClientesCombo,
   IFormClientes,
 } from '../interfaces/interfacesClientes';
 import { ApiResponse } from '../interfaces/interfacesApi';
 
 const BASE_URL = 'http://localhost:3000';
 
-// Obtener categorias
+// Obtener clientes
 export const getClientes = async (
   filtros: Partial<IFiltrosClientes>
 ): Promise<ApiResponse<IClientes[]>> => {
@@ -107,19 +108,23 @@ export const deleteClientes = async (
   }
 };
 
-export const getClientesCombo = async (): Promise<ApiResponse<IClientes[]>> => {
+// Obtener clientes
+export const getClientesCombo = async (
+  filtros?: Partial<IClientesCombo>
+): Promise<ApiResponse<IClientesCombo[]>> => {
   try {
-    const response = await fetch(`${BASE_URL}/getClientes`, {
+    const response = await fetch(`${BASE_URL}/getClientesCombo`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
     });
 
-    const data: ApiResponse<IClientes[]> = await response.json();
+    const data: ApiResponse<IClientesCombo[]> = await response.json();
     return data;
   } catch (error) {
-    console.error('Error al obtener Modelos:', error);
+    console.error('Error al obtener el combo de clientes:', error);
     throw error;
   }
 };

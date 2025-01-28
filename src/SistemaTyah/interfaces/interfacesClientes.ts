@@ -71,3 +71,9 @@ export interface IRedSocial {
   de_RedSocial: string; // Nombre de la red social (e.g., Facebook, Twitter)
   de_Enlace: string; // Enlace a la red social
 }
+
+export interface IClientesCombo {
+  id_Cliente?: string;
+  nb_Cliente?: string;
+  sn_Activo?: boolean | null;
+}

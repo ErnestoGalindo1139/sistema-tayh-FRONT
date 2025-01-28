@@ -18,7 +18,7 @@ export const DataTable = <T,>({
   data,
   columns,
   actions,
-  initialRowsPerPage = 5,
+  initialRowsPerPage = 10,
 }: DataTableProps<T>): React.ReactElement => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
