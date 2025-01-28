@@ -1,5 +1,6 @@
 import {
   IClientes,
+  IFiltrosClientes,
   IClientesCombo,
   IFormClientes,
 } from '../interfaces/interfacesClientes';
@@ -9,7 +10,7 @@ const BASE_URL = 'http://localhost:3000';
 
 // Obtener clientes
 export const getClientes = async (
-  filtros: Partial<IClientes>
+  filtros: Partial<IFiltrosClientes>
 ): Promise<ApiResponse<IClientes[]>> => {
   try {
     const response = await fetch(`${BASE_URL}/getClientes`, {

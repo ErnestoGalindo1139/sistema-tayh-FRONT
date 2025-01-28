@@ -29,7 +29,11 @@ export const DataTable = <T,>({
 
   // Verificar si data es un array válido
   if (!Array.isArray(data)) {
-    return <div className="dark:text-white">No se encontraron datos.</div>; // O puedes lanzar un error o manejarlo de otra manera
+    return (
+      <div className="dark:text-white text-[2rem]">
+        No se encontraron datos.
+      </div>
+    ); // O puedes lanzar un error o manejarlo de otra manera
   }
   // Calcular el número total de páginas
   const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -180,7 +184,7 @@ export const DataTable = <T,>({
                           key={actionIndex}
                           content={action.texto}
                           placement="bottom"
-                          className="w-auto text-center"
+                          className="w-auto text-center text-[1.5rem] leading-[2rem]"
                         >
                           <button
                             onClick={() => action.onClick(row)}

@@ -15,7 +15,11 @@ import {
 } from '@chakra-ui/react';
 import Toast from '../components/Toast';
 import { WaitScreen } from '../components/WaitScreen';
-import { IClientes, IFormClientes } from '../interfaces/interfacesClientes';
+import {
+  IClientes,
+  IFiltrosClientes,
+  IFormClientes,
+} from '../interfaces/interfacesClientes';
 import {
   createClientes,
   getClientes,
@@ -24,6 +28,7 @@ import {
 import { Datepicker, DatepickerRef, Label, TextInput } from 'flowbite-react';
 import { IApiError } from '../interfaces/interfacesApi';
 import { customDatePickerTheme } from '../themes/customDatePickerTheme';
+import { ModalConfirmacionAgregar } from './ModalConfirmacionAgregar';
 
 interface ModalClientesProps {
   isOpen: boolean;
@@ -32,6 +37,7 @@ interface ModalClientesProps {
   row: IFormClientes;
   sn_Editar: boolean;
   sn_Visualizar: boolean;
+  filtros: IFiltrosClientes;
 }
 
 export const ModalClientes = ({
@@ -41,6 +47,7 @@ export const ModalClientes = ({
   row,
   sn_Editar,
   sn_Visualizar,
+  filtros,
 }: ModalClientesProps): React.JSX.Element => {
   // Referencias para los inputs
   const nb_ClienteRef = useRef<HTMLInputElement>(null);
@@ -52,6 +59,9 @@ export const ModalClientes = ({
   const nu_TelefonoCelularRef = useRef<HTMLInputElement>(null);
   const nu_TelefonoWhatsAppRef = useRef<HTMLInputElement>(null);
 
+  const redSocialRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const enlaceRefs = useRef<(HTMLInputElement | null)[]>([]);
+
   // Manejar Validaciones para los Iputs
   const [nombreValido, setNombreValido] = useState(true);
   const [direccionValida, setDireccionValido] = useState(true);
@@ -61,6 +71,12 @@ export const ModalClientes = ({
   const [telefonoRedLocalValido, setTelefonoRedLocalValido] = useState(true);
   const [telefonoCelularValido, setTelefonoCelularValido] = useState(true);
   const [telefonoWhatsAppValido, setTelefonoWhatsAppValido] = useState(true);
+
+  const [validacionesRedes, setValidacionesRedes] = useState<
+    { de_RedSocial: boolean; de_Enlace: boolean }[]
+  >([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [formClientes, setFormClientes] = useState<IFormClientes>({
     id_Cliente: '',
@@ -72,8 +88,8 @@ export const ModalClientes = ({
     id_UsuarioRegistra: '',
     id_UsuarioModifica: '',
     id_UsuarioElimina: '',
-    fh_Cumpleanos: '2002-11-21',
-    fh_CumpleanosEmpresa: '2002-11-21',
+    fh_Cumpleanos: '',
+    fh_CumpleanosEmpresa: '',
     redesSociales: [],
     nu_TelefonoRedLocal: '',
     nu_TelefonoCelular: '',
@@ -209,60 +225,15 @@ export const ModalClientes = ({
     }));
   };
 
-  const guardarCliente = async (): Promise<void> => {
-    if (
-      !validarCampo(
-        formClientes.nb_Cliente,
-        nb_ClienteRef,
-        setNombreValido,
-        'Nombre del Cliente'
-      ) ||
-      !validarCampo(
-        formClientes.de_Direccion,
-        de_DireccionRef,
-        setDireccionValido,
-        'Dirección del Cliente'
-      ) ||
-      !validarCampo(
-        formClientes.de_CorreoElectronico,
-        de_CorreoElectronicoRef,
-        setCorreoValido,
-        'Correo del Cliente'
-      ) ||
-      // !validarCampo(
-      //   formClientes.nu_TelefonoRedLocal,
-      //   nu_TelefonoRedLocalRef,
-      //   setTelefonoRedLocalValido,
-      //   'Teléfono de Red Local'
-      // ) ||
-      // !validarCampo(
-      //   formClientes.nu_TelefonoCelular,
-      //   nu_TelefonoCelularRef,
-      //   setTelefonoCelularValido,
-      //   'Teléfono Celular'
-      // ) ||
-      // !validarCampo(
-      //   formClientes.nu_TelefonoWhatsApp,
-      //   nu_TelefonoWhatsAppRef,
-      //   setTelefonoWhatsAppValido,
-      //   'Teléfono para WhatsApp'
-      // ) ||
-      !validarCampo(
-        formClientes.fh_Cumpleanos,
-        fh_CumpleanosRef,
-        setCumpleanosValido,
-        'Cumpleaños del Cliente'
-      ) ||
-      !validarCampo(
-        formClientes.fh_CumpleanosEmpresa,
-        fh_CumpleanosEmpresaRef,
-        setCumpleanosEmpresaValido,
-        'Cumpleaños de la Empresa'
-      )
-    ) {
-      return;
-    }
+  const abrirModalConfirmacion = (): void => {
+    setIsModalOpen(true);
+  };
 
+  const cerrarModalConfirmacion = (): void => {
+    setIsModalOpen(false);
+  };
+
+  const guardarCliente = async (): Promise<void> => {
     const payload = {
       ...formClientes,
     };
@@ -297,8 +268,8 @@ export const ModalClientes = ({
         text: response.message,
       });
 
-      // Actualizar las categorias
-      const clientesData = await getClientes({});
+      // Actualizar los clientes
+      const clientesData = await getClientes(filtros);
       actualizarClientes(clientesData.body);
     } catch (error: unknown) {
       const errorMessage =
@@ -313,8 +284,203 @@ export const ModalClientes = ({
       setIsLoading(false);
       if (response?.success) {
         onClose(); // Cierra el modal o limpia el formulario
+        cerrarModalConfirmacion();
       }
     }
+  };
+
+  // Función para validar un número de teléfono
+  const validarCorreo = (
+    correo: string,
+    ref: React.RefObject<HTMLElement>,
+    setEstadoValido: React.Dispatch<React.SetStateAction<boolean>>,
+    campoNombre: string
+  ): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(correo)) {
+      ref.current?.focus();
+      setEstadoValido(false);
+      Toast.fire({
+        icon: 'error',
+        title: `${campoNombre} Invalido`,
+        text: `Por favor Ingrese un Correo Válido`,
+      });
+      return false;
+    }
+    setEstadoValido(true);
+    return true;
+  };
+
+  // Función para validar un número de teléfono
+  const validarTelefono = (
+    numero: string,
+    ref: React.RefObject<HTMLElement>,
+    setEstadoValido: React.Dispatch<React.SetStateAction<boolean>>,
+    campoNombre: string
+  ): boolean => {
+    const telefonoRegex = /^[0-9]{7,15}$/; // Acepta solo números de 7 a 15 dígitos
+    if (!telefonoRegex.test(numero)) {
+      ref.current?.focus();
+      setEstadoValido(false);
+      Toast.fire({
+        icon: 'error',
+        title: `${campoNombre} Invalido`,
+        text: `Por favor Ingrese un Telefono Válido`,
+      });
+      return false;
+    }
+    setEstadoValido(true);
+    return true;
+  };
+
+  const validarDatosFormulario = async (): Promise<void> => {
+    if (
+      !validarCampo(
+        formClientes.nb_Cliente,
+        nb_ClienteRef,
+        setNombreValido,
+        'Nombre del Cliente'
+      ) ||
+      !validarCampo(
+        formClientes.de_Direccion,
+        de_DireccionRef,
+        setDireccionValido,
+        'Dirección del Cliente'
+      ) ||
+      !validarCampo(
+        formClientes.de_CorreoElectronico,
+        de_CorreoElectronicoRef,
+        setCorreoValido,
+        'Correo del Cliente'
+      ) ||
+      !validarCampo(
+        formClientes.fh_Cumpleanos,
+        fh_CumpleanosRef,
+        setCumpleanosValido,
+        'Cumpleaños del Cliente'
+      ) ||
+      !validarCampo(
+        formClientes.fh_CumpleanosEmpresa,
+        fh_CumpleanosEmpresaRef,
+        setCumpleanosEmpresaValido,
+        'Cumpleaños de la Empresa'
+      )
+    ) {
+      return;
+    }
+
+    // Validaciones más especificas
+
+    // Validación de Correo
+    if (
+      !validarCorreo(
+        formClientes.de_CorreoElectronico,
+        de_CorreoElectronicoRef,
+        setCorreoValido,
+        'Correo Cliente'
+      )
+    ) {
+      return;
+    }
+
+    // Telefonos en caso de contar con info
+    if (formClientes.nu_TelefonoRedLocal) {
+      if (
+        !validarTelefono(
+          formClientes.nu_TelefonoRedLocal,
+          nu_TelefonoRedLocalRef,
+          setTelefonoRedLocalValido,
+          'Telefono de Red Local'
+        )
+      ) {
+        return;
+      }
+    }
+
+    if (formClientes.nu_TelefonoCelular) {
+      if (
+        !validarTelefono(
+          formClientes.nu_TelefonoCelular,
+          nu_TelefonoCelularRef,
+          setTelefonoCelularValido,
+          'Telefono Celular'
+        )
+      ) {
+        return;
+      }
+    }
+
+    if (formClientes.nu_TelefonoWhatsApp) {
+      if (
+        !validarTelefono(
+          formClientes.nu_TelefonoWhatsApp,
+          nu_TelefonoWhatsAppRef,
+          setTelefonoWhatsAppValido,
+          'Telefono WhatsApp'
+        )
+      ) {
+        return;
+      }
+    }
+
+    let contador = 0;
+
+    for (let index = 0; index < formClientes.redesSociales.length; index++) {
+      // Validar el nombre de la red social
+      if (!formClientes.redesSociales[index].de_RedSocial) {
+        actualizarEstadoValidaciones(index, 'de_RedSocial', false);
+        redSocialRefs.current[index]?.focus();
+        Toast.fire({
+          icon: 'error',
+          title: `Nombre de la Red Social (${index + 1}) es obligatorio`,
+          text: 'Por favor, completa este campo.',
+        });
+        contador = 1;
+        break;
+      } else {
+        contador = 0;
+        actualizarEstadoValidaciones(index, 'de_RedSocial', true);
+      }
+
+      // Validar el enlace de la red social
+      if (!formClientes.redesSociales[index].de_Enlace) {
+        actualizarEstadoValidaciones(index, 'de_Enlace', false);
+        enlaceRefs.current[index]?.focus();
+        Toast.fire({
+          icon: 'error',
+          title: `Enlace de la Red Social (${index + 1}) es obligatorio`,
+          text: 'Por favor, completa este campo.',
+        });
+        contador = 1;
+        break;
+      } else {
+        contador = 0;
+        actualizarEstadoValidaciones(index, 'de_Enlace', true);
+      }
+    }
+
+    // Validar cada red social
+
+    if (!contador) {
+      abrirModalConfirmacion();
+    }
+  };
+
+  // Función para inicializar o actualizar el estado de validaciones
+  const actualizarEstadoValidaciones = (
+    index: number,
+    campo: 'de_RedSocial' | 'de_Enlace',
+    esValido: boolean
+  ): void => {
+    setValidacionesRedes((prevState) => {
+      const nuevoEstado = [...prevState];
+      if (!nuevoEstado[index]) {
+        // Inicializa el estado si no existe
+        nuevoEstado[index] = { de_RedSocial: true, de_Enlace: true };
+      }
+      nuevoEstado[index][campo] = esValido;
+      return nuevoEstado;
+    });
   };
 
   const validarCampo = (
@@ -349,9 +515,13 @@ export const ModalClientes = ({
         motionPreset="scale"
         lockFocusAcrossFrames={true}
         size="w-full"
+        closeOnOverlayClick={false}
+        closeOnEsc={false}
+        blockScrollOnMount={false}
       >
         <ModalOverlay />
         <ModalContent
+          width="65%"
           maxWidth="1200px"
           height="auto"
           className="p-[1rem] mt-[4rem]"
@@ -363,10 +533,11 @@ export const ModalClientes = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Nombre del Cliente</Label>
                 <TextInput
+                  color={`${nombreValido ? '' : 'failure'}`}
                   disabled={sn_Visualizar}
                   ref={nb_ClienteRef}
                   placeholder="Nombre del cliente"
@@ -377,6 +548,7 @@ export const ModalClientes = ({
                   name="nb_Cliente"
                   value={formClientes.nb_Cliente}
                   onChange={handleInputChange}
+                  onBlur={() => setNombreValido(true)}
                   // className={`mb-2 w-full border ${nombreValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
@@ -386,6 +558,8 @@ export const ModalClientes = ({
               <div className="w-full">
                 <Label className="text-[1.6rem]">Dirección del Cliente</Label>
                 <TextInput
+                  color={`${direccionValida ? '' : 'failure'}`}
+                  onBlur={() => setDireccionValido(true)}
                   disabled={sn_Visualizar}
                   ref={de_DireccionRef}
                   placeholder="Dirección del Cliente"
@@ -405,6 +579,8 @@ export const ModalClientes = ({
               <div className="w-full">
                 <Label className="text-[1.6rem]">Correo Electrónico</Label>
                 <TextInput
+                  color={`${correoValido ? '' : 'failure'}`}
+                  onBlur={() => setCorreoValido(true)}
                   disabled={sn_Visualizar}
                   ref={de_CorreoElectronicoRef}
                   placeholder="correo@gmail.com"
@@ -422,10 +598,12 @@ export const ModalClientes = ({
                 />
               </div>
             </FormControl>
-            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Teléfono Red Local</Label>
                 <TextInput
+                  color={`${telefonoRedLocalValido ? '' : 'failure'}`}
+                  onBlur={() => setTelefonoRedLocalValido(true)}
                   disabled={sn_Visualizar}
                   ref={nu_TelefonoRedLocalRef}
                   placeholder="Teléfono de red local"
@@ -450,6 +628,8 @@ export const ModalClientes = ({
               <div className="w-full">
                 <Label className="text-[1.6rem]">Teléfono Celular</Label>
                 <TextInput
+                  color={`${telefonoCelularValido ? '' : 'failure'}`}
+                  onBlur={() => setTelefonoCelularValido(true)}
                   disabled={sn_Visualizar}
                   ref={nu_TelefonoCelularRef}
                   placeholder="Teléfono celular"
@@ -474,6 +654,8 @@ export const ModalClientes = ({
               <div className="w-full">
                 <Label className="text-[1.6rem]">Teléfono WhatsApp</Label>
                 <TextInput
+                  color={`${telefonoWhatsAppValido ? '' : 'failure'}`}
+                  onBlur={() => setTelefonoWhatsAppValido(true)}
                   disabled={sn_Visualizar}
                   ref={nu_TelefonoWhatsAppRef}
                   placeholder="Teléfono WhatsApp"
@@ -497,16 +679,17 @@ export const ModalClientes = ({
               </div>
             </FormControl>
 
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="w-full">
                 <Label className="text-[1.6rem]">
                   Fecha de Cumpleaños Cliente
                 </Label>
                 <Datepicker
+                  // key={formClientes.fh_Cumpleanos} // Cambia la clave cuando el valor cambia
+                  color={`${cumpleanosValido ? '' : 'failure'}`}
+                  ref={fh_CumpleanosRef}
                   disabled={sn_Visualizar}
                   placeholder="Fecha de cumpleaños Cliente"
-                  ref={fh_CumpleanosRef}
-                  required
                   id="fh_Cumpleanos"
                   name="fh_Cumpleanos"
                   value={getDateForPicker(formClientes.fh_Cumpleanos)} // Convertimos el string a Date ajustado a UTC
@@ -518,6 +701,7 @@ export const ModalClientes = ({
                   style={{ fontSize: '1.4rem', height: '4rem' }}
                   theme={customDatePickerTheme}
                   autoHide={false}
+                  onBlur={() => setCumpleanosValido(true)}
                 />
               </div>
               <div className="w-full">
@@ -526,6 +710,11 @@ export const ModalClientes = ({
                 </Label>
                 {/* <Datepicker language="es-MX" /> */}
                 <Datepicker
+                  // key={
+                  //   formClientes.fh_CumpleanosEmpresa || 'fh_CumpleanosEmpresa'
+                  // } // Cambia la clave cuando el valor cambia
+                  color={`${cumpleanosEmpresaValido ? '' : 'failure'}`}
+                  onBlur={() => setCumpleanosEmpresaValido(true)}
                   disabled={sn_Visualizar}
                   placeholder="Fecha de cumpleaños Empresa"
                   ref={fh_CumpleanosEmpresaRef}
@@ -555,7 +744,9 @@ export const ModalClientes = ({
                   className="items-center grid grid-cols-1 mt-[1rem] md:grid-cols-[25%_60%_12%] gap-4 md:mt-[1rem]"
                 >
                   <TextInput
+                    ref={(el) => (redSocialRefs.current[index] = el)}
                     placeholder="Nombre de la Red Social"
+                    color={`${validacionesRedes[index]?.de_RedSocial === false ? 'failure' : ''}`}
                     type="text"
                     value={red.de_RedSocial}
                     onChange={(e) =>
@@ -566,20 +757,20 @@ export const ModalClientes = ({
                       )
                     }
                     disabled={sn_Visualizar}
-                    // className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
                     className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-shrink"
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
                   />
                   <TextInput
+                    ref={(el) => (enlaceRefs.current[index] = el)}
                     placeholder="Enlace de la Red Social (e.g., https://facebook.com/usuario)"
                     type="url"
+                    color={`${validacionesRedes[index]?.de_Enlace === false ? 'failure' : ''}`}
                     value={red.de_Enlace}
                     onChange={(e) =>
                       handleRedSocialChange(index, 'de_Enlace', e.target.value)
                     }
                     disabled={sn_Visualizar}
-                    // className="border border-gray-300 rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
                     className="rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-500 text-black flex-1"
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
@@ -596,6 +787,7 @@ export const ModalClientes = ({
                   </Button>
                 </Box>
               ))}
+
               <Button
                 colorScheme="blue"
                 onClick={addRedSocial}
@@ -614,7 +806,7 @@ export const ModalClientes = ({
               isDisabled={sn_Visualizar}
               colorScheme="blue"
               mr={3}
-              onClick={guardarCliente}
+              onClick={validarDatosFormulario}
               fontSize="2xl"
               size="lg"
             >
@@ -631,6 +823,13 @@ export const ModalClientes = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <ModalConfirmacionAgregar
+        isOpen={isModalOpen}
+        onClose={cerrarModalConfirmacion}
+        onConfirm={guardarCliente}
+        objeto="Cliente"
+      />
     </>
   );
 };
