@@ -1,5 +1,9 @@
 import { ApiResponse } from '../interfaces/interfacesApi';
-import { IEnvios, IFiltrosEnvios } from '../interfaces/interfacesEnvios';
+import {
+  IEnvios,
+  IFiltrosEnvios,
+  IFormEnvios,
+} from '../interfaces/interfacesEnvios';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -24,31 +28,31 @@ export const getEnvios = async (
   }
 };
 
-// Crear producto
-// export const createClientes = async (
-//   cliente: IFormClientes
-// ): Promise<ApiResponse<IFormClientes>> => {
-//   try {
-//     const response = await fetch(`${BASE_URL}/createClientes`, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(cliente),
-//     });
+// Crear Envio
+export const createClientes = async (
+  envio: IFormEnvios
+): Promise<ApiResponse<IFormEnvios>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/createEnvios`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(envio),
+    });
 
-//     const data: ApiResponse<IFormClientes> = await response.json();
+    const data: ApiResponse<IFormEnvios> = await response.json();
 
-//     // if (!data.success) {
-//     //   throw new Error(data.message);
-//     // }
+    // if (!data.success) {
+    //   throw new Error(data.message);
+    // }
 
-//     return data; // Devuelve el producto creado
-//   } catch (error) {
-//     console.error('Error al crear producto:', error);
-//     throw error;
-//   }
-// };
+    return data; // Devuelve el producto creado
+  } catch (error) {
+    console.error('Error al crear producto:', error);
+    throw error;
+  }
+};
 
 // Actualizar producto
 // export const updateClientes = async (

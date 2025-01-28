@@ -6,17 +6,21 @@ import { EyeIcon } from '../icons/EyeIcon';
 import { AddIcon } from '../icons/AddIcon';
 import { useDisclosure } from '@chakra-ui/react';
 import { useTheme } from '../../ThemeContext';
-import { IApiError } from '../interfaces/interfacesApi';
+import { ApiResponse, IApiError } from '../interfaces/interfacesApi';
 import { WaitScreen } from '../components/WaitScreen';
-import { deleteClientes, getClientes } from '../helpers/apiClientes';
+import { deleteClientes, getClientes, getClientesCombo } from '../helpers/apiClientes';
 import { ModalClientes } from '../dialogs/ModalClientes';
 import { ModalConfirmacion } from '../dialogs/ModalConfirmacion';
 import { RetweetIcon } from '../icons/RetweetIcon';
-import { Tooltip, Label, TextInput } from 'flowbite-react';
+import { Tooltip, Label, Select } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
 import { IEnvios, IFiltrosEnvios } from '../interfaces/interfacesEnvios';
 import { getEnvios } from '../helpers/apiEnvios';
 import { ModalEnvios } from '../dialogs/ModalEnvios';
+import { useForm } from '../hooks/useForm';
+import { CustomInput } from '../components/custom/CustomInput';
+import { IClientesCombo } from '../interfaces/interfacesClientes';
+import { CustomSelect } from '../components/custom/CustomSelect';
 
 export const EnviosAdmin = (): React.JSX.Element => {
   const [envios, setEnvios] = useState<IEnvios[]>([]);
@@ -32,10 +36,22 @@ export const EnviosAdmin = (): React.JSX.Element => {
     de_FolioGuia: '',
   });
 
+  const { formState, setFormState, onInputChange, onResetForm } = useForm({
+    id_Envio: '',
+    id_Cliente: '',
+    nb_Destinatario: '',
+    de_Direccion: '',
+    de_CorreoElectronico: '',
+    nu_TelefonoCelular: '',
+    nu_TelefonoRedLocal: '',
+    de_FolioGuia: '',
+  });
+
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
   const [sn_Visualizar, setSn_Visualizar] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [clientesCombo, setClientesCombo] = useState<IClientesCombo[]>([]);
 
   const { isDarkMode } = useTheme();
 
@@ -54,7 +70,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
     const fetchEnvios = async (): Promise<void> => {
       try {
         setIsLoading(true);
-        const enviosData = await getEnvios(filtros);
+        const enviosData = await getEnvios(formState);
         setEnvios(enviosData.body);
       } catch (error) {
         const errorMessage =
@@ -69,7 +85,23 @@ export const EnviosAdmin = (): React.JSX.Element => {
       }
     };
 
+    const fetchClientesCombo = async (): Promise<void> => {
+      try {
+        const arregloCombo = await getClientesCombo({ sn_Activo: true });
+        setClientesCombo(arregloCombo.body);
+      } catch (error) {
+        const errorMessage =
+          (error as IApiError).message || 'Ocurrió un error desconocido';
+        Toast.fire({
+          icon: 'error',
+          title: 'Ocurrió un Error',
+          text: errorMessage,
+        });
+      }
+    };
+
     fetchEnvios();
+    fetchClientesCombo();
   }, []);
 
   const columns: {
@@ -166,7 +198,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
 
   return (
     <>
-      {/* {isLoading && <WaitScreen message="cargando..." />} */}
+      {isLoading && <WaitScreen message="cargando..." />}
       <div className={isDarkMode ? 'dark' : ''}>
         <section className="content dark:bg-[#020405]">
           {/* contenedor */}
@@ -202,32 +234,29 @@ export const EnviosAdmin = (): React.JSX.Element => {
               </legend>
               <div className="grid grid-cols-2 md:grid-cols-2 gap-y-4 gap-x-[2.5rem]">
                 <div className="dark:text-white">
-                  <Label className="text-[1.6rem]">Destinatario</Label>
-                  <TextInput
-                    type="text"
-                    placeholder="Nombre del cliente"
-                    className="dark:text-white text-[1.4rem]"
-                    value={filtros.nb_Destinatario}
-                    onChange={(e) =>
-                      setFiltros({
-                        ...filtros,
-                        nb_Destinatario: e.target.value,
-                      })
-                    }
-                    style={{ fontSize: '1.4rem' }}
-                    sizing="lg"
-                  />
+                  <Label className="text-[1.6rem]">Cliente</Label>
+                  <CustomSelect>
+                    <option value="">Seleccionar</option>
+                    {clientesCombo.map((cliente) => (
+                      <option
+                        key={cliente.id_Cliente}
+                        value={cliente.id_Cliente}
+                      >
+                        {cliente.nb_Cliente}
+                      </option>
+                    ))}
+                  </CustomSelect>
                 </div>
                 <div className="dark:text-white">
                   <Label className="text-[1.6rem]">Dirección</Label>
-                  <TextInput
+                  <CustomInput
                     type="text"
                     placeholder="Escribe su dirección"
-                    className="dark:text-white"
-                    value={filtros.de_Direccion}
-                    onChange={(e) =>
-                      setFiltros({ ...filtros, de_Direccion: e.target.value })
-                    }
+                    className=""
+                    id="de_Direccion"
+                    value={formState.de_Direccion}
+                    name="de_Direccion"
+                    onChange={onInputChange}
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
                   />
@@ -236,17 +265,14 @@ export const EnviosAdmin = (): React.JSX.Element => {
                   <Label className="text-[1.6rem] dark:text-white">
                     Correo Electronico
                   </Label>
-                  <TextInput
+                  <CustomInput
                     type="text"
                     placeholder="Escriba un correo electronico"
-                    className="dark:text-white text-[1.4rem]"
-                    value={filtros.de_CorreoElectronico}
-                    onChange={(e) =>
-                      setFiltros({
-                        ...filtros,
-                        de_CorreoElectronico: e.target.value,
-                      })
-                    }
+                    className="text-[1.4rem]"
+                    id="de_CorreoElectronico"
+                    value={formState.de_CorreoElectronico}
+                    name="de_CorreoElectronico"
+                    onChange={onInputChange}
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
                   />
@@ -255,17 +281,14 @@ export const EnviosAdmin = (): React.JSX.Element => {
                   <Label className="text-[1.6rem] dark:text-white">
                     Telefono de Red Local
                   </Label>
-                  <TextInput
+                  <CustomInput
                     type="number"
                     placeholder="Ej. 6692884736"
-                    className="dark:text-white text-[1.4rem]"
-                    value={filtros.nu_TelefonoCelular}
-                    onChange={(e) =>
-                      setFiltros({
-                        ...filtros,
-                        nu_TelefonoCelular: e.target.value,
-                      })
-                    }
+                    className="text-[1.4rem]"
+                    id="nu_TelefonoRedLocal"
+                    value={formState.nu_TelefonoRedLocal}
+                    name="nu_TelefonoRedLocal"
+                    onChange={onInputChange}
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
                   />
@@ -274,17 +297,14 @@ export const EnviosAdmin = (): React.JSX.Element => {
                   <Label className="text-[1.6rem] dark:text-white">
                     Telefono Celular
                   </Label>
-                  <TextInput
+                  <CustomInput
                     type="number"
                     placeholder="Ej. 6692884736"
-                    className="dark:text-white text-[1.4rem]"
-                    value={filtros.nu_TelefonoCelular}
-                    onChange={(e) =>
-                      setFiltros({
-                        ...filtros,
-                        nu_TelefonoCelular: e.target.value,
-                      })
-                    }
+                    className="text-[1.4rem]"
+                    id="nu_TelefonoCelular"
+                    value={formState.nu_TelefonoCelular}
+                    name="nu_TelefonoCelular"
+                    onChange={onInputChange}
                     style={{ fontSize: '1.4rem' }}
                     sizing="lg"
                   />

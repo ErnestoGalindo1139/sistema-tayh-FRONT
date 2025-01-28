@@ -19,6 +19,7 @@ import { Label, TextInput } from 'flowbite-react';
 import { IApiError } from '../interfaces/interfacesApi';
 import { IEnvios, IFormEnvios } from '../interfaces/interfacesEnvios';
 import { getEnvios } from '../helpers/apiEnvios';
+import { useForm } from '../hooks/useForm';
 
 interface ModalEnviosProps {
   isOpen: boolean;
@@ -38,10 +39,12 @@ export const ModalEnvios = ({
   sn_Visualizar,
 }: ModalEnviosProps): React.JSX.Element => {
   // Referencias para los inputs
-  const nb_ClienteRef = useRef<HTMLInputElement>(null);
+  const nb_DestinatarioRef = useRef<HTMLInputElement>(null);
   const de_DireccionRef = useRef<HTMLInputElement>(null);
   const de_CorreoElectronicoRef = useRef<HTMLInputElement>(null);
+  const nu_TelefonoCelularRef = useRef<HTMLInputElement>(null);
   const nu_TelefonoRedLocalRef = useRef<HTMLInputElement>(null);
+  const de_FolioGuiaRef = useRef<HTMLInputElement>(null);
 
   // Manejar Validaciones para los Iputs
   const [nombreValido, setNombreValido] = useState(true);
@@ -85,7 +88,7 @@ export const ModalEnvios = ({
   // Limpiar Formulario
   useEffect(() => {
     if (isOpen) {
-      limpiarFormulario();
+      onResetForm();
       setFormEnvios({
         ...row,
       });
@@ -112,11 +115,11 @@ export const ModalEnvios = ({
     return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day) + 1)); // Convertir string 'yyyy-MM-dd' a un objeto Date ajustado a UTC
   };
 
-  // const guardarCliente = async (): Promise<void> => {
+  // const guardarEnvio = async (): Promise<void> => {
   //   if (
   //     !validarCampo(
-  //       formEnvios.nb_Cliente,
-  //       nb_ClienteRef,
+  //       formEnvios.nb_Destinatario,
+  //       nb_DestinatarioRef,
   //       setNombreValido,
   //       'Nombre del Cliente'
   //     ) ||
@@ -129,6 +132,24 @@ export const ModalEnvios = ({
   //     !validarCampo(
   //       formEnvios.de_CorreoElectronico,
   //       de_CorreoElectronicoRef,
+  //       setCorreoValido,
+  //       'Correo del Cliente'
+  //     ) ||
+  //     !validarCampo(
+  //       formEnvios.nu_TelefonoCelular,
+  //       nu_TelefonoCelularRef,
+  //       setCorreoValido,
+  //       'Correo del Cliente'
+  //     ) ||
+  //     !validarCampo(
+  //       formEnvios.nu_TelefonoRedLocal,
+  //       de_CorreoElectronicoRef,
+  //       setCorreoValido,
+  //       'Correo del Cliente'
+  //     ) ||
+  //     !validarCampo(
+  //       formEnvios.de_FolioGuia,
+  //       de_FolioGuiaRef,
   //       setCorreoValido,
   //       'Correo del Cliente'
   //     )
@@ -150,7 +171,7 @@ export const ModalEnvios = ({
   //       response = await updateClientes(payload);
   //     } else {
   //       // Si es crear, llama a createClientes
-  //       response = await createClientes(payload);
+  //       response = await createEnvios(payload);
   //     }
 
   //     // Si la respuesta no es exitosa, mostrar un error
@@ -198,6 +219,26 @@ export const ModalEnvios = ({
     setFormEnvios({ ...formEnvios, [name]: value });
   };
 
+  const { setFormState, onInputChange, onResetForm } = useForm<{
+    id_Envio: number;
+    id_Cliente: number;
+    nb_Destinatario: string;
+    de_Direccion: string;
+    de_CorreoElectronico: string;
+    nu_TelefonoCelular: string;
+    nu_TelefonoRedLocal: string;
+    de_FolioGuia: string;
+  }>({
+    id_Envio: 0,
+    id_Cliente: 0,
+    nb_Destinatario: '',
+    de_Direccion: '',
+    de_CorreoElectronico: '',
+    nu_TelefonoCelular: '',
+    nu_TelefonoRedLocal: '',
+    de_FolioGuia: '',
+  });
+
   const validarCampo = (
     campo: string | number,
     ref: React.RefObject<HTMLElement>,
@@ -222,7 +263,7 @@ export const ModalEnvios = ({
     <>
       {isLoading && <WaitScreen message="Guardando..." />}
       <Modal
-        initialFocusRef={nb_ClienteRef}
+        // initialFocusRef={nb_ClienteRef}
         // finalFocusRef={finalRef}
         isOpen={isOpen}
         onClose={onClose}
@@ -244,12 +285,12 @@ export const ModalEnvios = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-[1rem]">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Nombre del Destinatario</Label>
                 <TextInput
                   disabled={sn_Visualizar}
-                  ref={nb_ClienteRef}
+                  // ref={nb_ClienteRef}
                   placeholder="Nombre del Destinatario"
                   required
                   type="text"
@@ -257,7 +298,7 @@ export const ModalEnvios = ({
                   id="nb_Destinatario"
                   name="nb_Destinatario"
                   value={formEnvios.nb_Destinatario}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mb-2 w-full border ${nombreValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
@@ -278,7 +319,7 @@ export const ModalEnvios = ({
                   id="de_Direccion"
                   name="de_Direccion"
                   value={formEnvios.de_Direccion}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${direccionValida ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
@@ -286,7 +327,7 @@ export const ModalEnvios = ({
                 />
               </div>
             </FormControl>
-            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-[1rem]">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Correo Electrónico</Label>
                 <TextInput
@@ -299,13 +340,35 @@ export const ModalEnvios = ({
                   id="de_CorreoElectronico"
                   name="de_CorreoElectronico"
                   value={formEnvios.de_CorreoElectronico}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${correoValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
                 />
               </div>
+              <div className="w-full">
+                <Label className="text-[1.6rem]">Folio guia</Label>
+                <TextInput
+                  disabled={sn_Visualizar}
+                  ref={de_DireccionRef}
+                  placeholder="Dirección del Envio"
+                  required
+                  type="text"
+                  autoComplete="off"
+                  id="de_Direccion"
+                  name="de_Direccion"
+                  value={formEnvios.de_Direccion}
+                  onChange={onInputChange}
+                  // className={`mt-2 mb-2 w-full border ${direccionValida ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
+                  style={{ fontSize: '1.4rem' }}
+                  sizing="lg"
+                />
+              </div>
+            </FormControl>
+
+            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Teléfono Celular</Label>
                 <TextInput
@@ -314,10 +377,10 @@ export const ModalEnvios = ({
                   placeholder="Teléfono de Celular"
                   required
                   type="number"
-                  id="nu_TelefonoRedLocal"
-                  name="nu_TelefonoRedLocal"
+                  id="nu_TelefonoCelular"
+                  name="nu_TelefonoCelular"
                   value={formEnvios.nu_TelefonoCelular}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${
                   //   telefonoRedLocalValido
                   //     ? 'border-[#656ed3e1]'
@@ -341,7 +404,7 @@ export const ModalEnvios = ({
                   id="nu_TelefonoRedLocal"
                   name="nu_TelefonoRedLocal"
                   value={formEnvios.nu_TelefonoRedLocal}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${
                   //   telefonoRedLocalValido
                   //     ? 'border-[#656ed3e1]'
@@ -355,28 +418,6 @@ export const ModalEnvios = ({
                 />
               </div>
             </FormControl>
-
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="w-full">
-                <Label className="text-[1.6rem]">Folio guia</Label>
-                <TextInput
-                  disabled={sn_Visualizar}
-                  ref={de_DireccionRef}
-                  placeholder="Dirección del Envio"
-                  required
-                  type="text"
-                  autoComplete="off"
-                  id="de_Direccion"
-                  name="de_Direccion"
-                  value={formEnvios.de_Direccion}
-                  onChange={handleInputChange}
-                  // className={`mt-2 mb-2 w-full border ${direccionValida ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  style={{ fontSize: '1.4rem' }}
-                  sizing="lg"
-                />
-              </div>
-            </FormControl>
           </ModalBody>
 
           <ModalFooter>
@@ -384,7 +425,7 @@ export const ModalEnvios = ({
               isDisabled={sn_Visualizar}
               colorScheme="blue"
               mr={3}
-              // onClick={guardarCliente}
+              // onClick={guardarEnvio}
               fontSize="2xl"
               size="lg"
             >
