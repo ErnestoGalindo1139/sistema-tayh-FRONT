@@ -113,3 +113,12 @@ export interface IViaContactoCombo {
   id_ViaContacto: number;
   de_ViaContacto: string;
 }
+
+export interface IEspecificacionesPedidos {
+  id_Especificacion: number;
+  de_Especificacion: string;
+  nu_Especificacion: number;
+  id_Modelo: number;
+  id_Talla: number;
+  de_Genero: string;
+}
