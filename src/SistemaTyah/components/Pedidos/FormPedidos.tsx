@@ -37,7 +37,7 @@ import { calcularPrecioUnitarioHelper } from '../../helpers/pedidos/calcularPrec
 import { Button } from '@chakra-ui/react';
 import { ModalConfirmacionAgregar } from '../../dialogs/ModalConfirmacionAgregar';
 import { getClientesCombo } from '../../helpers/apiClientes';
-import { IClientes } from '../../interfaces/interfacesClientes';
+import { IClientesCombo } from '../../interfaces/interfacesClientes';
 import { WaitScreen } from '../WaitScreen';
 import { IEstatus } from '../../interfaces/interfacesEstatus';
 
@@ -68,7 +68,7 @@ export const FormPedidos = ({
     ...row,
   });
 
-  const [clientes, setClientes] = useState<IClientes[]>([]);
+  const [clientes, setClientes] = useState<IClientesCombo[]>([]);
   const [viasContacto, setViasContacto] = useState<IViaContactoCombo[]>([]);
   const [modelos, setModelos] = useState<IModelos[]>([]);
   const [tallas, setTallas] = useState<ITallas[]>([]);
