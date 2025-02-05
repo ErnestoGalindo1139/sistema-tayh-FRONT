@@ -4,7 +4,14 @@ import { useTheme } from '../../ThemeContext';
 
 interface DataTableProps<T> {
   data: T[];
-  columns: { id: keyof T; texto: string; visible: boolean; width: string }[];
+  columns: {
+    id: keyof T;
+    texto: string;
+    visible: boolean;
+    width: string;
+    bgColor?: string;
+    textAlign?: string;
+  }[];
   actions?: {
     texto: string;
     icono: React.JSX.Element;
@@ -139,6 +146,26 @@ export const DataTable = <T,>({
                   .map((column) => {
                     const cellValue = row[column.id];
                     const displayValue = String(row[column.id] ?? 'N/A'); // Convertirlo siempre a string
+                    const bgColorRow =
+                      column.bgColor && typeof column.bgColor === 'string'
+                        ? String(row[column.bgColor as keyof T] ?? '')
+                        : ''; // Convertirlo siempre a string
+                    const textAlignRow = column.textAlign
+                      ? column.textAlign
+                      : '';
+
+                    let classTextAlign;
+                    switch (textAlignRow) {
+                      case 'center':
+                        classTextAlign = 'textCenterTable';
+                        break;
+                      case 'left':
+                        classTextAlign = 'textLeftTable';
+                        break;
+                      case 'right':
+                        classTextAlign = 'textRightTable';
+                        break;
+                    }
 
                     if (column.id === 'sn_Activo') {
                       return (
@@ -160,15 +187,27 @@ export const DataTable = <T,>({
                     return (
                       <Table.Cell
                         key={String(column.id)}
-                        className="py-3 px-6 text-[1.5rem] text-gray-600 leading-[2rem]"
-                        style={{ width: column.width || 'auto' }} // Asignar el width aquí
+                        className="text-[1.5rem] text-gray-600 leading-[2rem] px-6"
+                        style={{
+                          width: column.width || 'auto',
+                        }} // Asignar el width aquí
                       >
                         <Tooltip
                           content={displayValue}
                           placement="bottom"
                           className="text-[1.2rem] leading-[2rem]"
                         >
-                          <span className="leading-[2rem]">{displayValue}</span>
+                          <span
+                            className={`leading-[2rem] ${textAlignRow ? classTextAlign : ''}`}
+                            style={{
+                              backgroundColor: `${bgColorRow ? `${bgColorRow}` : ''}`,
+                              color: `${bgColorRow ? '#FFF' : ''}`,
+                              padding: `${bgColorRow ? '.6rem' : ''}`,
+                              borderRadius: `${bgColorRow ? '.4rem' : ''}`,
+                            }}
+                          >
+                            {displayValue}
+                          </span>
                         </Tooltip>
                       </Table.Cell>
                     );
