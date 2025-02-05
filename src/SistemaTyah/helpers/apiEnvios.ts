@@ -5,7 +5,7 @@ import {
   IFormEnvios,
 } from '../interfaces/interfacesEnvios';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://77.243.85.134:3000';
 
 // Obtener categorias
 export const getEnvios = async (

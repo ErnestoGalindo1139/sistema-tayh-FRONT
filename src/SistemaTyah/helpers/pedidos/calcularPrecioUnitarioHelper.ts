@@ -1,7 +1,7 @@
 import { ApiResponse } from '../../interfaces/interfacesApi';
 import { IFormPedidos } from '../../interfaces/interfacesPedidos';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://77.243.85.134:3000';
 
 export const calcularPrecioUnitarioHelper = async (
   payload: Partial<IFormPedidos>
