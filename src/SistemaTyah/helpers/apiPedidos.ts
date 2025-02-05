@@ -1,6 +1,7 @@
 import { ApiResponse } from '../interfaces/interfacesApi';
 import {
   IColores,
+  IEspecificacionesPedidos,
   IFiltrosPedidos,
   IFormDetallesPedidos,
   IFormPedidos,
@@ -216,6 +217,28 @@ export const getTipoPrendas = async (): Promise<
     return data;
   } catch (error) {
     console.error('Error al obtener Tipo Prendas:', error);
+    throw error;
+  }
+};
+
+export const getEspecificacionesPedidos = async (
+  filtros: Partial<IEspecificacionesPedidos>
+): Promise<ApiResponse<IEspecificacionesPedidos[]>> => {
+  try {
+    console.log(filtros);
+
+    const response = await fetch(`${BASE_URL}/getEspecificacionesPedidos`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IEspecificacionesPedidos[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener Especificaciones del Pedido:', error);
     throw error;
   }
 };
