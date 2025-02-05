@@ -6,45 +6,44 @@ import { EyeIcon } from '../icons/EyeIcon';
 import { AddIcon } from '../icons/AddIcon';
 import { useDisclosure } from '@chakra-ui/react';
 import { useTheme } from '../../ThemeContext';
-import { ApiResponse, IApiError } from '../interfaces/interfacesApi';
+import { IApiError } from '../interfaces/interfacesApi';
 import { WaitScreen } from '../components/WaitScreen';
-import { deleteClientes, getClientes, getClientesCombo } from '../helpers/apiClientes';
-import { ModalClientes } from '../dialogs/ModalClientes';
-import { ModalConfirmacion } from '../dialogs/ModalConfirmacion';
+import { getClientesCombo } from '../helpers/apiClientes';
 import { RetweetIcon } from '../icons/RetweetIcon';
-import { Tooltip, Label, Select } from 'flowbite-react';
+import { Tooltip, Label } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
-import { IEnvios, IFiltrosEnvios } from '../interfaces/interfacesEnvios';
+import {
+  IEnvios,
+  IFiltrosEnvios,
+  IFormEnvios,
+} from '../interfaces/interfacesEnvios';
 import { getEnvios } from '../helpers/apiEnvios';
 import { ModalEnvios } from '../dialogs/ModalEnvios';
 import { useForm } from '../hooks/useForm';
 import { CustomInput } from '../components/custom/CustomInput';
 import { IClientesCombo } from '../interfaces/interfacesClientes';
+import { CustomMultiSelect } from '../components/custom/CustomMultiSelect';
+import { buscarEnviosHelper } from '../helpers/envios/buscarEnviosHelper';
+import { ModalCancelacionEstatus } from '../dialogs/ModalCancelacionEstatus';
+import { eliminarEnvioHelper } from '../helpers/envios/eliminarEnvioHelper';
 import { CustomSelect } from '../components/custom/CustomSelect';
+import { IEstatus } from '../interfaces/interfacesEstatus';
+import { getEstatus } from '../helpers/apiEstatus';
 
 export const EnviosAdmin = (): React.JSX.Element => {
   const [envios, setEnvios] = useState<IEnvios[]>([]);
   const [envio, setEnvio] = useState<IEnvios>();
 
-  const [filtros, setFiltros] = useState<IFiltrosEnvios>({
-    id_Envio: '',
-    nb_Destinatario: '',
-    de_Direccion: '',
-    de_CorreoElectronico: '',
-    nu_TelefonoCelular: '',
-    nu_TelefonoRedLocal: '',
-    de_FolioGuia: '',
-  });
-
   const { formState, setFormState, onInputChange, onResetForm } = useForm({
     id_Envio: '',
     id_Cliente: '',
-    nb_Destinatario: '',
+    clientes: '',
     de_Direccion: '',
     de_CorreoElectronico: '',
     nu_TelefonoCelular: '',
     nu_TelefonoRedLocal: '',
     de_FolioGuia: '',
+    id_Estatus: '',
   });
 
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
@@ -52,6 +51,10 @@ export const EnviosAdmin = (): React.JSX.Element => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [clientesCombo, setClientesCombo] = useState<IClientesCombo[]>([]);
+  const [estatusEnvios, setEstatusEnvios] = useState<IEstatus[]>([]);
+  const [estatusEnviosFormulario, setEstatusEnviosFormulario] = useState<
+    IEstatus[]
+  >([]);
 
   const { isDarkMode } = useTheme();
 
@@ -87,8 +90,24 @@ export const EnviosAdmin = (): React.JSX.Element => {
 
     const fetchClientesCombo = async (): Promise<void> => {
       try {
-        const arregloCombo = await getClientesCombo({ sn_Activo: true });
+        const arregloCombo = await getClientesCombo();
         setClientesCombo(arregloCombo.body);
+      } catch (error) {
+        const errorMessage =
+          (error as IApiError).message || 'Ocurrió un error desconocido';
+        Toast.fire({
+          icon: 'error',
+          title: 'Ocurrió un Error',
+          text: errorMessage,
+        });
+      }
+    };
+
+    const fetchEstatusEnvios = async (): Promise<void> => {
+      try {
+        const estatusData = await getEstatus(3); // Modulo de Pedidos
+        setEstatusEnvios(estatusData.body);
+        setEstatusEnviosFormulario(estatusData.body);
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';
@@ -102,6 +121,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
 
     fetchEnvios();
     fetchClientesCombo();
+    fetchEstatusEnvios();
   }, []);
 
   const columns: {
@@ -109,19 +129,15 @@ export const EnviosAdmin = (): React.JSX.Element => {
     texto: string;
     visible: boolean;
     width: string;
+    bgColor?: string;
+    textAlign?: string;
   }[] = [
     { id: 'id_Envio', texto: 'Envio', visible: true, width: '5%' },
     {
-      id: 'id_Cliente',
+      id: 'nb_Cliente',
       texto: 'Cliente',
       visible: true,
-      width: '5%',
-    },
-    {
-      id: 'nb_Destinatario',
-      texto: 'Destinatario',
-      visible: true,
-      width: '30%',
+      width: '',
     },
     {
       id: 'de_Direccion',
@@ -132,14 +148,34 @@ export const EnviosAdmin = (): React.JSX.Element => {
     {
       id: 'de_CorreoElectronico',
       texto: 'CorreoElectronico',
-      visible: false,
+      visible: true,
       width: '',
     },
     {
       id: 'nu_TelefonoCelular',
-      texto: 'TelefonoCelular',
-      visible: false,
+      texto: 'Telefono Celular',
+      visible: true,
       width: '',
+    },
+    {
+      id: 'nu_TelefonoRedLocal',
+      texto: 'Telefono Red Local',
+      visible: true,
+      width: '',
+    },
+    {
+      id: 'de_FolioGuia',
+      texto: 'Folio Guia',
+      visible: true,
+      width: '',
+    },
+    {
+      id: 'de_Estatus',
+      texto: 'Estatus',
+      bgColor: 'color_Estatus',
+      textAlign: 'center',
+      visible: true,
+      width: '10%',
     },
   ];
 
@@ -150,7 +186,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
       onClick: (row: IEnvios): void => {
         setSn_Editar(false);
         setSn_Visualizar(true);
-        limpiarCliente();
+        onResetForm();
         openModal();
         setEnvio({
           ...row,
@@ -164,7 +200,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
       onClick: (row: IEnvios): void => {
         setSn_Editar(true);
         setSn_Visualizar(false);
-        limpiarCliente();
+        onResetForm();
         openModal();
         setEnvio({
           ...row,
@@ -183,17 +219,57 @@ export const EnviosAdmin = (): React.JSX.Element => {
     },
   ];
 
-  const limpiarCliente = (): void => {
-    setEnvio({
-      id_Envio: 0,
-      id_Cliente: 0,
-      nb_Destinatario: '',
-      de_Direccion: '',
-      de_CorreoElectronico: '',
-      nu_TelefonoCelular: '',
-      nu_TelefonoRedLocal: '',
-      de_FolioGuia: '',
-    });
+  const arregloComboClientes = clientesCombo.map((cliente) => {
+    // Asegurarse de que `id_Cliente` sea siempre un número, o un string si lo prefieres
+    const value = cliente.id_Cliente ?? 0; // Asigna 0 si `id_Cliente` es `undefined`
+    return {
+      value:
+        typeof value === 'number' || !isNaN(Number(value)) ? Number(value) : 0, // Asegúrate de convertir el valor a un número si es posible
+      label: cliente.nb_Cliente || 'Cliente desconocido', // Asegúrate de que `label` siempre tenga un valor
+    };
+  });
+
+  const buscarEnvios = async (filtros: IFiltrosEnvios): Promise<void> => {
+    setIsLoading(true);
+
+    const clientes = Array.isArray(filtros.id_Cliente)
+      ? filtros.id_Cliente
+          .map((cliente: { value: unknown }) => cliente.value)
+          .toString()
+      : '';
+
+    filtros.clientes = clientes;
+
+    const enviosData = await buscarEnviosHelper(filtros);
+
+    if (enviosData.success) {
+      setEnvios(enviosData.body);
+      setIsLoading(false);
+    } else {
+      setEnvios([]);
+      setIsLoading(false);
+      return;
+    }
+  };
+
+  const eliminarEnvio = async (envio: IFormEnvios): Promise<void> => {
+    setIsLoading(true);
+    const enviosData = await eliminarEnvioHelper(
+      envio.id_Cliente,
+      envio.id_Envio,
+      envio.id_Estatus,
+      formState
+    );
+
+    if (enviosData.success) {
+      setEnvios(enviosData.body);
+      setIsLoading(false);
+      closeConfirm();
+    } else {
+      setEnvios([]);
+      setIsLoading(false);
+      return;
+    }
   };
 
   return (
@@ -217,7 +293,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
                 onClick={() => {
                   setSn_Editar(false);
                   setSn_Visualizar(false);
-                  limpiarCliente();
+                  onResetForm();
                   openModal();
                 }}
               >
@@ -235,17 +311,15 @@ export const EnviosAdmin = (): React.JSX.Element => {
               <div className="grid grid-cols-2 md:grid-cols-2 gap-y-4 gap-x-[2.5rem]">
                 <div className="dark:text-white">
                   <Label className="text-[1.6rem]">Cliente</Label>
-                  <CustomSelect>
-                    <option value="">Seleccionar</option>
-                    {clientesCombo.map((cliente) => (
-                      <option
-                        key={cliente.id_Cliente}
-                        value={cliente.id_Cliente}
-                      >
-                        {cliente.nb_Cliente}
-                      </option>
-                    ))}
-                  </CustomSelect>
+                  <CustomMultiSelect
+                    options={arregloComboClientes}
+                    onChange={(newValue) => {
+                      setFormState((prevState) => ({
+                        ...prevState,
+                        id_Cliente: newValue as unknown as string,
+                      }));
+                    }}
+                  />
                 </div>
                 <div className="dark:text-white">
                   <Label className="text-[1.6rem]">Dirección</Label>
@@ -309,6 +383,28 @@ export const EnviosAdmin = (): React.JSX.Element => {
                     sizing="lg"
                   />
                 </div>
+                <div>
+                  <Label className="text-[1.6rem] dark:text-white">
+                    Estatus
+                  </Label>
+                  <CustomSelect
+                    className="id_Estatus"
+                    value={formState.id_Estatus}
+                    name="id_Estatus"
+                    onChange={onInputChange}
+                    style={{ fontSize: '1.4rem' }}
+                  >
+                    <option value="">Seleccionar</option>
+                    {estatusEnvios.map((estatus) => (
+                      <option
+                        key={estatus.id_Estatus}
+                        value={estatus.id_Estatus}
+                      >
+                        {estatus.de_Estatus}
+                      </option>
+                    ))}
+                  </CustomSelect>
+                </div>
               </div>
 
               <div className="flex justify-end mt-[2rem] cursor-pointer">
@@ -317,7 +413,10 @@ export const EnviosAdmin = (): React.JSX.Element => {
                   className="text-[1.3rem]"
                   placement="bottom"
                 >
-                  <SearchIcon className="text-[#1769d8] text-[1.8rem]" />
+                  <SearchIcon
+                    className="text-[#1769d8] text-[1.8rem]"
+                    onClick={() => buscarEnvios(formState)}
+                  />
                 </Tooltip>
               </div>
             </fieldset>
@@ -336,27 +435,34 @@ export const EnviosAdmin = (): React.JSX.Element => {
                 ? envio
                 : {
                     id_Envio: 0,
-                    id_Cliente: 0,
-                    nb_Destinatario: '',
+                    id_Cliente: '',
                     de_Direccion: '',
                     de_CorreoElectronico: '',
                     nu_TelefonoCelular: '',
                     nu_TelefonoRedLocal: '',
                     de_FolioGuia: '',
+                    id_Estatus: 0,
                   }
             }
             sn_Editar={sn_Editar}
             sn_Visualizar={sn_Visualizar}
           />
 
-          {/* <ModalConfirmacion
+          <ModalCancelacionEstatus
             isOpen={isConfirmOpen}
             onClose={closeConfirm}
-            // onConfirm={() => eliminarCliente(envio?.id_Cliente || '')}
-            descripcion={envio?.nb_Destinatario || ''}
-            objeto="Cliente"
-            activo={envio?.sn_Activo || false}
-          /> */}
+            onConfirm={() => {
+              if (envio) {
+                eliminarEnvio({
+                  ...envio,
+                  id_Cliente: Number(envio.id_Cliente),
+                });
+              }
+            }}
+            descripcion={`El Envio #${envio?.id_Envio} del Cliente: ${envio?.nb_Cliente}`}
+            objeto="Envio"
+            estatusActivo={envio?.id_Estatus != 5 ? true : false}
+          />
         </section>
       </div>
     </>

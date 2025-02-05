@@ -1,7 +1,8 @@
 import { ApiResponse } from '../interfaces/interfacesApi';
 import { IEstatus } from '../interfaces/interfacesEstatus';
 
-const BASE_URL = 'http://77.243.85.134:3000';
+// const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = 'http://localhost:3000';
 
 // Obtener categorias
 export const getEstatus = async (

@@ -11,6 +11,7 @@ html {
 	font-family: "Roboto", serif;
 	margin: 0;
 	padding: 0;
+  --tw-ring-shadow: none !important;
 }
 
 *, *:before, *:after {
@@ -34,6 +35,7 @@ input[type="number"] {
 .inputPassword {
 	padding-right: 2.5rem; /* Asegúrate de dejar espacio para el icono */
 }
+
 
 .spanPassword {
 	position: absolute;
@@ -133,12 +135,12 @@ input[type="number"] {
 	background-color: rgba(255, 255, 255, 0.5); /* Blanco con 50% de opacidad */
 }
 
-
 /* Main Content */
 .main-content {
 	flex-grow: 1;
 	background-color: #ecf0f1;
 	padding: 20px;
+	max-width: 100%;
 }
 
 .header {
@@ -239,3 +241,20 @@ th {
 	font-weight: bold; /* Negrita */
 	color: #656ed3e1; /* Color del texto */
 }
+
+/* DataTable */
+/* Para elegir la orientacion del texto dentro de la celda de la tabla */
+.w-fit:has(.textCenterTable) {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.w-fit:has(.textLeftTable) {
+  width: 100% !important;
+  text-align: left !important;
+}
+.w-fit:has(.textRightTable) {
+  width: 100% !important;
+  text-align: right !important;
+}
+

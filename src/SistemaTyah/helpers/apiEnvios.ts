@@ -5,9 +5,10 @@ import {
   IFormEnvios,
 } from '../interfaces/interfacesEnvios';
 
-const BASE_URL = 'http://77.243.85.134:3000';
+// const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = 'http://localhost:3000';
 
-// Obtener categorias
+// Obtener envios
 export const getEnvios = async (
   filtros: Partial<IFiltrosEnvios>
 ): Promise<ApiResponse<IEnvios[]>> => {
@@ -29,7 +30,7 @@ export const getEnvios = async (
 };
 
 // Crear Envio
-export const createClientes = async (
+export const createEnvios = async (
   envio: IFormEnvios
 ): Promise<ApiResponse<IFormEnvios>> => {
   try {
@@ -43,9 +44,9 @@ export const createClientes = async (
 
     const data: ApiResponse<IFormEnvios> = await response.json();
 
-    // if (!data.success) {
-    //   throw new Error(data.message);
-    // }
+    if (!data.success) {
+      throw new Error(data.message);
+    }
 
     return data; // Devuelve el producto creado
   } catch (error) {
@@ -54,54 +55,54 @@ export const createClientes = async (
   }
 };
 
-// Actualizar producto
-// export const updateClientes = async (
-//   cliente: Partial<IFormClientes>
-// ): Promise<ApiResponse<IFormClientes>> => {
-//   try {
-//     const response = await fetch(`${BASE_URL}/updateClientes`, {
-//       method: 'POST', // El método sigue siendo POST
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({ ...cliente }), // Incluye el ID y los datos a actualizar
-//     });
+// Actualizar envio
+export const updateEnvios = async (
+  envio: Partial<IFormEnvios>
+): Promise<ApiResponse<IFormEnvios>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/updateEnvios`, {
+      method: 'POST', // El método sigue siendo POST
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...envio }), // Incluye el ID y los datos a actualizar
+    });
 
-//     const data: ApiResponse<IFormClientes> = await response.json();
+    const data: ApiResponse<IFormEnvios> = await response.json();
 
-//     // if (!data.success) {
-//     //   throw new Error(data.message);
-//     // }
+    if (!data.success) {
+      throw new Error(data.message);
+    }
 
-//     return data; // Devuelve el producto actualizado
-//   } catch (error) {
-//     console.error('Error al actualizar producto:', error);
-//     throw error;
-//   }
-// };
+    return data; // Devuelve el producto actualizado
+  } catch (error) {
+    console.error('Error al actualizar producto:', error);
+    throw error;
+  }
+};
 
-// Eliminar (Desactivar) cliente
-// export const deleteClientes = async (
-//   cliente: Partial<IFormClientes>
-// ): Promise<ApiResponse<IFormClientes>> => {
-//   try {
-//     const response = await fetch(`${BASE_URL}/deleteClientes`, {
-//       method: 'POST', // El método sigue siendo POST
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({ ...cliente }), // Incluye el ID y los datos a actualizar
-//     });
+// Cancelar / Reanudar pedido
+export const deleteEnvios = async (
+  envio: Partial<IFormEnvios>
+): Promise<ApiResponse<IFormEnvios>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/deleteEnvios`, {
+      method: 'POST', // El método sigue siendo POST
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...envio }), // Incluye el ID y los datos a actualizar
+    });
 
-//     const data: ApiResponse<IFormClientes> = await response.json();
+    const data: ApiResponse<IFormEnvios> = await response.json();
 
-//     // if (!data.success) {
-//     //   throw new Error(data.message);
-//     // }
+    if (!data.success) {
+      throw new Error(data.message);
+    }
 
-//     return data; // Devuelve el producto actualizado
-//   } catch (error) {
-//     console.error('Error al activar / desactivar cliente:', error);
-//     throw error;
-//   }
-// };
+    return data; // Devuelve el producto actualizado
+  } catch (error) {
+    console.error('Error al cancelar / reanudar pedido:', error);
+    throw error;
+  }
+};
