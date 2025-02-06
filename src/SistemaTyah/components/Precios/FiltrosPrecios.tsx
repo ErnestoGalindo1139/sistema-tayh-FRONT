@@ -1,11 +1,19 @@
 import { Label, Select, TextInput, Tooltip } from 'flowbite-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SearchIcon } from '../../icons/SearchIcon';
 import { IFiltrosPrecios, IPrecios } from '../../interfaces/interfacesPrecios';
-import { getTallas, getTipoPrendas } from '../../helpers/apiPedidos';
+import {
+  getModelosCombo,
+  getTallas,
+  getTipoPrendas,
+} from '../../helpers/apiPedidos';
 import { IApiError } from '../../interfaces/interfacesApi';
 import Toast from '../Toast';
-import { ITallas, ITipoPrendas } from '../../interfaces/interfacesPedidos';
+import {
+  IModelos,
+  ITallas,
+  ITipoPrendas,
+} from '../../interfaces/interfacesPedidos';
 import { getPrecios } from '../../helpers/apiPrecios';
 
 export const FiltrosPrecios = ({
@@ -21,6 +29,10 @@ export const FiltrosPrecios = ({
 }): React.JSX.Element => {
   const [tipoPrendas, setTipoPrendas] = useState<ITipoPrendas[]>([]);
   const [tallas, setTallas] = useState<ITallas[]>([]);
+  const [modelos, setModelos] = useState<IModelos[]>([]);
+
+  const im_PrecioMinimoRef = useRef<HTMLInputElement>(null);
+  const im_PrecioMaximoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchPrecios = async (): Promise<void> => {
@@ -45,10 +57,10 @@ export const FiltrosPrecios = ({
   }, []);
 
   useEffect(() => {
-    const fetchTipoPrendas = async (): Promise<void> => {
+    const fetchModelos = async (): Promise<void> => {
       try {
-        const tipoPrendasData = await getTipoPrendas();
-        setTipoPrendas(tipoPrendasData.body);
+        const modelosData = await getModelosCombo(filtros.de_Genero); // Modulo de Pedidos
+        setModelos(modelosData.body);
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';
@@ -57,11 +69,16 @@ export const FiltrosPrecios = ({
           title: 'Ocurrió un Error',
           text: errorMessage,
         });
+      } finally {
+        setFiltros({
+          ...filtros,
+          id_Modelo: 0,
+        });
       }
     };
 
-    fetchTipoPrendas();
-  }, []);
+    fetchModelos();
+  }, [filtros.de_Genero]);
 
   useEffect(() => {
     const fetchTallas = async (): Promise<void> => {
@@ -82,6 +99,25 @@ export const FiltrosPrecios = ({
     fetchTallas();
   }, []);
 
+  useEffect(() => {
+    const fetchTipoPrendas = async (): Promise<void> => {
+      try {
+        const tipoPrendasData = await getTipoPrendas();
+        setTipoPrendas(tipoPrendasData.body);
+      } catch (error) {
+        const errorMessage =
+          (error as IApiError).message || 'Ocurrió un error desconocido';
+        Toast.fire({
+          icon: 'error',
+          title: 'Ocurrió un Error',
+          text: errorMessage,
+        });
+      }
+    };
+
+    fetchTipoPrendas();
+  }, []);
+
   const buscarPrecios = async (filtros: IFiltrosPrecios): Promise<void> => {
     setIsLoading(true);
     const preciosData = await getPrecios(filtros);
@@ -91,6 +127,14 @@ export const FiltrosPrecios = ({
       setIsLoading(false);
     } else {
       return;
+    }
+  };
+
+  const seleccionarTextoInput = (
+    ref: React.RefObject<HTMLInputElement>
+  ): void => {
+    if (ref.current && ref.current.value === '0') {
+      ref.current.select();
     }
   };
 
@@ -129,6 +173,44 @@ export const FiltrosPrecios = ({
               <option className="dark:text-black" value="M">
                 Mujer
               </option>
+            </Select>
+          </div>
+
+          <div className="dark:text-white">
+            <Label className="text-[1.6rem] dark:text-white font-semibold">
+              Modelo
+            </Label>
+            <Select
+              value={filtros.id_Modelo}
+              className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+              id="id_Modelo"
+              name="id_Modelo"
+              onChange={(e) => {
+                setFiltros({ ...filtros, id_Modelo: Number(e.target.value) });
+              }}
+              sizing="lg"
+              style={{
+                fontSize: '1.4rem',
+                border: '1px solid #b9b9b9',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <option className="dark:text-black" value="">
+                Seleccione un Modelo
+              </option>
+              {modelos && modelos.length > 0 ? (
+                modelos.map((modelo) => (
+                  <option
+                    className="dark:text-black"
+                    key={modelo.id_Modelo}
+                    value={modelo.id_Modelo}
+                  >
+                    {modelo.de_Modelo}
+                  </option>
+                ))
+              ) : (
+                <></>
+              )}
             </Select>
           </div>
 
@@ -214,6 +296,7 @@ export const FiltrosPrecios = ({
           <div className="dark:text-white">
             <Label className="text-[1.6rem] font-bold">Precio Minimo</Label>
             <TextInput
+              ref={im_PrecioMinimoRef}
               type="number"
               placeholder="Precio Minimo"
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
@@ -232,6 +315,7 @@ export const FiltrosPrecios = ({
                 border: '1px solid #b9b9b9',
                 backgroundColor: '#FFFFFF',
               }}
+              onFocus={() => seleccionarTextoInput(im_PrecioMinimoRef)}
               sizing="lg"
             />
           </div>
@@ -239,6 +323,7 @@ export const FiltrosPrecios = ({
           <div className="dark:text-white">
             <Label className="text-[1.6rem] font-bold">Precio Maximo</Label>
             <TextInput
+              ref={im_PrecioMaximoRef}
               type="number"
               placeholder="Precio Maximo"
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
@@ -257,6 +342,7 @@ export const FiltrosPrecios = ({
                 border: '1px solid #b9b9b9',
                 backgroundColor: '#FFFFFF',
               }}
+              onFocus={() => seleccionarTextoInput(im_PrecioMaximoRef)}
               sizing="lg"
             />
           </div>

@@ -1,10 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Box,
   Button,
   FormControl,
-  FormLabel,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -23,13 +22,22 @@ import {
   IFormPrecios,
   IPrecios,
 } from '../interfaces/interfacesPrecios';
-import { ITallas, ITipoPrendas } from '../interfaces/interfacesPedidos';
-import { getTallas, getTipoPrendas } from '../helpers/apiPedidos';
+import {
+  IModelos,
+  ITallas,
+  ITipoPrendas,
+} from '../interfaces/interfacesPedidos';
+import {
+  getModelosCombo,
+  getTallas,
+  getTipoPrendas,
+} from '../helpers/apiPedidos';
 import {
   createPrecios,
   getPrecios,
   updatePrecios,
 } from '../helpers/apiPrecios';
+import { useForm } from '../hooks/useForm';
 
 interface ModalPreciosAgregarProps {
   isOpen: boolean;
@@ -55,17 +63,27 @@ export const ModalPreciosAgregar = ({
   const id_TipoPrendaRef = useRef<HTMLSelectElement>(null);
   const id_TallaRef = useRef<HTMLSelectElement>(null);
   const im_PrecioUnitarioRef = useRef<HTMLInputElement>(null);
+  const id_ModeloRef = useRef<HTMLSelectElement>(null);
 
   // Manejar Validaciones para los Iputs
   const [generoValido, setGeneroValido] = useState(true);
   const [tipoPrendaValida, setTipoPrendaValida] = useState(true);
   const [tallaValida, setTallaValida] = useState(true);
   const [precioUnitarioValido, setPrecioUnitarioValido] = useState(true);
+  const [modeloValido, setModeloValido] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [formPrecios, setFormPrecios] = useState<IFormPrecios>({
+  const [cerrarFormulario, setCerrarFormulario] = useState(false);
+
+  const {
+    formState: formPrecios,
+    setFormState: setFormPrecios,
+    onInputChange,
+    onResetForm: limpiarFormulario,
+  } = useForm<IFormPrecios>({
     id_Precio: 0,
+    id_Modelo: 0,
     de_Genero: '',
     id_TipoPrenda: 0,
     id_Talla: 0,
@@ -74,6 +92,7 @@ export const ModalPreciosAgregar = ({
 
   const [tipoPrendas, setTipoPrendas] = useState<ITipoPrendas[]>([]);
   const [tallas, setTallas] = useState<ITallas[]>([]);
+  const [modelos, setModelos] = useState<IModelos[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -124,25 +143,33 @@ export const ModalPreciosAgregar = ({
     };
 
     fetchTallas();
-  });
+  }, []);
 
-  const limpiarFormulario = (): void => {
-    setFormPrecios({
-      id_Precio: 0,
-      de_Genero: '',
-      id_TipoPrenda: 0,
-      id_Talla: 0,
-      im_PrecioUnitario: 0,
-    });
-  };
+  useEffect(() => {
+    const fetchModelos = async (): Promise<void> => {
+      try {
+        if (formPrecios.de_Genero) {
+          const modelosData = await getModelosCombo(formPrecios.de_Genero); // Modulo de Pedidos
+          setModelos(modelosData.body);
+        }
+      } catch (error) {
+        const errorMessage =
+          (error as IApiError).message || 'Ocurrió un error desconocido';
+        Toast.fire({
+          icon: 'error',
+          title: 'Ocurrió un Error',
+          text: errorMessage,
+        });
+      } finally {
+        setFormPrecios({
+          ...formPrecios,
+          id_Modelo: 0,
+        });
+      }
+    };
 
-  // Función para manejar otros cambios de input (no fecha)
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ): void => {
-    const { name, value } = e.target;
-    setFormPrecios({ ...formPrecios, [name]: value });
-  };
+    fetchModelos();
+  }, [formPrecios.de_Genero]);
 
   const abrirModalConfirmacion = (): void => {
     setIsModalOpen(true);
@@ -150,6 +177,14 @@ export const ModalPreciosAgregar = ({
 
   const cerrarModalConfirmacion = (): void => {
     setIsModalOpen(false);
+  };
+
+  const seleccionarTextoInput = (
+    ref: React.RefObject<HTMLInputElement>
+  ): void => {
+    if (ref.current && ref.current.value === '0') {
+      ref.current.select();
+    }
   };
 
   const guardarPrecio = async (): Promise<void> => {
@@ -202,19 +237,30 @@ export const ModalPreciosAgregar = ({
     } finally {
       setIsLoading(false);
       cerrarModalConfirmacion();
+
       if (response?.success) {
-        onClose(); // Cierra el modal o limpia el formulario
+        if (cerrarFormulario) {
+          onClose(); // Cierra el modal o limpia el formulario
+        }
+        const preciosData = await getPrecios(filtros);
+        actualizarPrecios(preciosData.body);
       }
     }
   };
 
-  const validarDatosFormulario = async (): Promise<void> => {
+  const validarDatosFormulario = (cerrarForm: boolean = true): void => {
     if (
       !validarCampo(
         formPrecios.de_Genero,
         de_GeneroRef,
         setGeneroValido,
         'Genero'
+      ) ||
+      !validarCampo(
+        formPrecios.id_Modelo,
+        id_ModeloRef,
+        setModeloValido,
+        'Modelo'
       ) ||
       !validarCampo(
         formPrecios.id_TipoPrenda,
@@ -238,6 +284,7 @@ export const ModalPreciosAgregar = ({
       return;
     }
 
+    setCerrarFormulario(cerrarForm);
     abrirModalConfirmacion();
   };
 
@@ -279,7 +326,7 @@ export const ModalPreciosAgregar = ({
       >
         <ModalOverlay />
         <ModalContent
-          width="45%"
+          width="65%"
           maxWidth="1200px"
           height="auto"
           className="p-[1rem] mt-[4rem]"
@@ -291,7 +338,7 @@ export const ModalPreciosAgregar = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="dark:text-white">
                 <Label className="text-[1.6rem] dark:text-white font-semibold">
                   Genero
@@ -304,7 +351,7 @@ export const ModalPreciosAgregar = ({
                   className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${generoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   id="de_Genero"
                   name="de_Genero"
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   onBlur={() => setGeneroValido(true)}
                   sizing="lg"
                   style={{
@@ -331,6 +378,50 @@ export const ModalPreciosAgregar = ({
 
               <div className="dark:text-white">
                 <Label className="text-[1.6rem] dark:text-white font-semibold">
+                  Modelo
+                </Label>
+                <Select
+                  disabled={sn_Visualizar}
+                  ref={id_ModeloRef}
+                  value={formPrecios.id_Modelo}
+                  color={`${modeloValido ? '' : 'failure'}`}
+                  className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${modeloValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                  id="id_Modelo"
+                  name="id_Modelo"
+                  onChange={onInputChange}
+                  onBlur={() => setModeloValido(true)}
+                  sizing="lg"
+                  style={{
+                    fontSize: '1.4rem',
+                    border: '1px solid #b9b9b9',
+                    backgroundColor: '#ffffff',
+                  }}
+                >
+                  <option
+                    className="dark:text-black"
+                    value=""
+                    disabled={!!formPrecios.id_Modelo}
+                  >
+                    Seleccione un Modelo
+                  </option>
+                  {modelos && modelos.length > 0 ? (
+                    modelos.map((modelo) => (
+                      <option
+                        className="dark:text-black"
+                        key={modelo.id_Modelo}
+                        value={modelo.id_Modelo}
+                      >
+                        {modelo.de_Modelo}
+                      </option>
+                    ))
+                  ) : (
+                    <></>
+                  )}
+                </Select>
+              </div>
+
+              <div className="dark:text-white">
+                <Label className="text-[1.6rem] dark:text-white font-semibold">
                   Tipo Prenda
                 </Label>
                 <Select
@@ -341,7 +432,7 @@ export const ModalPreciosAgregar = ({
                   className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${tipoPrendaValida ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                   id="id_TipoPrenda"
                   name="id_TipoPrenda"
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   onBlur={() => setTipoPrendaValida(true)}
                   sizing="lg"
                   style={{
@@ -350,7 +441,11 @@ export const ModalPreciosAgregar = ({
                     backgroundColor: '#ffffff',
                   }}
                 >
-                  <option className="dark:text-black" value="">
+                  <option
+                    className="dark:text-black"
+                    value=""
+                    disabled={!!formPrecios.id_TipoPrenda}
+                  >
                     Seleccione un Tipo de Prenda
                   </option>
                   {tipoPrendas && tipoPrendas.length > 0 ? (
@@ -382,7 +477,7 @@ export const ModalPreciosAgregar = ({
                   id="id_Talla"
                   name="id_Talla"
                   required
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   onBlur={() => setTallaValida(true)}
                   sizing="lg"
                   style={{
@@ -391,7 +486,11 @@ export const ModalPreciosAgregar = ({
                     backgroundColor: '#ffffff',
                   }}
                 >
-                  <option className="dark:text-black" value="">
+                  <option
+                    className="dark:text-black"
+                    value=""
+                    disabled={!!formPrecios.id_Talla}
+                  >
                     Seleccione una Talla
                   </option>
                   {tallas.map((talla) => (
@@ -422,13 +521,14 @@ export const ModalPreciosAgregar = ({
                   name="im_PrecioUnitario"
                   addon="$"
                   required
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   style={{
                     fontSize: '1.4rem',
                     border: '1px solid #b9b9b9',
                     backgroundColor: '#FFFFFF',
                   }}
                   onBlur={() => setPrecioUnitarioValido(true)}
+                  onFocus={() => seleccionarTextoInput(im_PrecioUnitarioRef)}
                   sizing="lg"
                 />
               </div>
@@ -437,10 +537,20 @@ export const ModalPreciosAgregar = ({
 
           <ModalFooter>
             <Button
+              hidden={sn_Editar}
+              colorScheme="pink"
+              mr={3}
+              onClick={() => validarDatosFormulario(false)}
+              fontSize="2xl"
+              size="lg"
+            >
+              Guardar y agregar Otro
+            </Button>
+            <Button
               isDisabled={sn_Visualizar}
               colorScheme="blue"
               mr={3}
-              onClick={validarDatosFormulario}
+              onClick={() => validarDatosFormulario(true)}
               fontSize="2xl"
               size="lg"
             >

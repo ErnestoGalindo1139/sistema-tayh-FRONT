@@ -1,5 +1,7 @@
 export interface IPrecios {
   id_Precio: number;
+  id_Modelo: number;
+  de_Modelo: string;
   de_Genero: string;
   de_GeneroCompleto: string;
   id_TipoPrenda: number;
@@ -11,6 +13,7 @@ export interface IPrecios {
 
 export interface IFormPrecios {
   id_Precio?: number;
+  id_Modelo: number;
   de_Genero: string;
   id_TipoPrenda: number;
   id_Talla: number;
@@ -18,6 +21,7 @@ export interface IFormPrecios {
 }
 
 export interface IFiltrosPrecios {
+  id_Modelo: number;
   de_Genero: string;
   id_TipoPrenda: number;
   id_Talla: number;

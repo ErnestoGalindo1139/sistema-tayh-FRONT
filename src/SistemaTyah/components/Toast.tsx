@@ -13,18 +13,19 @@ interface ToastOptions {
     | 'bottom-start'
     | 'bottom-end'
     | 'bottom'; // Tipos de posición
+  timer?: number; // Duración del Toast
 }
 
 class ToastComponent {
   // Método para mostrar el Toast
   static fire(options: ToastOptions): void {
-    const { title, text, icon, position } = options;
+    const { title, text, icon, position, timer } = options;
 
     const toast = Swal.mixin({
       toast: true,
       position: position || 'top-end', // Valor por defecto
       showConfirmButton: false,
-      timer: 3000,
+      timer: timer || 3000, // Valor por defecto
       timerProgressBar: true,
       customClass: {
         popup: 'text-[1.5rem]', // Clase personalizada para el popup

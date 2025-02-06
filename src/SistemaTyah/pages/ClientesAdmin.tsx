@@ -13,15 +13,12 @@ import {
   IRedSocial,
 } from '../interfaces/interfacesClientes';
 import { WaitScreen } from '../components/WaitScreen';
-import { getClientes } from '../helpers/apiClientes';
+import { deleteClientes, getClientes } from '../helpers/apiClientes';
 import { ModalClientes } from '../dialogs/ModalClientes';
-import { ModalConfirmacion } from '../dialogs/ModalConfirmacion';
 import { RetweetIcon } from '../icons/RetweetIcon';
-import { Tooltip, Label, Select, TextInput } from 'flowbite-react';
-import { SearchIcon } from '../icons/SearchIcon';
-import { eliminarClienteHelper } from '../helpers/clientes/eliminarClienteHelper';
-import { buscarClientesHelper } from '../helpers/clientes/buscarClientesHelper';
-import { mesesData } from '../data/mesesData';
+import { Tooltip } from 'flowbite-react';
+import { FiltrosClientes } from '../components/Clientes/FiltrosClientes';
+import { ModalConfirmacionActivarInactivar } from '../dialogs/ModalConfirmacionActivarInactivar';
 
 export const ClientesAdmin = (): React.JSX.Element => {
   const [clientes, setClientes] = useState<IClientes[]>([]);
@@ -53,17 +50,14 @@ export const ClientesAdmin = (): React.JSX.Element => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
   const { isDarkMode } = useTheme();
 
   const {
     isOpen: isModalOpen,
     onOpen: openModal,
     onClose: closeModal,
-  } = useDisclosure();
-  const {
-    isOpen: isConfirmOpen,
-    onOpen: openConfirm,
-    onClose: closeConfirm,
   } = useDisclosure();
 
   useEffect(() => {
@@ -87,25 +81,6 @@ export const ClientesAdmin = (): React.JSX.Element => {
 
     fetchClientes();
   }, []);
-
-  // useEffect(() => {
-  //   const fetchCategorias = async (): Promise<void> => {
-  //     try {
-  //       const categoriasData = await getCategorias({});
-  //       setCategorias(categoriasData.body);
-  //     } catch (error) {
-  //       const errorMessage =
-  //         (error as IApiError).message || 'Ocurrió un error desconocido';
-  //       Toast.fire({
-  //         icon: 'error',
-  //         title: 'Ocurrió un Error',
-  //         text: errorMessage,
-  //       });
-  //     }
-  //   };
-
-  //   fetchCategorias();
-  // }, []);
 
   const columns: {
     id: keyof IClientes;
@@ -171,7 +146,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
       visible: false,
       width: '10%',
     },
-    { id: 'sn_Activo', texto: 'Activo', visible: true, width: '10%' },
+    { id: 'sn_Activo', texto: 'Estatus', visible: true, width: '10%' },
   ];
 
   const actions = [
@@ -234,7 +209,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
         setSn_Editar(false);
         setSn_Visualizar(false);
         setCliente({ ...row });
-        openConfirm();
+        abrirModalConfirmacion();
       },
     },
   ];
@@ -263,29 +238,39 @@ export const ClientesAdmin = (): React.JSX.Element => {
     });
   };
 
-  const eliminarCliente = async (id_Cliente: string): Promise<void> => {
+  const eliminarCliente = async (
+    id_Cliente: string,
+    sn_Activo: boolean
+  ): Promise<void> => {
     setIsLoading(true);
-    const clientesData = await eliminarClienteHelper(id_Cliente, filtros);
+    const clientes = await deleteClientes({ id_Cliente });
 
-    if (clientesData.success) {
+    if (clientes.success) {
+      Toast.fire({
+        icon: 'success',
+        title: 'Operación Exitosa',
+        text: `Cliente ${sn_Activo ? 'Inactivado' : 'Activado'} correctamente`,
+      });
+
+      const clientesData = await getClientes(filtros);
       setClientes(clientesData.body);
+      cerrarModalConfirmacion();
       setIsLoading(false);
-      closeConfirm();
     } else {
-      return;
+      Toast.fire({
+        icon: 'error',
+        title: 'Ocurrió un Error',
+        text: clientes.message,
+      });
     }
   };
 
-  const buscarClientes = async (filtros: IFiltrosClientes): Promise<void> => {
-    setIsLoading(true);
-    const clientesData = await buscarClientesHelper(filtros);
+  const abrirModalConfirmacion = (): void => {
+    setIsConfirmOpen(true);
+  };
 
-    if (clientesData.success) {
-      setClientes(clientesData.body);
-      setIsLoading(false);
-    } else {
-      return;
-    }
+  const cerrarModalConfirmacion = (): void => {
+    setIsConfirmOpen(false);
   };
 
   return (
@@ -321,130 +306,12 @@ export const ClientesAdmin = (): React.JSX.Element => {
           </div>
 
           {/* Filtros */}
-          <div className="filtros">
-            <fieldset className="filtros-fieldset dark:bg-[#020405]">
-              <legend className="filtros-legend dark:text-white">
-                &nbsp;&nbsp;Filtros&nbsp;&nbsp;
-              </legend>
-              <div className="grid grid-cols-2 md:grid-cols-2 gap-y-4 gap-x-[2.5rem]">
-                <div className="dark:text-white">
-                  <Label className="text-[1.6rem] font-bold">Folio</Label>
-                  <TextInput
-                    type="text"
-                    placeholder="Folio del Cliente"
-                    className="dark:text-white text-[1.4rem]"
-                    value={filtros.id_Cliente}
-                    onChange={(e) =>
-                      setFiltros({ ...filtros, id_Cliente: e.target.value })
-                    }
-                    style={{
-                      fontSize: '1.4rem',
-                      border: '1px solid #b9b9b9',
-                      backgroundColor: '#ffffff',
-                    }}
-                    sizing="lg"
-                  />
-                </div>
-                <div className="dark:text-white">
-                  <Label className="text-[1.6rem] font-bold">Nombre</Label>
-                  <TextInput
-                    type="text"
-                    placeholder="Nombre del Cliente"
-                    className="dark:text-white"
-                    value={filtros.nb_Cliente}
-                    onChange={(e) =>
-                      setFiltros({ ...filtros, nb_Cliente: e.target.value })
-                    }
-                    style={{
-                      fontSize: '1.4rem',
-                      border: '1px solid #b9b9b9',
-                      backgroundColor: '#ffffff',
-                    }}
-                    sizing="lg"
-                  />
-                </div>
-                <div>
-                  <Label className="text-[1.6rem] dark:text-white font-bold">
-                    Mes Cumpleaños
-                  </Label>
-
-                  <Select
-                    value={filtros.fh_Cumpleanos}
-                    onChange={(e) =>
-                      setFiltros({
-                        ...filtros,
-                        fh_Cumpleanos: e.target.value,
-                      })
-                    }
-                    sizing="lg"
-                    style={{
-                      fontSize: '1.4rem',
-                      border: '1px solid #b9b9b9',
-                      backgroundColor: '#ffffff',
-                    }}
-                  >
-                    <option value="">Todos</option>
-                    {mesesData.map((mes) => (
-                      <option key={mes.id} value={mes.id}>
-                        {mes.texto}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-[1.6rem] dark:text-white font-semibold">
-                    Estatus
-                  </Label>
-                  <Select
-                    value={
-                      filtros.sn_Activo === null
-                        ? ''
-                        : filtros.sn_Activo
-                          ? '1'
-                          : '0'
-                    }
-                    className="dark:text-white"
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFiltros({
-                        ...filtros,
-                        sn_Activo: value === '' ? null : value === '1',
-                      });
-                    }}
-                    sizing="lg"
-                    style={{
-                      fontSize: '1.4rem',
-                      border: '1px solid #b9b9b9',
-                      backgroundColor: '#ffffff',
-                    }}
-                  >
-                    <option className="dark:text-black" value="">
-                      Todos
-                    </option>
-                    <option className="dark:text-black" value="1">
-                      Activo
-                    </option>
-                    <option className="dark:text-black" value="0">
-                      Inactivo
-                    </option>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex justify-end mt-[2rem]">
-                <Tooltip
-                  content="Buscar"
-                  className="text-[1.3rem]"
-                  placement="bottom"
-                >
-                  <SearchIcon
-                    className="text-[#1769d8] text-[1.8rem] cursor-pointer"
-                    onClick={() => buscarClientes(filtros)}
-                  />
-                </Tooltip>
-              </div>
-            </fieldset>
-          </div>
+          <FiltrosClientes
+            filtros={filtros}
+            setFiltros={setFiltros}
+            actualizarClientes={setClientes}
+            setIsLoading={setIsLoading}
+          />
 
           <div className="table-container dark:bg-transparent">
             <DataTable
@@ -489,10 +356,15 @@ export const ClientesAdmin = (): React.JSX.Element => {
             filtros={filtros}
           />
 
-          <ModalConfirmacion
+          <ModalConfirmacionActivarInactivar
             isOpen={isConfirmOpen}
-            onClose={closeConfirm}
-            onConfirm={() => eliminarCliente(cliente?.id_Cliente || '')}
+            onClose={cerrarModalConfirmacion}
+            onConfirm={() =>
+              eliminarCliente(
+                cliente?.id_Cliente || '',
+                cliente?.sn_Activo || false
+              )
+            }
             descripcion={cliente?.nb_Cliente || ''}
             objeto="Cliente"
             activo={cliente?.sn_Activo || false}

@@ -7,27 +7,23 @@ import { useTheme } from '../../ThemeContext';
 import { WaitScreen } from '../components/WaitScreen';
 import { Tooltip } from 'flowbite-react';
 
-import { IFiltrosPrecios, IPrecios } from '../interfaces/interfacesPrecios';
-import { FiltrosPrecios } from '../components/Precios/FiltrosPrecios';
-import { ModalPreciosAgregar } from '../dialogs/ModalPreciosAgregar';
-import { useForm } from '../hooks/useForm';
+import { IModelos } from '../interfaces/interfacesPedidos';
+import { IFiltrosModelos } from '../interfaces/interfacesModelos';
+import { FiltrosModelos } from '../components/Modelos/FiltrosModelos';
+import { ModalModelosAgregar } from '../dialogs/ModalModelosAgregar';
 
-export const PreciosAdmin = (): React.JSX.Element => {
-  const [precios, setPrecios] = useState<IPrecios[]>([]);
-  const [precio, setPrecio] = useState<IPrecios>();
+export const ModelosAdmin = (): React.JSX.Element => {
+  const [modelos, setModelos] = useState<IModelos[]>([]);
+  const [modelo, setModelo] = useState<IModelos>();
 
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
   const [sn_Visualizar, setSn_Visualizar] = useState<boolean>(false);
 
-  const { formState: filtros, setFormState: setFiltros } =
-    useForm<IFiltrosPrecios>({
-      id_Modelo: 0,
-      de_Genero: '',
-      id_TipoPrenda: 0,
-      id_Talla: 0,
-      im_PrecioMinimo: 0,
-      im_PrecioMaximo: 0,
-    });
+  const [filtros, setFiltros] = useState<IFiltrosModelos>({
+    id_Modelo: '',
+    de_Genero: '',
+    de_Modelo: '',
+  });
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,31 +34,17 @@ export const PreciosAdmin = (): React.JSX.Element => {
     onOpen: openModal,
     onClose: closeModal,
   } = useDisclosure();
-  // const {
-  //   isOpen: isConfirmOpen,
-  //   onOpen: openConfirm,
-  //   onClose: closeConfirm,
-  // } = useDisclosure();
 
   const columns: {
-    id: keyof IPrecios;
+    id: keyof IModelos;
     texto: string;
     visible: boolean;
     width: string;
   }[] = [
-    { id: 'id_Precio', texto: 'ID', visible: true, width: '10%' },
+    { id: 'id_Modelo', texto: 'ID', visible: true, width: '20%' },
     { id: 'de_Genero', texto: 'Genero', visible: false, width: '20%' },
     { id: 'de_GeneroCompleto', texto: 'Genero', visible: true, width: '20%' },
-    { id: 'id_TipoPrenda', texto: 'Tipo Prenda', visible: false, width: '20%' },
-    { id: 'de_TipoPrenda', texto: 'Tipo Prenda', visible: true, width: '20%' },
-    { id: 'id_Talla', texto: 'Talla', visible: false, width: '20%' },
-    { id: 'de_Talla', texto: 'Talla', visible: true, width: '20%' },
-    {
-      id: 'im_PrecioUnitario',
-      texto: 'Precio Unitario',
-      visible: true,
-      width: '20%',
-    },
+    { id: 'de_Modelo', texto: 'Modelo', visible: true, width: '40%' },
   ];
 
   const actions = [
@@ -72,7 +54,7 @@ export const PreciosAdmin = (): React.JSX.Element => {
     //   onClick: (row: IPrecios): void => {
     //     setSn_Editar(false);
     //     setSn_Visualizar(true);
-    //     limpiarPrecios();
+    //     limpiarModelos();
     //     openModal();
     //     setPrecio({
     //       ...row,
@@ -82,13 +64,13 @@ export const PreciosAdmin = (): React.JSX.Element => {
     {
       icono: <EditIcon className="text-[#a22694]" />,
       texto: 'Editar',
-      onClick: (row: IPrecios): void => {
+      onClick: (row: IModelos): void => {
         setSn_Editar(true);
         setSn_Visualizar(false);
-        limpiarPrecios();
+        limpiarModelos();
         openModal();
 
-        setPrecio({
+        setModelo({
           ...row,
         });
       },
@@ -105,17 +87,11 @@ export const PreciosAdmin = (): React.JSX.Element => {
     // },
   ];
 
-  const limpiarPrecios = (): void => {
-    setPrecio({
-      id_Precio: 0,
+  const limpiarModelos = (): void => {
+    setModelo({
+      id_Modelo: '',
       de_Genero: '',
       de_GeneroCompleto: '',
-      id_TipoPrenda: 0,
-      de_TipoPrenda: '',
-      id_Talla: 0,
-      de_Talla: '',
-      im_PrecioUnitario: 0,
-      id_Modelo: 0,
       de_Modelo: '',
     });
   };
@@ -128,14 +104,14 @@ export const PreciosAdmin = (): React.JSX.Element => {
           {/* contenedor */}
           <div className="flex items-center justify-between">
             <div className="dark:text-white">
-              <h2 className="font-bold text-[2.5rem]">Precios</h2>
+              <h2 className="font-bold text-[2.5rem]">Modelos</h2>
               <p className="text-[1.6rem]">
-                Aquí puedes gestionar los Precios.
+                Aquí puedes gestionar los Modelos.
               </p>
             </div>
 
             <Tooltip
-              content="Agregar Precio"
+              content="Agregar Modelo"
               className="text-[1.3rem]"
               placement="bottom"
             >
@@ -143,7 +119,7 @@ export const PreciosAdmin = (): React.JSX.Element => {
                 onClick={() => {
                   setSn_Editar(false);
                   setSn_Visualizar(false);
-                  limpiarPrecios();
+                  limpiarModelos();
                   openModal();
                 }}
               >
@@ -153,17 +129,17 @@ export const PreciosAdmin = (): React.JSX.Element => {
           </div>
 
           {/* Filtros */}
-          <FiltrosPrecios
+          <FiltrosModelos
             filtros={filtros}
             setFiltros={setFiltros}
-            actualizarPrecios={setPrecios}
+            actualizarModelos={setModelos}
             setIsLoading={setIsLoading}
           />
 
           {/* Grid | Tabla */}
           <div className="table-container dark:bg-transparent">
             <DataTable
-              data={precios}
+              data={modelos}
               columns={columns}
               actions={actions}
               initialRowsPerPage={10}
@@ -171,19 +147,17 @@ export const PreciosAdmin = (): React.JSX.Element => {
           </div>
 
           {/* Modal para Agregar */}
-          <ModalPreciosAgregar
+          <ModalModelosAgregar
             isOpen={isModalOpen}
             onClose={closeModal}
-            actualizarPrecios={setPrecios}
+            actualizarModelos={setModelos}
             row={
-              precio
-                ? precio
+              modelo
+                ? modelo
                 : {
-                    id_Modelo: 0,
+                    id_Modelo: '',
                     de_Genero: '',
-                    id_TipoPrenda: 0,
-                    id_Talla: 0,
-                    im_PrecioUnitario: 0,
+                    de_Modelo: '',
                   }
             }
             sn_Editar={sn_Editar}
