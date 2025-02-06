@@ -29,6 +29,9 @@ import { Datepicker, DatepickerRef, Label, TextInput } from 'flowbite-react';
 import { IApiError } from '../interfaces/interfacesApi';
 import { customDatePickerTheme } from '../themes/customDatePickerTheme';
 import { ModalConfirmacionAgregar } from './ModalConfirmacionAgregar';
+import { useForm } from '../hooks/useForm';
+import { useValidations } from '../hooks/useValidations';
+import { useFormDate } from '../hooks/useFormDate';
 
 interface ModalClientesProps {
   isOpen: boolean;
@@ -78,7 +81,12 @@ export const ModalClientes = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [formClientes, setFormClientes] = useState<IFormClientes>({
+  const {
+    formState: formClientes,
+    setFormState: setFormClientes,
+    onInputChange,
+    onResetForm: limpiarFormulario,
+  } = useForm<IFormClientes>({
     id_Cliente: '',
     nb_Cliente: '',
     de_Direccion: '',
@@ -102,10 +110,19 @@ export const ModalClientes = ({
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Hook para manejar todas las validaciones generales
+  const { validarCorreo, validarTelefono, validarCampo } = useValidations();
+
+  // Hook Para manejar el cambio de Fechas
+  const { handleDateChange, getDateForPicker } = useFormDate(
+    formClientes,
+    setFormClientes
+  );
+
   useEffect(() => {
     const fetchClientes = async (): Promise<void> => {
       try {
-        const clientesData = await getClientes({});
+        const clientesData = await getClientes(filtros);
         actualizarClientes(clientesData.body);
       } catch (error) {
         // Asegurarte de que el error es de tipo ApiError
@@ -131,68 +148,6 @@ export const ModalClientes = ({
       });
     }
   }, [isOpen, row]);
-
-  const limpiarFormulario = (): void => {
-    setFormClientes({
-      id_Cliente: '',
-      nb_Cliente: '',
-      de_Direccion: '',
-      de_CorreoElectronico: '',
-      de_FolioCliente: '',
-      nb_Atendio: '',
-      id_UsuarioRegistra: '',
-      id_UsuarioModifica: '',
-      id_UsuarioElimina: '',
-      fh_Cumpleanos: '',
-      fh_CumpleanosEmpresa: '',
-      redesSociales: [],
-      nu_TelefonoRedLocal: '',
-      nu_TelefonoCelular: '',
-      nu_TelefonoWhatsApp: '',
-      fh_Registro: '',
-      fh_Modificacion: '',
-      fh_Eliminacion: '',
-      sn_Activo: true,
-    });
-  };
-
-  const handleDateChange = (date: Date | null, fieldName: string): void => {
-    if (date) {
-      // Ajusta la fecha para evitar el desfase de zona horaria (mantener en zona local)
-      const localDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      ); // Ajuste de zona horaria
-
-      // Convierte la fecha a formato 'yyyy-MM-dd'
-      const formattedDate = localDate.toISOString().split('T')[0];
-
-      // Actualiza el estado del campo correspondiente
-      setFormClientes({
-        ...formClientes,
-        [fieldName]: formattedDate, // Usa el nombre del campo dinámicamente
-      });
-    } else {
-      setFormClientes({
-        ...formClientes,
-        [fieldName]: '', // Si no hay fecha seleccionada, limpia el campo correspondiente
-      });
-    }
-  };
-
-  // Convertir el string de fecha 'yyyy-MM-dd' a un objeto Date antes de pasarlo al Datepicker
-  const getDateForPicker = (dateString: string): Date | null => {
-    if (!dateString) return null; // Si no hay valor, retorna null
-    const [year, month, day] = dateString.split('-');
-    return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day) + 1)); // Convertir string 'yyyy-MM-dd' a un objeto Date ajustado a UTC
-  };
-
-  // Función para manejar otros cambios de input (no fecha)
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ): void => {
-    const { name, value } = e.target;
-    setFormClientes({ ...formClientes, [name]: value });
-  };
 
   const addRedSocial = (): void => {
     setFormClientes((prevState) => ({
@@ -288,50 +243,34 @@ export const ModalClientes = ({
       }
     }
   };
+  //   if (date) {
+  //     // Ajusta la fecha para evitar el desfase de zona horaria (mantener en zona local)
+  //     const localDate = new Date(
+  //       date.getTime() - date.getTimezoneOffset() * 60000
+  //     ); // Ajuste de zona horaria
 
-  // Función para validar un número de teléfono
-  const validarCorreo = (
-    correo: string,
-    ref: React.RefObject<HTMLElement>,
-    setEstadoValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
-  ): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(correo)) {
-      ref.current?.focus();
-      setEstadoValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} Invalido`,
-        text: `Por favor Ingrese un Correo Válido`,
-      });
-      return false;
-    }
-    setEstadoValido(true);
-    return true;
-  };
+  //     // Convierte la fecha a formato 'yyyy-MM-dd'
+  //     const formattedDate = localDate.toISOString().split('T')[0];
 
-  // Función para validar un número de teléfono
-  const validarTelefono = (
-    numero: string,
-    ref: React.RefObject<HTMLElement>,
-    setEstadoValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
-  ): boolean => {
-    const telefonoRegex = /^[0-9]{7,15}$/; // Acepta solo números de 7 a 15 dígitos
-    if (!telefonoRegex.test(numero)) {
-      ref.current?.focus();
-      setEstadoValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} Invalido`,
-        text: `Por favor Ingrese un Telefono Válido`,
-      });
-      return false;
-    }
-    setEstadoValido(true);
-    return true;
-  };
+  //     // Actualiza el estado del campo correspondiente
+  //     setFormClientes({
+  //       ...formClientes,
+  //       [fieldName]: formattedDate, // Usa el nombre del campo dinámicamente
+  //     });
+  //   } else {
+  //     setFormClientes({
+  //       ...formClientes,
+  //       [fieldName]: '', // Si no hay fecha seleccionada, limpia el campo correspondiente
+  //     });
+  //   }
+  // };
+
+  // // Convertir el string de fecha 'yyyy-MM-dd' a un objeto Date antes de pasarlo al Datepicker
+  // const getDateForPicker = (dateString: string): Date | null => {
+  //   if (!dateString) return null; // Si no hay valor, retorna null
+  //   const [year, month, day] = dateString.split('-');
+  //   return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day) + 1)); // Convertir string 'yyyy-MM-dd' a un objeto Date ajustado a UTC
+  // };
 
   const validarDatosFormulario = async (): Promise<void> => {
     if (
@@ -483,26 +422,6 @@ export const ModalClientes = ({
     });
   };
 
-  const validarCampo = (
-    campo: string | number,
-    ref: React.RefObject<HTMLElement>,
-    setValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
-  ): boolean => {
-    if (!campo) {
-      ref.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} es obligatorio`,
-        text: `Por favor completa el campo ${campoNombre}.`,
-      });
-      return false;
-    }
-    setValido(true);
-    return true;
-  };
-
   return (
     <>
       {isLoading && <WaitScreen message="Guardando..." />}
@@ -547,7 +466,7 @@ export const ModalClientes = ({
                   id="nb_Cliente"
                   name="nb_Cliente"
                   value={formClientes.nb_Cliente}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   onBlur={() => setNombreValido(true)}
                   // className={`mb-2 w-full border ${nombreValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${nombreValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
@@ -569,7 +488,7 @@ export const ModalClientes = ({
                   id="de_Direccion"
                   name="de_Direccion"
                   value={formClientes.de_Direccion}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${direccionValida ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${direccionValida ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
@@ -590,7 +509,7 @@ export const ModalClientes = ({
                   id="de_CorreoElectronico"
                   name="de_CorreoElectronico"
                   value={formClientes.de_CorreoElectronico}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${correoValido ? 'border-[#656ed3e1]' : 'border-red-500'} rounded-lg py-2 px-3 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:${correoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
                   style={{ fontSize: '1.4rem' }}
@@ -612,7 +531,7 @@ export const ModalClientes = ({
                   id="nu_TelefonoRedLocal"
                   name="nu_TelefonoRedLocal"
                   value={formClientes.nu_TelefonoRedLocal}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${
                   //   telefonoRedLocalValido
                   //     ? 'border-[#656ed3e1]'
@@ -638,7 +557,7 @@ export const ModalClientes = ({
                   id="nu_TelefonoCelular"
                   name="nu_TelefonoCelular"
                   value={formClientes.nu_TelefonoCelular}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${
                   //   telefonoCelularValido
                   //     ? 'border-[#656ed3e1]'
@@ -664,7 +583,7 @@ export const ModalClientes = ({
                   id="nu_TelefonoWhatsApp"
                   name="nu_TelefonoWhatsApp"
                   value={formClientes.nu_TelefonoWhatsApp}
-                  onChange={handleInputChange}
+                  onChange={onInputChange}
                   // className={`mt-2 mb-2 w-full border ${
                   //   telefonoWhatsAppValido
                   //     ? 'border-[#656ed3e1]'

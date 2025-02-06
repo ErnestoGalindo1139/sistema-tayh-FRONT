@@ -10,6 +10,7 @@ import { PedidosAdmin } from '../pages/PedidosAdmin';
 import { ConfiguracionesAdmin } from '../pages/ConfiguracionesAdmin';
 import { OrdenTrabajo } from '../pages/OrdenTrabajo';
 import { PreciosAdmin } from '../pages/PreciosAdmin';
+import { ModelosAdmin } from '../pages/ModelosAdmin';
 
 export const SistemaTayhRoutes = (): React.JSX.Element => {
   return (
@@ -24,9 +25,9 @@ export const SistemaTayhRoutes = (): React.JSX.Element => {
           <Route path="pedidos" element={<PedidosAdmin />} />
           <Route path="configuraciones" element={<ConfiguracionesAdmin />} />
           <Route path="precios" element={<PreciosAdmin />} />
-          {/* <Route path="modelos" element={<ModelosAdmin />} />
-          <Route path="usuarios" element={<UsuariosAdmin />} />
-          <Route path="reportes" element={<ReportesAdmin />} /> */}
+          <Route path="modelos" element={<ModelosAdmin />} />
+          {/* <Route path="usuarios" element={<UsuariosAdmin />} /> */}
+          {/* <Route path="reportes" element={<ReportesAdmin />} /> */}
         </Route>
 
         {/* Ruta independiente, fuera del layout de administración */}

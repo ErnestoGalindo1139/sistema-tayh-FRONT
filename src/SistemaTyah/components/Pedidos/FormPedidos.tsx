@@ -25,7 +25,7 @@ import {
   createPedidos,
   getColores,
   getIdPedido,
-  getModelos,
+  getModelosCombo,
   getPedidos,
   getTallas,
   getTipoPrendas,
@@ -40,6 +40,8 @@ import { getClientesCombo } from '../../helpers/apiClientes';
 import { IClientesCombo } from '../../interfaces/interfacesClientes';
 import { WaitScreen } from '../WaitScreen';
 import { IEstatus } from '../../interfaces/interfacesEstatus';
+import { useValidations } from '../../hooks/useValidations';
+import { useFormDate } from '../../hooks/useFormDate';
 
 interface IFormPedidosProps {
   setSn_Agregar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -86,6 +88,16 @@ export const FormPedidos = ({
   const de_ViaContactoRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  // Hook para manejar todas las validaciones generales
+  const { validarCampo, validarNumeroNegativo, validarRangoFechas } =
+    useValidations();
+
+  // Hook Para manejar el cambio de Fechas
+  const { handleDateChange, getDateForPicker } = useFormDate(
+    formPedidos,
+    setFormPedidos
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cerrarFormulario, setCerrarFormulario] = useState(false);
@@ -176,8 +188,10 @@ export const FormPedidos = ({
   useEffect(() => {
     const fetchModelos = async (): Promise<void> => {
       try {
-        const modelosData = await getModelos(formPedidos.de_Genero); // Modulo de Pedidos
-        setModelos(modelosData.body);
+        if (formPedidos.de_Genero) {
+          const modelosData = await getModelosCombo(formPedidos.de_Genero); // Modulo de Pedidos
+          setModelos(modelosData.body);
+        }
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';
@@ -315,36 +329,6 @@ export const FormPedidos = ({
     });
   }, [formPedidos.im_SubTotal, formPedidos.im_Impuesto]);
 
-  // Convertir el string de fecha 'yyyy-MM-dd' a un objeto Date antes de pasarlo al Datepicker
-  const getDateForPicker = (dateString: string): Date | null => {
-    if (!dateString) return null; // Si no hay valor, retorna null
-    const [year, month, day] = dateString.split('-');
-    return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day) + 1)); // Convertir string 'yyyy-MM-dd' a un objeto Date ajustado a UTC
-  };
-
-  const handleDateChange = (date: Date | null, fieldName: string): void => {
-    if (date) {
-      // Ajusta la fecha para evitar el desfase de zona horaria (mantener en zona local)
-      const localDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      ); // Ajuste de zona horaria
-
-      // Convierte la fecha a formato 'yyyy-MM-dd'
-      const formattedDate = localDate.toISOString().split('T')[0];
-
-      // Actualiza el estado del campo correspondiente
-      setFormPedidos({
-        ...formPedidos,
-        [fieldName]: formattedDate, // Usa el nombre del campo dinámicamente
-      });
-    } else {
-      setFormPedidos({
-        ...formPedidos,
-        [fieldName]: '', // Si no hay fecha seleccionada, limpia el campo correspondiente
-      });
-    }
-  };
-
   const obtenerPrecioUnitario = async (
     target: HTMLSelectElement
   ): Promise<void> => {
@@ -367,50 +351,6 @@ export const FormPedidos = ({
       ...prev,
       im_PrecioUnitario: calculo.body,
     }));
-  };
-
-  const validarNumeroNegativo = (
-    numero: string | number,
-    ref: React.RefObject<HTMLElement>,
-    setValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
-  ): boolean => {
-    const valor = Number(numero);
-    if (isNaN(valor)) {
-      ref.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} no es un número válido`,
-        text: `Por favor ingresa un valor numérico en ${campoNombre}.`,
-      });
-      return false;
-    }
-
-    if (valor == 0) {
-      ref.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} no puede ser 0`,
-        text: `Por favor ingresa una Cantidad Válida`,
-      });
-      return false;
-    }
-
-    if (valor < 0) {
-      ref.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} no puede ser negativo`,
-        text: `Por favor ingresa una Cantidad Válida`,
-      });
-      return false;
-    }
-
-    setValido(true);
-    return true;
   };
 
   const validarDatosFormulario = (cerrarForm: boolean = true): void => {
@@ -691,69 +631,6 @@ export const FormPedidos = ({
       im_Total: 0,
       de_Genero: '',
     });
-  };
-
-  const validarCampo = (
-    campo: string | number,
-    ref: React.RefObject<HTMLElement>,
-    setValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
-  ): boolean => {
-    if (!campo) {
-      ref.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} es obligatorio`,
-        text: `Por favor completa el campo ${campoNombre}.`,
-      });
-      return false;
-    }
-    setValido(true);
-    return true;
-  };
-
-  const validarRangoFechas = (
-    fechaInicio: Date | string,
-    fechaFin: Date | string,
-    refInicio: React.RefObject<HTMLElement>,
-    refFin: React.RefObject<HTMLElement>,
-    setValido: React.Dispatch<React.SetStateAction<boolean>>,
-    nombreFechaInicio: string,
-    nombreFechaFin: string
-  ): boolean => {
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-
-    if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) {
-      const campoInvalido = isNaN(inicio.getTime())
-        ? nombreFechaInicio
-        : nombreFechaFin;
-      const refInvalido = isNaN(inicio.getTime()) ? refInicio : refFin;
-
-      refInvalido.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoInvalido} no es una fecha válida`,
-        text: `Por favor selecciona una fecha válida para ${campoInvalido}.`,
-      });
-      return false;
-    }
-
-    if (fin < inicio) {
-      refFin.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `Rango de fechas no válido`,
-        text: `${nombreFechaFin} no puede ser menor que ${nombreFechaInicio}.`,
-      });
-      return false;
-    }
-
-    setValido(true);
-    return true;
   };
 
   return (
@@ -1128,12 +1005,7 @@ export const FormPedidos = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${modeloValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               id="id_Modelo"
               name="id_Modelo"
-              onChange={(e) => {
-                setFormPedidos({
-                  ...formPedidos,
-                  id_Modelo: e.target.value,
-                });
-              }}
+              onChange={(e) => obtenerPrecioUnitario(e.target)}
               onBlur={() => setModeloValido(true)}
               sizing="lg"
               style={{
@@ -1222,7 +1094,11 @@ export const FormPedidos = ({
                 backgroundColor: '#ffffff',
               }}
             >
-              <option className="dark:text-black" value="">
+              <option
+                className="dark:text-black"
+                value=""
+                disabled={!!formPedidos.id_Talla}
+              >
                 Seleccione una Talla
               </option>
               {tallas.map((talla) => (
@@ -1309,7 +1185,11 @@ export const FormPedidos = ({
                 backgroundColor: '#ffffff',
               }}
             >
-              <option className="dark:text-black" value="">
+              <option
+                className="dark:text-black"
+                value=""
+                disabled={!!formPedidos.id_TipoTela}
+              >
                 Seleccione un Tipo de Tela
               </option>
               {tipoTelas.map((tipoTela) => (

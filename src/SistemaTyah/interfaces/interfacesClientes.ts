@@ -77,3 +77,9 @@ export interface IClientesCombo {
   nb_Cliente?: string;
   sn_Activo?: boolean | null;
 }
+export interface ICumpleanosClientes {
+  id_Cliente?: string;
+  nb_Cliente?: string;
+  nu_DiasParaCumpleanos: number;
+  mensaje: string;
+}

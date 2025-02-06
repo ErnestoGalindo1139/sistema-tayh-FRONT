@@ -5,6 +5,7 @@ import { Datepicker, Label, Select, TextInput, Tooltip } from 'flowbite-react';
 import { customDatePickerTheme } from '../../themes/customDatePickerTheme';
 import { SearchIcon } from '../../icons/SearchIcon';
 import { buscarPedidosHelper } from '../../helpers/pedidos/buscarPedidosHelper';
+import { useFormDate } from '../../hooks/useFormDate';
 
 export const FiltrosPedidos = ({
   filtros,
@@ -19,35 +20,10 @@ export const FiltrosPedidos = ({
   actualizarPedidos: React.Dispatch<React.SetStateAction<IPedidos[]>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>; // El actualizador del estado de carga
 }): React.JSX.Element => {
-  // Convertir el string de fecha 'yyyy-MM-dd' a un objeto Date antes de pasarlo al Datepicker
-  const getDateForPicker = (dateString: string): Date | null => {
-    if (!dateString) return null; // Si no hay valor, retorna null
-    const [year, month, day] = dateString.split('-');
-    return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day) + 1)); // Convertir string 'yyyy-MM-dd' a un objeto Date ajustado a UTC
-  };
-
-  const handleDateChange = (date: Date | null, fieldName: string): void => {
-    if (date) {
-      // Ajusta la fecha para evitar el desfase de zona horaria (mantener en zona local)
-      const localDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      ); // Ajuste de zona horaria
-
-      // Convierte la fecha a formato 'yyyy-MM-dd'
-      const formattedDate = localDate.toISOString().split('T')[0];
-
-      // Actualiza el estado del campo correspondiente
-      setFiltros({
-        ...filtros,
-        [fieldName]: formattedDate, // Usa el nombre del campo dinámicamente
-      });
-    } else {
-      setFiltros({
-        ...filtros,
-        [fieldName]: '', // Si no hay fecha seleccionada, limpia el campo correspondiente
-      });
-    }
-  };
+  const { handleDateChange, getDateForPicker } = useFormDate(
+    filtros,
+    setFiltros
+  );
 
   const buscarPedidos = async (filtros: IFiltrosPedidos): Promise<void> => {
     setIsLoading(true);

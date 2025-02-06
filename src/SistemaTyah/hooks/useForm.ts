@@ -9,9 +9,7 @@ interface IFormState<T = Record<string, unknown>> {
   onResetForm: () => void; // Reinicia el formulario
 }
 
-export const useForm = <T extends Record<string, unknown>>(
-  initialState: T
-): IFormState<T> => {
+export const useForm = <T extends object>(initialState: T): IFormState<T> => {
   const [formState, setFormState] = useState<T>(initialState);
 
   const onInputChange = (
@@ -23,6 +21,7 @@ export const useForm = <T extends Record<string, unknown>>(
       [name]: value,
     });
   };
+
   const onResetForm = (): void => {
     setFormState(initialState);
   };

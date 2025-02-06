@@ -87,6 +87,8 @@ export interface IFiltrosPedidos {
 export interface IModelos {
   id_Modelo: string;
   de_Modelo: string;
+  de_Genero: string;
+  de_GeneroCompleto: string;
 }
 
 export interface ITallas {

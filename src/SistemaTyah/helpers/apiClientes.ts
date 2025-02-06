@@ -3,6 +3,7 @@ import {
   IFiltrosClientes,
   IClientesCombo,
   IFormClientes,
+  ICumpleanosClientes,
 } from '../interfaces/interfacesClientes';
 import { ApiResponse } from '../interfaces/interfacesApi';
 
@@ -85,8 +86,8 @@ export const updateClientes = async (
 
 // Eliminar (Desactivar) cliente
 export const deleteClientes = async (
-  cliente: Partial<IFormClientes>
-): Promise<ApiResponse<IFormClientes>> => {
+  cliente: Partial<IClientes>
+): Promise<ApiResponse<IClientes>> => {
   try {
     const response = await fetch(`${BASE_URL}/deleteClientes`, {
       method: 'POST', // El método sigue siendo POST
@@ -96,7 +97,7 @@ export const deleteClientes = async (
       body: JSON.stringify({ ...cliente }), // Incluye el ID y los datos a actualizar
     });
 
-    const data: ApiResponse<IFormClientes> = await response.json();
+    const data: ApiResponse<IClientes> = await response.json();
 
     // if (!data.success) {
     //   throw new Error(data.message);
@@ -126,6 +127,29 @@ export const getClientesCombo = async (
     return data;
   } catch (error) {
     console.error('Error al obtener el combo de clientes:', error);
+    throw error;
+  }
+};
+
+// Obtener clientes
+export const getFechaCumpleanosClientes = async (): Promise<
+  ApiResponse<ICumpleanosClientes[]>
+> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getFechaCumpleanosClientes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data: ApiResponse<ICumpleanosClientes[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error(
+      'Error al obtener las fechas de cumpleaños de los clientes',
+      error
+    );
     throw error;
   }
 };

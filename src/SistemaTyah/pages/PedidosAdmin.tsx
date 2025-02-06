@@ -96,6 +96,8 @@ export const PedidosAdmin = (): React.JSX.Element => {
     texto: string;
     visible: boolean;
     width: string;
+    bgColor?: string;
+    textAlign?: string;
   }[] = [
     { id: 'id_Pedido', texto: 'Folio Pedido', visible: true, width: '10%' },
     { id: 'id_Cliente', texto: 'Folio Cliente', visible: true, width: '10%' },
@@ -118,7 +120,14 @@ export const PedidosAdmin = (): React.JSX.Element => {
       visible: true,
       width: '15%',
     },
-    { id: 'de_Estatus', texto: 'Estatus', visible: true, width: '10%' },
+    {
+      id: 'de_Estatus',
+      texto: 'Estatus',
+      visible: true,
+      width: '10%',
+      bgColor: 'color_Estatus',
+      textAlign: 'center',
+    },
   ];
 
   const actions = [

@@ -121,7 +121,7 @@ export const deletePedido = async (
 };
 
 // Llenar Combos
-export const getModelos = async (
+export const getModelosCombo = async (
   de_Genero: string
 ): Promise<ApiResponse<IModelos[]>> => {
   const payload = {
