@@ -131,10 +131,13 @@ export const ModalEnvios = ({
   useEffect(() => {
     if (isOpen) {
       onResetForm();
-      setFormState({
-        ...row,
-        id_Cliente: Number(row.id_Cliente),
-      });
+
+      if (sn_Editar) {
+        setFormState({
+          ...row,
+          id_Cliente: Number(row.id_Cliente),
+        });
+      }
     }
   }, [isOpen, row]);
 
@@ -316,12 +319,13 @@ export const ModalEnvios = ({
         setFolioGuiaValido,
         'Ingrese un folio de guia'
       ) ||
-      !validarCampo(
-        formState.id_Estatus,
-        id_EstatusRef,
-        setEstatusValido,
-        'Ingrese un estatus'
-      )
+      (sn_Editar &&
+        !validarCampo(
+          formState.id_Estatus,
+          id_EstatusRef,
+          setEstatusValido,
+          'Ingrese un estatus'
+        ))
     ) {
       return;
     }
@@ -551,7 +555,7 @@ export const ModalEnvios = ({
 
           <ModalFooter>
             <Button
-              isDisabled={sn_Visualizar}
+              hidden={sn_Visualizar}
               colorScheme="blue"
               mr={3}
               onClick={validarDatosFormulario}
