@@ -19,16 +19,11 @@ jobs:
           node-version: 18
           cache: 'yarn'
 
-      - name: Definir la variable de entorno
-        run: echo "VITE_API_URL=${{ secrets.VITE_API_URL_PROD }}" >> $GITHUB_ENV
-
       - name: Instalar dependencias
         run: yarn install --frozen-lockfile
 
-      - name: Construir el proyecto
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-        run: yarn vite build
+      - name: Construir el proyecto en modo producción
+        run: yarn vite build --mode production
 
       - name: Subir solo el contenido de dist a la rama produccion
         env:
