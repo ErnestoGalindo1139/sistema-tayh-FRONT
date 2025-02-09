@@ -1,0 +1,36 @@
+name: Build and Deploy to Production
+
+on:
+  push:
+    branches:
+      - main  # Se ejecuta cuando hay un push en la rama main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: Instalar dependencias
+        run: yarn install --frozen-lockfile
+
+      - name: Construir el proyecto
+        run: yarn vite build
+
+      - name: Subir archivos a la rama produccion
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git checkout --orphan produccion
+          git reset --hard
+          git add -f dist
+          git commit -m "🚀 Build automático desde main"
+          git push origin produccion --force
