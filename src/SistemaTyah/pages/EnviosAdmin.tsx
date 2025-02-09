@@ -132,7 +132,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
     bgColor?: string;
     textAlign?: string;
   }[] = [
-    { id: 'id_Envio', texto: 'Envio', visible: true, width: '5%' },
+    { id: 'id_Envio', texto: 'Folio Envio', visible: true, width: '5%' },
     {
       id: 'nb_Cliente',
       texto: 'Cliente',
@@ -308,7 +308,23 @@ export const EnviosAdmin = (): React.JSX.Element => {
               <legend className="filtros-legend dark:text-white">
                 &nbsp;&nbsp;Filtros&nbsp;&nbsp;
               </legend>
-              <div className="grid grid-cols-2 md:grid-cols-2 gap-y-4 gap-x-[2.5rem]">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-[2.5rem]">
+                <div>
+                  <Label className="text-[1.6rem] dark:text-white">
+                    Folio Envio
+                  </Label>
+                  <CustomInput
+                    type="number"
+                    placeholder="Ingrese un folio"
+                    className="text-[1.4rem]"
+                    name="id_Envio"
+                    id="id_Envio"
+                    value={formState.id_Envio}
+                    onChange={onInputChange}
+                    style={{ fontSize: '1.4rem' }}
+                    sizing="lg"
+                  />
+                </div>
                 <div className="dark:text-white">
                   <Label className="text-[1.6rem]">Cliente</Label>
                   <CustomMultiSelect
@@ -335,22 +351,8 @@ export const EnviosAdmin = (): React.JSX.Element => {
                     sizing="lg"
                   />
                 </div>
-                <div>
-                  <Label className="text-[1.6rem] dark:text-white">
-                    Correo Electronico
-                  </Label>
-                  <CustomInput
-                    type="text"
-                    placeholder="Escriba un correo electronico"
-                    className="text-[1.4rem]"
-                    id="de_CorreoElectronico"
-                    value={formState.de_CorreoElectronico}
-                    name="de_CorreoElectronico"
-                    onChange={onInputChange}
-                    style={{ fontSize: '1.4rem' }}
-                    sizing="lg"
-                  />
-                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-[2.5rem] mt-[1rem]">
                 <div>
                   <Label className="text-[1.6rem] dark:text-white">
                     Telefono de Red Local
@@ -383,6 +385,24 @@ export const EnviosAdmin = (): React.JSX.Element => {
                     sizing="lg"
                   />
                 </div>
+                <div>
+                  <Label className="text-[1.6rem] dark:text-white">
+                    Correo Electronico
+                  </Label>
+                  <CustomInput
+                    type="text"
+                    placeholder="Escriba un correo electronico"
+                    className="text-[1.4rem]"
+                    id="de_CorreoElectronico"
+                    value={formState.de_CorreoElectronico}
+                    name="de_CorreoElectronico"
+                    onChange={onInputChange}
+                    style={{ fontSize: '1.4rem' }}
+                    sizing="lg"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-[2.5rem] mt-[1rem]">
                 <div>
                   <Label className="text-[1.6rem] dark:text-white">
                     Estatus
