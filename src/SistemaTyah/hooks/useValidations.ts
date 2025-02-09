@@ -82,7 +82,10 @@ export const useValidations = (): UseValidations => {
 
   const validarCampo = useCallback<UseValidations['validarCampo']>(
     (campo, ref, setValido, campoNombre) => {
-      if (!campo) {
+      // Si el campo es una cadena, elimina los espacios en blanco al principio y al final
+      const valorCampo = typeof campo === 'string' ? campo.trim() : campo;
+
+      if (!valorCampo) {
         ref.current?.focus();
         setValido(false);
         Toast.fire({

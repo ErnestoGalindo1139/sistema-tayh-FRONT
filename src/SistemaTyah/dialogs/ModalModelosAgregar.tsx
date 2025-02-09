@@ -25,6 +25,8 @@ import {
   updateModelos,
 } from '../helpers/apiModelos';
 import { useForm } from '../hooks/useForm';
+import { useValidations } from '../hooks/useValidations';
+import { useInputsInteraction } from '../hooks/useInputsInteraction';
 
 interface ModalModelosAgregarProps {
   isOpen: boolean;
@@ -68,6 +70,11 @@ export const ModalModelosAgregar = ({
     de_Modelo: '',
   });
 
+  // Hook para manejar todas las validaciones generales
+  const { validarCampo } = useValidations();
+
+  const seleccionarTextoInput = useInputsInteraction();
+
   const [isLoading, setIsLoading] = useState(false);
 
   // Limpiar Formulario
@@ -78,7 +85,6 @@ export const ModalModelosAgregar = ({
         ...row,
       });
     }
-    console.log(row);
   }, [isOpen, row]);
 
   const abrirModalConfirmacion = (): void => {
@@ -87,14 +93,6 @@ export const ModalModelosAgregar = ({
 
   const cerrarModalConfirmacion = (): void => {
     setIsModalOpen(false);
-  };
-
-  const seleccionarTextoInput = (
-    ref: React.RefObject<HTMLInputElement>
-  ): void => {
-    if (ref.current && ref.current.value === '0') {
-      ref.current.select();
-    }
   };
 
   const guardarModelo = async (): Promise<void> => {
@@ -178,26 +176,6 @@ export const ModalModelosAgregar = ({
 
     setCerrarFormulario(cerrarForm);
     abrirModalConfirmacion();
-  };
-
-  const validarCampo = (
-    campo: string | number,
-    ref: React.RefObject<HTMLElement>,
-    setValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
-  ): boolean => {
-    if (!campo.toString().trim()) {
-      ref.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} es obligatorio`,
-        text: `Por favor completa el campo ${campoNombre}.`,
-      });
-      return false;
-    }
-    setValido(true);
-    return true;
   };
 
   return (
@@ -286,8 +264,6 @@ export const ModalModelosAgregar = ({
                   onChange={onInputChange}
                   style={{
                     fontSize: '1.4rem',
-                    border: '1px solid #b9b9b9',
-                    backgroundColor: '#FFFFFF',
                   }}
                   onBlur={() => setModeloValido(true)}
                   onFocus={() => seleccionarTextoInput(de_ModeloRef)}
@@ -335,6 +311,7 @@ export const ModalModelosAgregar = ({
         onClose={cerrarModalConfirmacion}
         onConfirm={guardarModelo}
         objeto="Modelo"
+        sn_editar={sn_Editar}
       />
     </>
   );

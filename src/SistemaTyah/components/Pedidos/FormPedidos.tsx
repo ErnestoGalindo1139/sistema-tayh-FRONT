@@ -42,6 +42,8 @@ import { WaitScreen } from '../WaitScreen';
 import { IEstatus } from '../../interfaces/interfacesEstatus';
 import { useValidations } from '../../hooks/useValidations';
 import { useFormDate } from '../../hooks/useFormDate';
+import { useForm } from '../../hooks/useForm';
+import { useInputsInteraction } from '../../hooks/useInputsInteraction';
 
 interface IFormPedidosProps {
   setSn_Agregar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -66,7 +68,12 @@ export const FormPedidos = ({
   filtros,
   estatusPedidos,
 }: IFormPedidosProps): React.JSX.Element => {
-  const [formPedidos, setFormPedidos] = useState<IFormPedidos>({
+  const {
+    formState: formPedidos,
+    setFormState: setFormPedidos,
+    onInputChange,
+    // onResetForm: limpiarFormulario,
+  } = useForm<IFormPedidos>({
     ...row,
   });
 
@@ -98,6 +105,8 @@ export const FormPedidos = ({
     formPedidos,
     setFormPedidos
   );
+
+  const seleccionarTextoInput = useInputsInteraction();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cerrarFormulario, setCerrarFormulario] = useState(false);
@@ -657,12 +666,7 @@ export const FormPedidos = ({
               placeholder="Folio de Pedido"
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               value={formPedidos.id_Pedido}
-              onChange={(e) =>
-                setFormPedidos({
-                  ...formPedidos,
-                  id_Pedido: Number(e.target.value),
-                })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -684,12 +688,7 @@ export const FormPedidos = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${modeloValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               id="id_Cliente"
               name="id_Cliente"
-              onChange={(e) => {
-                setFormPedidos({
-                  ...formPedidos,
-                  id_Cliente: Number(e.target.value),
-                });
-              }}
+              onChange={onInputChange}
               onBlur={() => setClienteValido(true)}
               sizing="lg"
               style={{
@@ -726,16 +725,11 @@ export const FormPedidos = ({
               Estatus
             </Label>
             <Select
-              disabled={sn_Visualizar}
+              disabled={sn_Editar ? false : true}
               ref={id_EstatusRef}
               color={`${estatusValido ? '' : 'failure'}`}
               value={formPedidos.id_Estatus}
-              onChange={(e) => {
-                setFormPedidos({
-                  ...formPedidos,
-                  id_Estatus: e.target.value,
-                });
-              }}
+              onChange={onInputChange}
               onBlur={() => setEstatusValido(true)}
               sizing="lg"
               style={{
@@ -843,15 +837,9 @@ export const FormPedidos = ({
               value={formPedidos.id_ViaContacto || ''}
               color={`${viaContactoValida ? '' : 'failure'}`}
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${modeloValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
-              id="id_Cliente"
-              name="id_Cliente"
-              onChange={(e) => {
-                const selectedVia = e.target.value;
-                setFormPedidos({
-                  ...formPedidos,
-                  id_ViaContacto: Number(selectedVia),
-                });
-              }}
+              id="id_ViaContacto"
+              name="id_ViaContacto"
+              onChange={onInputChange}
               onBlur={() => setViaContactoValida(true)}
               sizing="lg"
               style={{
@@ -885,8 +873,8 @@ export const FormPedidos = ({
           </div>
 
           {/* Campo adicional si selecciona Online u Otros */}
-          {(formPedidos.id_ViaContacto === 1 ||
-            formPedidos.id_ViaContacto === 6) && (
+          {(formPedidos.id_ViaContacto == 1 ||
+            formPedidos.id_ViaContacto == 6) && (
             <div className="dark:text-white">
               <Label className="text-[1.6rem] font-bold">Especifique</Label>
               <TextInput
@@ -894,7 +882,7 @@ export const FormPedidos = ({
                 ref={de_ViaContactoRef}
                 type="text"
                 placeholder={
-                  formPedidos.id_ViaContacto === 1
+                  formPedidos.id_ViaContacto == 1
                     ? 'Especifique la plataforma online'
                     : 'Especifique otra vía de contacto'
                 }
@@ -903,12 +891,7 @@ export const FormPedidos = ({
                 color={`${DescripcionContactoValida ? '' : 'failure'}`}
                 className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${conceptoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                 value={formPedidos.de_ViaContacto || ''}
-                onChange={(e) =>
-                  setFormPedidos({
-                    ...formPedidos,
-                    de_ViaContacto: e.target.value,
-                  })
-                }
+                onChange={onInputChange}
                 style={{
                   fontSize: '1.4rem',
                   border: '1px solid #b9b9b9',
@@ -940,12 +923,7 @@ export const FormPedidos = ({
               color={`${conceptoValido ? '' : 'failure'}`}
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${conceptoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               value={formPedidos.de_Concepto}
-              onChange={(e) =>
-                setFormPedidos({
-                  ...formPedidos,
-                  de_Concepto: e.target.value,
-                })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -1125,13 +1103,7 @@ export const FormPedidos = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${colorValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               id="id_Color"
               name="id_Color"
-              onChange={(e) => {
-                setFormPedidos({
-                  ...formPedidos,
-                  id_Color: e.target.value,
-                });
-                // calcularPrecioUnitario();
-              }}
+              onChange={onInputChange}
               onBlur={() => setColorValido(true)}
               sizing="lg"
               style={{
@@ -1171,12 +1143,7 @@ export const FormPedidos = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${tipoTelaValida ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               id="id_TipoTela"
               name="id_TipoTela"
-              onChange={(e) => {
-                setFormPedidos({
-                  ...formPedidos,
-                  id_TipoTela: e.target.value,
-                });
-              }}
+              onChange={onInputChange}
               onBlur={() => setTipoTelaValida(true)}
               sizing="lg"
               style={{
@@ -1216,18 +1183,14 @@ export const FormPedidos = ({
               value={formPedidos.nu_Cantidad}
               id="nu_Cantidad"
               name="nu_Cantidad"
-              onChange={(e) => {
-                setFormPedidos({
-                  ...formPedidos,
-                  nu_Cantidad: Number(e.target.value),
-                });
-              }}
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
                 backgroundColor: '#ffffff',
               }}
               onBlur={() => setCantidadValida(true)}
+              onFocus={() => seleccionarTextoInput(nu_CantidadRef)}
               sizing="lg"
               min="1"
             />
@@ -1248,12 +1211,7 @@ export const FormPedidos = ({
               name="im_PrecioUnitario"
               addon="$"
               required
-              onChange={(e) =>
-                setFormPedidos({
-                  ...formPedidos,
-                  im_PrecioUnitario: Number(e.target.value),
-                })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -1278,12 +1236,7 @@ export const FormPedidos = ({
               value={formPedidos.im_SubTotal}
               id="im_SubTotal"
               name="im_SubTotal"
-              onChange={(e) =>
-                setFormPedidos({
-                  ...formPedidos,
-                  im_SubTotal: Number(e.target.value),
-                })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -1301,12 +1254,7 @@ export const FormPedidos = ({
               color={`${impuestoValido ? '' : 'failure'}`}
               ref={im_ImpuestoRef}
               value={formPedidos.im_Impuesto}
-              onChange={(e) => {
-                setFormPedidos({
-                  ...formPedidos,
-                  im_Impuesto: Number(e.target.value),
-                });
-              }}
+              onChange={onInputChange}
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${impuestoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               id="im_Impuesto"
               name="im_Impuesto"
@@ -1348,12 +1296,7 @@ export const FormPedidos = ({
               value={formPedidos.im_Total}
               id="im_Total"
               name="im_Total"
-              onChange={(e) =>
-                setFormPedidos({
-                  ...formPedidos,
-                  im_Total: Number(e.target.value),
-                })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -1420,6 +1363,7 @@ export const FormPedidos = ({
         onClose={cerrarModalConfirmacion}
         onConfirm={guardarPedido}
         objeto="Pedido"
+        sn_editar={sn_Editar}
       />
     </div>
   );

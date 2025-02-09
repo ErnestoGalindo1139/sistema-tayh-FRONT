@@ -38,6 +38,8 @@ import {
   updatePrecios,
 } from '../helpers/apiPrecios';
 import { useForm } from '../hooks/useForm';
+import { useValidations } from '../hooks/useValidations';
+import { useInputsInteraction } from '../hooks/useInputsInteraction';
 
 interface ModalPreciosAgregarProps {
   isOpen: boolean;
@@ -82,19 +84,19 @@ export const ModalPreciosAgregar = ({
     onInputChange,
     onResetForm: limpiarFormulario,
   } = useForm<IFormPrecios>({
-    id_Precio: 0,
-    id_Modelo: 0,
-    de_Genero: '',
-    id_TipoPrenda: 0,
-    id_Talla: 0,
-    im_PrecioUnitario: 0,
+    ...row,
   });
+
+  // Hook para manejar todas las validaciones generales
+  const { validarCampo } = useValidations();
 
   const [tipoPrendas, setTipoPrendas] = useState<ITipoPrendas[]>([]);
   const [tallas, setTallas] = useState<ITallas[]>([]);
   const [modelos, setModelos] = useState<IModelos[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const seleccionarTextoInput = useInputsInteraction();
 
   // Limpiar Formulario
   useEffect(() => {
@@ -104,7 +106,6 @@ export const ModalPreciosAgregar = ({
         ...row,
       });
     }
-    console.log(row);
   }, [isOpen, row]);
 
   useEffect(() => {
@@ -149,8 +150,20 @@ export const ModalPreciosAgregar = ({
     const fetchModelos = async (): Promise<void> => {
       try {
         if (formPrecios.de_Genero) {
-          const modelosData = await getModelosCombo(formPrecios.de_Genero); // Modulo de Pedidos
+          const modelosData = await getModelosCombo(formPrecios.de_Genero);
           setModelos(modelosData.body);
+
+          // Verificar si el modelo seleccionado sigue existiendo en la nueva lista
+          const modeloExiste = modelosData.body.some(
+            (m) => Number(m.id_Modelo) === Number(formPrecios.id_Modelo)
+          );
+
+          if (!modeloExiste) {
+            setFormPrecios((prev) => ({
+              ...prev,
+              id_Modelo: 0,
+            }));
+          }
         }
       } catch (error) {
         const errorMessage =
@@ -159,11 +172,6 @@ export const ModalPreciosAgregar = ({
           icon: 'error',
           title: 'Ocurrió un Error',
           text: errorMessage,
-        });
-      } finally {
-        setFormPrecios({
-          ...formPrecios,
-          id_Modelo: 0,
         });
       }
     };
@@ -177,14 +185,6 @@ export const ModalPreciosAgregar = ({
 
   const cerrarModalConfirmacion = (): void => {
     setIsModalOpen(false);
-  };
-
-  const seleccionarTextoInput = (
-    ref: React.RefObject<HTMLInputElement>
-  ): void => {
-    if (ref.current && ref.current.value === '0') {
-      ref.current.select();
-    }
   };
 
   const guardarPrecio = async (): Promise<void> => {
@@ -286,26 +286,6 @@ export const ModalPreciosAgregar = ({
 
     setCerrarFormulario(cerrarForm);
     abrirModalConfirmacion();
-  };
-
-  const validarCampo = (
-    campo: string | number,
-    ref: React.RefObject<HTMLElement>,
-    setValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
-  ): boolean => {
-    if (!campo) {
-      ref.current?.focus();
-      setValido(false);
-      Toast.fire({
-        icon: 'error',
-        title: `${campoNombre} es obligatorio`,
-        text: `Por favor completa el campo ${campoNombre}.`,
-      });
-      return false;
-    }
-    setValido(true);
-    return true;
   };
 
   return (
@@ -525,7 +505,6 @@ export const ModalPreciosAgregar = ({
                   style={{
                     fontSize: '1.4rem',
                     border: '1px solid #b9b9b9',
-                    backgroundColor: '#FFFFFF',
                   }}
                   onBlur={() => setPrecioUnitarioValido(true)}
                   onFocus={() => seleccionarTextoInput(im_PrecioUnitarioRef)}
@@ -573,6 +552,7 @@ export const ModalPreciosAgregar = ({
         onClose={cerrarModalConfirmacion}
         onConfirm={guardarPrecio}
         objeto="Precio"
+        sn_editar={sn_Editar}
       />
     </>
   );

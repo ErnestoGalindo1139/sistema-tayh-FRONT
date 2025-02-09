@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tooltip, Table } from 'flowbite-react';
 import { useTheme } from '../../ThemeContext';
 
@@ -33,6 +33,11 @@ export const DataTable = <T,>({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const { isDarkMode } = useTheme();
+
+  // Se reinicia el paginado cada vez que se realiza una busqueda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data]);
 
   // Verificar si data es un array válido
   if (!Array.isArray(data)) {

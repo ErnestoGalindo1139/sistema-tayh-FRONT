@@ -50,12 +50,14 @@ export const PreciosAdmin = (): React.JSX.Element => {
     visible: boolean;
     width: string;
   }[] = [
-    { id: 'id_Precio', texto: 'ID', visible: true, width: '10%' },
     { id: 'de_Genero', texto: 'Genero', visible: false, width: '20%' },
-    { id: 'de_GeneroCompleto', texto: 'Genero', visible: true, width: '20%' },
+    { id: 'id_Modelo', texto: 'ID Modelo', visible: false, width: '20%' },
     { id: 'id_TipoPrenda', texto: 'Tipo Prenda', visible: false, width: '20%' },
-    { id: 'de_TipoPrenda', texto: 'Tipo Prenda', visible: true, width: '20%' },
     { id: 'id_Talla', texto: 'Talla', visible: false, width: '20%' },
+    { id: 'id_Precio', texto: 'ID', visible: true, width: '5%' },
+    { id: 'de_GeneroCompleto', texto: 'Genero', visible: true, width: '15%' },
+    { id: 'de_Modelo', texto: 'Modelo', visible: true, width: '15%' },
+    { id: 'de_TipoPrenda', texto: 'Tipo Prenda', visible: true, width: '15%' },
     { id: 'de_Talla', texto: 'Talla', visible: true, width: '20%' },
     {
       id: 'im_PrecioUnitario',

@@ -87,25 +87,7 @@ export const ModalClientes = ({
     onInputChange,
     onResetForm: limpiarFormulario,
   } = useForm<IFormClientes>({
-    id_Cliente: '',
-    nb_Cliente: '',
-    de_Direccion: '',
-    de_CorreoElectronico: '',
-    de_FolioCliente: '',
-    nb_Atendio: '',
-    id_UsuarioRegistra: '',
-    id_UsuarioModifica: '',
-    id_UsuarioElimina: '',
-    fh_Cumpleanos: '',
-    fh_CumpleanosEmpresa: '',
-    redesSociales: [],
-    nu_TelefonoRedLocal: '',
-    nu_TelefonoCelular: '',
-    nu_TelefonoWhatsApp: '',
-    fh_Registro: '',
-    fh_Modificacion: '',
-    fh_Eliminacion: '',
-    sn_Activo: true,
+    ...row,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -604,7 +586,7 @@ export const ModalClientes = ({
                   Fecha de Cumpleaños Cliente
                 </Label>
                 <Datepicker
-                  // key={formClientes.fh_Cumpleanos} // Cambia la clave cuando el valor cambia
+                  key={formClientes.id_Cliente || 'default'} // Cambia la clave cuando el valor cambia
                   color={`${cumpleanosValido ? '' : 'failure'}`}
                   ref={fh_CumpleanosRef}
                   disabled={sn_Visualizar}
@@ -629,9 +611,7 @@ export const ModalClientes = ({
                 </Label>
                 {/* <Datepicker language="es-MX" /> */}
                 <Datepicker
-                  // key={
-                  //   formClientes.fh_CumpleanosEmpresa || 'fh_CumpleanosEmpresa'
-                  // } // Cambia la clave cuando el valor cambia
+                  key={formClientes.id_Cliente || 'default'} // Cambia la clave cuando el valor cambia
                   color={`${cumpleanosEmpresaValido ? '' : 'failure'}`}
                   onBlur={() => setCumpleanosEmpresaValido(true)}
                   disabled={sn_Visualizar}
@@ -748,6 +728,7 @@ export const ModalClientes = ({
         onClose={cerrarModalConfirmacion}
         onConfirm={guardarCliente}
         objeto="Cliente"
+        sn_editar={sn_Editar}
       />
     </>
   );
