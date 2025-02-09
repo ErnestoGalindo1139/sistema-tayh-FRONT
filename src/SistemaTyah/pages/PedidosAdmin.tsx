@@ -138,8 +138,6 @@ export const PedidosAdmin = (): React.JSX.Element => {
         setSn_Editar(false);
         setSn_Visualizar(true);
         limpiarPedido();
-        console.log(row);
-
         setPedido({
           ...row,
         });

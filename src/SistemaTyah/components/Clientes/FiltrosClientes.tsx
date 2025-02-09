@@ -7,6 +7,7 @@ import {
   IFiltrosClientes,
 } from '../../interfaces/interfacesClientes';
 import { getClientes } from '../../helpers/apiClientes';
+import { useInputsInteraction } from '../../hooks/useInputsInteraction';
 
 export const FiltrosClientes = ({
   filtros,
@@ -22,11 +23,7 @@ export const FiltrosClientes = ({
   const id_ClienteRef = useRef<HTMLInputElement>(null);
   const nb_ClienteRef = useRef<HTMLInputElement>(null);
 
-  const seleccionarTextoInput = (
-    ref: React.RefObject<HTMLInputElement>
-  ): void => {
-    ref.current?.select();
-  };
+  const seleccionarTextoInput = useInputsInteraction();
 
   const buscarClientes = async (filtros: IFiltrosClientes): Promise<void> => {
     setIsLoading(true);

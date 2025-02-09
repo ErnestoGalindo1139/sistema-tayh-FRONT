@@ -15,6 +15,7 @@ import {
   ITipoPrendas,
 } from '../../interfaces/interfacesPedidos';
 import { getPrecios } from '../../helpers/apiPrecios';
+import { useInputsInteraction } from '../../hooks/useInputsInteraction';
 
 export const FiltrosPrecios = ({
   filtros,
@@ -33,6 +34,8 @@ export const FiltrosPrecios = ({
 
   const im_PrecioMinimoRef = useRef<HTMLInputElement>(null);
   const im_PrecioMaximoRef = useRef<HTMLInputElement>(null);
+
+  const seleccionarTextoInput = useInputsInteraction();
 
   useEffect(() => {
     const fetchPrecios = async (): Promise<void> => {
@@ -127,14 +130,6 @@ export const FiltrosPrecios = ({
       setIsLoading(false);
     } else {
       return;
-    }
-  };
-
-  const seleccionarTextoInput = (
-    ref: React.RefObject<HTMLInputElement>
-  ): void => {
-    if (ref.current && ref.current.value === '0') {
-      ref.current.select();
     }
   };
 

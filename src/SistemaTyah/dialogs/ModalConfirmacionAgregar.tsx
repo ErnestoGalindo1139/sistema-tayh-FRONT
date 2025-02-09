@@ -8,6 +8,7 @@ interface ModalConfirmacionAgregarProps {
   onClose: () => void;
   onConfirm: () => void;
   objeto: string;
+  sn_editar: boolean;
 }
 
 export const ModalConfirmacionAgregar = ({
@@ -15,6 +16,7 @@ export const ModalConfirmacionAgregar = ({
   onClose,
   onConfirm,
   objeto,
+  sn_editar,
 }: ModalConfirmacionAgregarProps): React.JSX.Element => {
   return (
     <Modal
@@ -25,14 +27,17 @@ export const ModalConfirmacionAgregar = ({
       className="z-[9999]"
     >
       <Modal.Header>
-        <p className="text-gray-700 text-[2rem] m-[1rem]">Agregar {objeto}</p>
+        <p className="text-gray-700 text-[2rem] m-[1rem]">
+          {sn_editar ? 'Editar' : 'Agregar'} {objeto}
+        </p>
       </Modal.Header>
       <Modal.Body>
         <HiCheckCircle className="mx-auto mb-4 h-14 w-14 text-green-500 dark:text-gray-200" />
 
         <div className="text-center">
           <p className="text-gray-700 text-[2rem]">
-            ¿Está seguro de que desea agregar el {objeto}?
+            ¿Está seguro de que desea {sn_editar ? 'editar' : 'agregar'} el{' '}
+            {objeto}?
           </p>
         </div>
       </Modal.Body>

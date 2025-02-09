@@ -7,8 +7,6 @@ const BASE_URL = 'http://localhost:3000';
 export const calcularPrecioUnitarioHelper = async (
   payload: Partial<IFormPedidos>
 ): Promise<ApiResponse<number>> => {
-  console.log(payload);
-
   try {
     const response = await fetch(`${BASE_URL}/getPrecioUnitario`, {
       method: 'POST',

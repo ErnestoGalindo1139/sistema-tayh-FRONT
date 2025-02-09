@@ -31,7 +31,6 @@ export const createPrecios = async (
   pedido: IFormPrecios
 ): Promise<ApiResponse<IFormPrecios>> => {
   try {
-    console.log(pedido);
     const response = await fetch(`${BASE_URL}/createPrecios`, {
       method: 'POST',
       headers: {

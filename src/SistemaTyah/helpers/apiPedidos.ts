@@ -42,7 +42,6 @@ export const createPedidos = async (
   pedido: IFormPedidos
 ): Promise<ApiResponse<IFormPedidos>> => {
   try {
-    console.log(pedido);
     const response = await fetch(`${BASE_URL}/createPedidos`, {
       method: 'POST',
       headers: {
@@ -225,8 +224,6 @@ export const getEspecificacionesPedidos = async (
   filtros: Partial<IEspecificacionesPedidos>
 ): Promise<ApiResponse<IEspecificacionesPedidos[]>> => {
   try {
-    console.log(filtros);
-
     const response = await fetch(`${BASE_URL}/getEspecificacionesPedidos`, {
       method: 'POST',
       headers: {
@@ -246,8 +243,6 @@ export const getEspecificacionesPedidos = async (
 export const getIdPedido = async (
   payload: Partial<IFormPedidos>
 ): Promise<ApiResponse<number>> => {
-  console.log(payload);
-
   try {
     const response = await fetch(`${BASE_URL}/getIdPedido`, {
       method: 'POST',

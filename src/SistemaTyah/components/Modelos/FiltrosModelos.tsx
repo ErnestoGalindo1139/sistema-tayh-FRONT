@@ -10,6 +10,7 @@ import {
 } from '../../interfaces/interfacesPedidos';
 import { IFiltrosModelos } from '../../interfaces/interfacesModelos';
 import { getModelos } from '../../helpers/apiModelos';
+import { useInputsInteraction } from '../../hooks/useInputsInteraction';
 
 export const FiltrosModelos = ({
   filtros,
@@ -26,9 +27,12 @@ export const FiltrosModelos = ({
   const de_GeneroRef = useRef<HTMLInputElement>(null);
   const de_ModeloRef = useRef<HTMLInputElement>(null);
 
+  const seleccionarTextoInput = useInputsInteraction();
+
   useEffect(() => {
     const fetchModelos = async (): Promise<void> => {
       try {
+        setIsLoading(true);
         const modelosData = await getModelos(filtros); // Modulo de Pedidos
         actualizarModelos(modelosData.body);
       } catch (error) {
@@ -40,10 +44,7 @@ export const FiltrosModelos = ({
           text: errorMessage,
         });
       } finally {
-        setFiltros({
-          ...filtros,
-          id_Modelo: '',
-        });
+        setIsLoading(false);
       }
     };
 
@@ -59,14 +60,6 @@ export const FiltrosModelos = ({
       setIsLoading(false);
     } else {
       return;
-    }
-  };
-
-  const seleccionarTextoInput = (
-    ref: React.RefObject<HTMLInputElement>
-  ): void => {
-    if (ref.current && ref.current.value === '0') {
-      ref.current.select();
     }
   };
 
