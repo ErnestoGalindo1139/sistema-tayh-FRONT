@@ -79,7 +79,7 @@ export default function AdminLayout(): React.JSX.Element {
           }}
         >
           <Image
-            src={'../../../public/Logo Tayh Clothing.png'}
+            src={'img/Logo Tayh Clothing.png'}
             alt="Logo Tayh Clothing"
             objectFit="cover"
             borderRadius="md"
