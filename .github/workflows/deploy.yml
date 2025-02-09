@@ -3,7 +3,7 @@ name: Build and Deploy to Production
 on:
   push:
     branches:
-      - main  # Se ejecuta cuando hay un push en la rama main
+      - main  # Se ejecuta cuando hay un push en main
 
 jobs:
   build-and-deploy:
@@ -26,6 +26,8 @@ jobs:
         run: yarn vite build
 
       - name: Subir archivos a la rama produccion
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
@@ -33,4 +35,4 @@ jobs:
           git reset --hard
           git add -f dist
           git commit -m "🚀 Build automático desde main"
-          git push origin produccion --force
+          git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git produccion --force
