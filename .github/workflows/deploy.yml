@@ -25,15 +25,29 @@ jobs:
       - name: Construir el proyecto
         run: yarn vite build
 
-      - name: Subir archivos a la rama produccion
+      - name: Subir solo el contenido de dist a la rama produccion
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git checkout --orphan produccion
+
+          # Cambiar a la rama produccion o crearla si no existe
+          git checkout --orphan produccion || git checkout produccion
           git reset --hard
-          git add -f dist
+
+          # Mover el contenido de dist a la raíz
+          mv dist/* .
+
+          # Eliminar la carpeta dist vacía y cualquier otro archivo innecesario
+          rm -rf dist node_modules
+
+          # Agregar solo los archivos movidos
+          git add .
+
+          # Confirmar los cambios
           git commit -m "🚀 Build automático desde main"
+
+          # Forzar el push a la rama produccion
           git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git
           git push origin produccion --force
