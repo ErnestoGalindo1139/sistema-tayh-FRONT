@@ -130,13 +130,18 @@ export const ModalEnvios = ({
   // Limpiar Formulario
   useEffect(() => {
     if (isOpen) {
-      onResetForm();
-
       if (sn_Editar) {
         setFormState({
           ...row,
           id_Cliente: Number(row.id_Cliente),
         });
+      } else if (sn_Visualizar) {
+        setFormState({
+          ...row,
+          id_Cliente: Number(row.id_Cliente),
+        });
+      } else {
+        onResetForm();
       }
     }
   }, [isOpen, row]);
@@ -400,7 +405,7 @@ export const ModalEnvios = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-[2rem] mb-[1rem]">
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-[2rem] mb-[1rem]">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Cliente</Label>
                 <CustomSelect
@@ -443,8 +448,6 @@ export const ModalEnvios = ({
                   sizing="lg"
                 />
               </div>
-            </FormControl>
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-[2rem] mb-[1rem]">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Correo Electrónico</Label>
                 <CustomInput
@@ -465,6 +468,8 @@ export const ModalEnvios = ({
                   sizing="lg"
                 />
               </div>
+            </FormControl>
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-[2rem] mb-[1rem]">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Teléfono Celular</Label>
                 <CustomInput
@@ -484,9 +489,6 @@ export const ModalEnvios = ({
                   sizing="lg"
                 />
               </div>
-            </FormControl>
-
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-[2rem]">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Teléfono Red Local</Label>
                 <CustomInput
@@ -527,7 +529,8 @@ export const ModalEnvios = ({
                 />
               </div>
             </FormControl>
-            <FormControl className="grid grid-cols-1 md:grid-cols-2 gap-[2rem]">
+
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-[2rem]">
               <div className="w-full">
                 <Label className={`text-[1.6rem] ${sn_Editar ? '' : 'hidden'}`}>
                   Estatus
@@ -581,6 +584,7 @@ export const ModalEnvios = ({
         onClose={cerrarModalConfirmacion}
         onConfirm={guardarEnvio}
         objeto="Envio"
+        sn_editar={sn_Editar}
       />
     </>
   );
