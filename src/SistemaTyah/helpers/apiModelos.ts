@@ -2,7 +2,7 @@ import { ApiResponse } from '../interfaces/interfacesApi';
 import { IFiltrosModelos, IFormModelos } from '../interfaces/interfacesModelos';
 import { IModelos } from '../interfaces/interfacesPedidos';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const getModelos = async (
   filtros: IFiltrosModelos

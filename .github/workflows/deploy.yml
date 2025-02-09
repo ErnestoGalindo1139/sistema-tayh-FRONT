@@ -26,6 +26,8 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Construir el proyecto
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: yarn vite build
 
       - name: Subir solo el contenido de dist a la rama produccion
