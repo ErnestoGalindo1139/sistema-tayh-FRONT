@@ -46,7 +46,7 @@ export const OrdenTrabajo = (props: OrdenTrabajoProps): React.JSX.Element => {
       <header className="flex flex-col sm:flex-row justify-between items-center pt-8 mb-8 border-b border-gray-400 pb-4">
         {/* Logo de la empresa */}
         <img
-          src="../../../public/Logo-Tayh_Horizontal-Negro.png" // Reemplaza con la ruta correcta del logo
+          src="img/Logo-Tayh_Horizontal-Negro.png" // Reemplaza con la ruta correcta del logo
           alt="Logo Empresa"
           className="w-60 sm:w-96 h-auto object-contain mb-4 sm:mb-0 pl-8 pr-8"
         />
@@ -66,7 +66,7 @@ export const OrdenTrabajo = (props: OrdenTrabajoProps): React.JSX.Element => {
         {/* Imagen editada a la izquierda */}
         <div className="flex justify-center md:justify-start md:w-1/2">
           <img
-            src="../../../public/Filipina Prueba Azul.png"
+            src="img/Filipina Prueba Azul.png"
             alt="Imagen Editada"
             className="w-[40rem] h-auto rounded-lg m-auto"
           />
