@@ -50,4 +50,6 @@ jobs:
 
           # Forzar el push a la rama produccion
           git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git
-          git push origin produccion --force
+          git pull origin produccion --rebase  # Asegura que los cambios sean compatibles
+          git push origin produccion --force   # Sobreescribe solo si es necesario
+
