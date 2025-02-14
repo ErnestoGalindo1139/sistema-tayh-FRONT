@@ -19,15 +19,18 @@ export const PreciosAdmin = (): React.JSX.Element => {
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
   const [sn_Visualizar, setSn_Visualizar] = useState<boolean>(false);
 
-  const { formState: filtros, setFormState: setFiltros } =
-    useForm<IFiltrosPrecios>({
-      id_Modelo: 0,
-      de_Genero: '',
-      id_TipoPrenda: 0,
-      id_Talla: 0,
-      im_PrecioMinimo: 0,
-      im_PrecioMaximo: 0,
-    });
+  const {
+    formState: filtros,
+    setFormState: setFiltros,
+    onInputChange,
+  } = useForm<IFiltrosPrecios>({
+    id_Modelo: 0,
+    de_Genero: '',
+    id_TipoPrenda: 0,
+    id_Talla: 0,
+    im_PrecioMinimo: '',
+    im_PrecioMaximo: '',
+  });
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -160,6 +163,7 @@ export const PreciosAdmin = (): React.JSX.Element => {
             setFiltros={setFiltros}
             actualizarPrecios={setPrecios}
             setIsLoading={setIsLoading}
+            onInputChange={onInputChange}
           />
 
           {/* Grid | Tabla */}

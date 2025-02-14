@@ -11,6 +11,7 @@ import { IModelos } from '../interfaces/interfacesPedidos';
 import { IFiltrosModelos } from '../interfaces/interfacesModelos';
 import { FiltrosModelos } from '../components/Modelos/FiltrosModelos';
 import { ModalModelosAgregar } from '../dialogs/ModalModelosAgregar';
+import { useForm } from '../hooks/useForm';
 
 export const ModelosAdmin = (): React.JSX.Element => {
   const [modelos, setModelos] = useState<IModelos[]>([]);
@@ -19,7 +20,11 @@ export const ModelosAdmin = (): React.JSX.Element => {
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
   const [sn_Visualizar, setSn_Visualizar] = useState<boolean>(false);
 
-  const [filtros, setFiltros] = useState<IFiltrosModelos>({
+  const {
+    formState: filtros,
+    setFormState: setFiltros,
+    onInputChange,
+  } = useForm<IFiltrosModelos>({
     id_Modelo: '',
     de_Genero: '',
     de_Modelo: '',
@@ -134,6 +139,7 @@ export const ModelosAdmin = (): React.JSX.Element => {
             setFiltros={setFiltros}
             actualizarModelos={setModelos}
             setIsLoading={setIsLoading}
+            onInputChange={onInputChange}
           />
 
           {/* Grid | Tabla */}
