@@ -20,6 +20,7 @@ import { IEstatus } from '../interfaces/interfacesEstatus';
 import { getEstatus } from '../helpers/apiEstatus';
 import { FormPedidos } from '../components/Pedidos/FormPedidos';
 import { FiltrosPedidos } from '../components/Pedidos/FiltrosPedidos';
+import { useForm } from '../hooks/useForm';
 
 export const PedidosAdmin = (): React.JSX.Element => {
   const [pedidos, setPedidos] = useState<IPedidos[]>([]);
@@ -31,7 +32,11 @@ export const PedidosAdmin = (): React.JSX.Element => {
     IEstatus[]
   >([]);
 
-  const [filtros, setFiltros] = useState<IFiltrosPedidos>({
+  const {
+    formState: filtros,
+    setFormState: setFiltros,
+    onInputChange,
+  } = useForm<IFiltrosPedidos>({
     id_Pedido: '',
     id_Cliente: '',
     fh_Pedido: '',
@@ -285,6 +290,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
               estatusPedidos={estatusPedidos}
               actualizarPedidos={setPedidos}
               setIsLoading={setIsLoading}
+              onInputChange={onInputChange}
             />
 
             <div className="table-container dark:bg-transparent">

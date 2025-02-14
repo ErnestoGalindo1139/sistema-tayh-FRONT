@@ -25,6 +25,6 @@ export interface IFiltrosPrecios {
   de_Genero: string;
   id_TipoPrenda: number;
   id_Talla: number;
-  im_PrecioMinimo: number;
-  im_PrecioMaximo: number;
+  im_PrecioMinimo: string;
+  im_PrecioMaximo: string;
 }

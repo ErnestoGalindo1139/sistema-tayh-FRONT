@@ -22,11 +22,15 @@ export const FiltrosPrecios = ({
   setFiltros,
   actualizarPrecios,
   setIsLoading,
+  onInputChange,
 }: {
   filtros: IFiltrosPrecios;
   setFiltros: React.Dispatch<React.SetStateAction<IFiltrosPrecios>>;
   actualizarPrecios: React.Dispatch<React.SetStateAction<IPrecios[]>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>; // El actualizador del estado de carga
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>; // El actualizador del estado de carga,
+  onInputChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void; // Cambios en inputs
 }): React.JSX.Element => {
   const [tipoPrendas, setTipoPrendas] = useState<ITipoPrendas[]>([]);
   const [tallas, setTallas] = useState<ITallas[]>([]);
@@ -149,9 +153,7 @@ export const FiltrosPrecios = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               id="de_Genero"
               name="de_Genero"
-              onChange={(e) =>
-                setFiltros({ ...filtros, de_Genero: e.target.value })
-              }
+              onChange={onInputChange}
               sizing="lg"
               style={{
                 fontSize: '1.4rem',
@@ -180,9 +182,7 @@ export const FiltrosPrecios = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               id="id_Modelo"
               name="id_Modelo"
-              onChange={(e) => {
-                setFiltros({ ...filtros, id_Modelo: Number(e.target.value) });
-              }}
+              onChange={onInputChange}
               sizing="lg"
               style={{
                 fontSize: '1.4rem',
@@ -218,13 +218,7 @@ export const FiltrosPrecios = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               id="id_TipoPrenda"
               name="id_TipoPrenda"
-              onChange={(e) => {
-                setFiltros({
-                  ...filtros,
-                  id_TipoPrenda: Number(e.target.value),
-                });
-                // calcularPrecioUnitario();
-              }}
+              onChange={onInputChange}
               sizing="lg"
               style={{
                 fontSize: '1.4rem',
@@ -260,12 +254,7 @@ export const FiltrosPrecios = ({
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               id="id_Talla"
               name="id_Talla"
-              onChange={(e) =>
-                setFiltros({
-                  ...filtros,
-                  id_Talla: Number(e.target.value),
-                })
-              }
+              onChange={onInputChange}
               sizing="lg"
               style={{
                 fontSize: '1.4rem',
@@ -299,12 +288,7 @@ export const FiltrosPrecios = ({
               id="im_PrecioMinimo"
               name="im_PrecioMinimo"
               addon="$"
-              onChange={(e) =>
-                setFiltros({
-                  ...filtros,
-                  im_PrecioMinimo: Number(e.target.value),
-                })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -326,12 +310,7 @@ export const FiltrosPrecios = ({
               id="im_PrecioMaximo"
               name="im_PrecioMaximo"
               addon="$"
-              onChange={(e) =>
-                setFiltros({
-                  ...filtros,
-                  im_PrecioMaximo: Number(e.target.value),
-                })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',

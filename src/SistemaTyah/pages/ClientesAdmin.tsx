@@ -19,12 +19,17 @@ import { RetweetIcon } from '../icons/RetweetIcon';
 import { Tooltip } from 'flowbite-react';
 import { FiltrosClientes } from '../components/Clientes/FiltrosClientes';
 import { ModalConfirmacionActivarInactivar } from '../dialogs/ModalConfirmacionActivarInactivar';
+import { useForm } from '../hooks/useForm';
 
 export const ClientesAdmin = (): React.JSX.Element => {
   const [clientes, setClientes] = useState<IClientes[]>([]);
   const [cliente, setCliente] = useState<IClientes>();
 
-  const [filtros, setFiltros] = useState<IFiltrosClientes>({
+  const {
+    formState: filtros,
+    setFormState: setFiltros,
+    onInputChange,
+  } = useForm<IFiltrosClientes>({
     id_Cliente: '',
     nb_Cliente: '',
     de_Direccion: '',
@@ -42,7 +47,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
     fh_Registro: '',
     fh_Modificacion: '',
     fh_Eliminacion: '',
-    sn_Activo: true,
+    sn_Activo: '1',
   });
 
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
@@ -311,6 +316,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
             setFiltros={setFiltros}
             actualizarClientes={setClientes}
             setIsLoading={setIsLoading}
+            onInputChange={onInputChange}
           />
 
           <div className="table-container dark:bg-transparent">
