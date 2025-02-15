@@ -11,6 +11,7 @@ import { ConfiguracionesAdmin } from '../pages/ConfiguracionesAdmin';
 import { OrdenTrabajo } from '../pages/OrdenTrabajo';
 import { PreciosAdmin } from '../pages/PreciosAdmin';
 import { ModelosAdmin } from '../pages/ModelosAdmin';
+import { FacturacionAdmin } from '../pages/FacturacionAdmin';
 
 export const SistemaTayhRoutes = (): React.JSX.Element => {
   return (
@@ -23,6 +24,7 @@ export const SistemaTayhRoutes = (): React.JSX.Element => {
           <Route path="clientes" element={<ClientesAdmin />} />
           <Route path="envios" element={<EnviosAdmin />} />
           <Route path="pedidos" element={<PedidosAdmin />} />
+          <Route path="facturacion" element={<FacturacionAdmin />} />
           <Route path="configuraciones" element={<ConfiguracionesAdmin />} />
           <Route path="precios" element={<PreciosAdmin />} />
           <Route path="modelos" element={<ModelosAdmin />} />

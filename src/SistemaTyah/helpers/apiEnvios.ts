@@ -81,7 +81,7 @@ export const updateEnvios = async (
   }
 };
 
-// Cancelar / Reanudar pedido
+// Cancelar / Reanudar envio
 export const deleteEnvios = async (
   envio: Partial<IFormEnvios>
 ): Promise<ApiResponse<IFormEnvios>> => {
@@ -100,7 +100,7 @@ export const deleteEnvios = async (
       throw new Error(data.message);
     }
 
-    return data; // Devuelve el producto actualizado
+    return data; // Devuelve el envio actualizado
   } catch (error) {
     console.error('Error al cancelar / reanudar pedido:', error);
     throw error;

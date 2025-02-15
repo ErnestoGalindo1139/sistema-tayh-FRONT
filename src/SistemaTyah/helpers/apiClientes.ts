@@ -6,6 +6,7 @@ import {
   ICumpleanosClientes,
 } from '../interfaces/interfacesClientes';
 import { ApiResponse } from '../interfaces/interfacesApi';
+import { CustomSelectValue } from '../interfaces/interfacesGlobales';
 
 // const BASE_URL = import.meta.env.VITE_BASE_URL;
 const BASE_URL = 'http://localhost:3000';
@@ -124,6 +125,46 @@ export const getClientesCombo = async (
 
     const data: ApiResponse<IClientesCombo[]> = await response.json();
     return data;
+  } catch (error) {
+    console.error('Error al obtener el combo de clientes:', error);
+    throw error;
+  }
+};
+
+// Obtener clientes combo multi select
+export const getClientesComboMultiSelect = async (
+  filtros?: Partial<IClientesCombo>
+): Promise<ApiResponse<CustomSelectValue[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getClientesCombo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IClientesCombo[]> = await response.json();
+
+    const comboClientesMultiSelect = data.body.map(
+      (cliente: IClientesCombo) => {
+        // Asegurarse de que `id_Cliente` sea siempre un número, o un string si lo prefieres
+        const value = cliente.id_Cliente ?? 0; // Asigna 0 si `id_Cliente` es `undefined`
+        return {
+          value:
+            typeof value === 'number' || !isNaN(Number(value))
+              ? Number(value)
+              : 0, // Asegúrate de convertir el valor a un número si es posible
+          label: cliente.nb_Cliente || 'Cliente desconocido', // Asegúrate de que `label` siempre tenga un valor
+        };
+      }
+    );
+
+    return {
+      message: 'Success',
+      success: true,
+      body: comboClientesMultiSelect,
+    };
   } catch (error) {
     console.error('Error al obtener el combo de clientes:', error);
     throw error;
