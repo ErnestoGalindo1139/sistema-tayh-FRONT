@@ -7,6 +7,7 @@ import {
   IFormPedidos,
   IModelos,
   IPedidos,
+  IPedidosDisponiblesCombo,
   ITallas,
   ITipoPrendas,
   ITipoTelas,
@@ -274,6 +275,27 @@ export const getViasContactoCombo = async (): Promise<
     return data;
   } catch (error) {
     console.error('Error al obtener Modelos:', error);
+    throw error;
+  }
+};
+
+// Obtener pedidos disponibles
+export const getPedidosDisponiblesCombo = async (
+  filtros?: Partial<IPedidosDisponiblesCombo>
+): Promise<ApiResponse<IPedidosDisponiblesCombo[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getPedidosSinRelacionarCombo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IPedidosDisponiblesCombo[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener el combo de pedidos:', error);
     throw error;
   }
 };

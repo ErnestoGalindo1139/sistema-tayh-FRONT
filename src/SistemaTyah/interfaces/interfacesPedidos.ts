@@ -124,3 +124,10 @@ export interface IEspecificacionesPedidos {
   id_Talla: number;
   de_Genero: string;
 }
+
+export interface IPedidosDisponiblesCombo {
+  id_Pedido?: string;
+  id_Cliente?: string;
+  de_Pedido?: string;
+  de_CorreoElectronico?: string;
+}
