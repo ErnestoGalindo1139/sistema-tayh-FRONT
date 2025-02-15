@@ -63,7 +63,7 @@ export interface IFiltrosClientes {
   fh_Registro: string;
   fh_Modificacion: string;
   fh_Eliminacion: string;
-  sn_Activo: boolean | null;
+  sn_Activo: string;
 }
 
 export interface IRedSocial {

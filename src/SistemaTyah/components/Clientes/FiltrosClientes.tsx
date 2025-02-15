@@ -14,11 +14,15 @@ export const FiltrosClientes = ({
   setFiltros,
   actualizarClientes,
   setIsLoading,
+  onInputChange,
 }: {
   filtros: IFiltrosClientes;
   setFiltros: React.Dispatch<React.SetStateAction<IFiltrosClientes>>;
   actualizarClientes: React.Dispatch<React.SetStateAction<IClientes[]>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>; // El actualizador del estado de carga
+  onInputChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void; // Cambios en inputs
 }): React.JSX.Element => {
   const id_ClienteRef = useRef<HTMLInputElement>(null);
   const nb_ClienteRef = useRef<HTMLInputElement>(null);
@@ -44,12 +48,12 @@ export const FiltrosClientes = ({
             <TextInput
               ref={id_ClienteRef}
               type="text"
+              id="id_Cliente"
+              name="id_Cliente"
               placeholder="Folio del Cliente"
               className="dark:text-white text-[1.4rem]"
               value={filtros.id_Cliente}
-              onChange={(e) =>
-                setFiltros({ ...filtros, id_Cliente: e.target.value })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -66,10 +70,10 @@ export const FiltrosClientes = ({
               type="text"
               placeholder="Nombre del Cliente"
               className="dark:text-white"
+              id="nb_Cliente"
+              name="nb_Cliente"
               value={filtros.nb_Cliente}
-              onChange={(e) =>
-                setFiltros({ ...filtros, nb_Cliente: e.target.value })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -86,12 +90,9 @@ export const FiltrosClientes = ({
 
             <Select
               value={filtros.fh_Cumpleanos}
-              onChange={(e) =>
-                setFiltros({
-                  ...filtros,
-                  fh_Cumpleanos: e.target.value,
-                })
-              }
+              onChange={onInputChange}
+              id="fh_Cumpleanos"
+              name="fh_Cumpleanos"
               sizing="lg"
               style={{
                 fontSize: '1.4rem',
@@ -112,17 +113,11 @@ export const FiltrosClientes = ({
               Estatus
             </Label>
             <Select
-              value={
-                filtros.sn_Activo === null ? '' : filtros.sn_Activo ? '1' : '0'
-              }
+              value={filtros.sn_Activo}
               className="dark:text-white"
-              onChange={(e) => {
-                const value = e.target.value;
-                setFiltros({
-                  ...filtros,
-                  sn_Activo: value === '' ? null : value === '1',
-                });
-              }}
+              onChange={onInputChange}
+              id="sn_Activo"
+              name="sn_Activo"
               sizing="lg"
               style={{
                 fontSize: '1.4rem',

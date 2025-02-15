@@ -1,8 +1,7 @@
 import { ApiResponse } from '../../interfaces/interfacesApi';
 import { IFormPedidos } from '../../interfaces/interfacesPedidos';
 
-const BASE_URL = 'http://localhost:3000';
-// const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const calcularPrecioUnitarioHelper = async (
   payload: Partial<IFormPedidos>

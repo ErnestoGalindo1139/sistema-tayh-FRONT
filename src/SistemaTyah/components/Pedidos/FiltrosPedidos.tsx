@@ -13,12 +13,16 @@ export const FiltrosPedidos = ({
   estatusPedidos,
   actualizarPedidos,
   setIsLoading,
+  onInputChange,
 }: {
   filtros: IFiltrosPedidos;
   setFiltros: React.Dispatch<React.SetStateAction<IFiltrosPedidos>>;
   estatusPedidos: IEstatus[];
   actualizarPedidos: React.Dispatch<React.SetStateAction<IPedidos[]>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>; // El actualizador del estado de carga
+  onInputChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void; // Cambios en inputs
 }): React.JSX.Element => {
   const { handleDateChange, getDateForPicker } = useFormDate(
     filtros,
@@ -52,9 +56,9 @@ export const FiltrosPedidos = ({
               placeholder="Folio del Pedido"
               className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               value={filtros.id_Pedido}
-              onChange={(e) =>
-                setFiltros({ ...filtros, id_Pedido: e.target.value })
-              }
+              id="id_Pedido"
+              name="id_Pedido"
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -71,9 +75,9 @@ export const FiltrosPedidos = ({
               placeholder="Folio del Cliente"
               className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               value={filtros.id_Cliente}
-              onChange={(e) =>
-                setFiltros({ ...filtros, id_Cliente: e.target.value })
-              }
+              id="id_Cliente"
+              name="id_Cliente"
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -90,9 +94,9 @@ export const FiltrosPedidos = ({
               placeholder="Nombre del Cliente"
               className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               value={filtros.nb_Cliente}
-              onChange={(e) =>
-                setFiltros({ ...filtros, nb_Cliente: e.target.value })
-              }
+              id="nb_Cliente"
+              name="nb_Cliente"
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -108,13 +112,10 @@ export const FiltrosPedidos = ({
             </Label>
             <Select
               value={filtros.id_Estatus}
+              id="id_Estatus"
+              name="id_Estatus"
               className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
-              onChange={(e) => {
-                setFiltros({
-                  ...filtros,
-                  id_Estatus: e.target.value,
-                });
-              }}
+              onChange={onInputChange}
               sizing="lg"
               style={{
                 fontSize: '1.4rem',

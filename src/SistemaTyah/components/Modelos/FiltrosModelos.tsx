@@ -17,14 +17,18 @@ export const FiltrosModelos = ({
   setFiltros,
   actualizarModelos,
   setIsLoading,
+  onInputChange,
 }: {
   filtros: IFiltrosModelos;
   setFiltros: React.Dispatch<React.SetStateAction<IFiltrosModelos>>;
   actualizarModelos: React.Dispatch<React.SetStateAction<IModelos[]>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>; // El actualizador del estado de carga
+  onInputChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void; // Cambios en inputs
 }): React.JSX.Element => {
   const id_ModeloRef = useRef<HTMLInputElement>(null);
-  const de_GeneroRef = useRef<HTMLInputElement>(null);
+  const de_GeneroRef = useRef<HTMLSelectElement>(null);
   const de_ModeloRef = useRef<HTMLInputElement>(null);
 
   const seleccionarTextoInput = useInputsInteraction();
@@ -75,13 +79,12 @@ export const FiltrosModelos = ({
               Genero
             </Label>
             <Select
+              ref={de_GeneroRef}
               value={filtros.de_Genero}
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               id="de_Genero"
               name="de_Genero"
-              onChange={(e) =>
-                setFiltros({ ...filtros, de_Genero: e.target.value })
-              }
+              onChange={onInputChange}
               sizing="lg"
               style={{
                 fontSize: '1.4rem',
@@ -108,9 +111,7 @@ export const FiltrosModelos = ({
               placeholder="Id del Modelo"
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               value={filtros.id_Modelo}
-              onChange={(e) =>
-                setFiltros({ ...filtros, id_Modelo: e.target.value })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',
@@ -128,9 +129,7 @@ export const FiltrosModelos = ({
               placeholder="Modelo"
               className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               value={filtros.de_Modelo}
-              onChange={(e) =>
-                setFiltros({ ...filtros, de_Modelo: e.target.value })
-              }
+              onChange={onInputChange}
               style={{
                 fontSize: '1.4rem',
                 border: '1px solid #b9b9b9',

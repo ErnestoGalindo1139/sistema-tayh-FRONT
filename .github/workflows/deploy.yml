@@ -1,0 +1,53 @@
+name: Build and Deploy to Production
+
+on:
+  push:
+    branches:
+      - main  # Se ejecuta cuando hay un push en main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: Instalar dependencias
+        run: yarn install --frozen-lockfile
+
+      - name: Construir el proyecto en modo producción
+        run: yarn vite build --mode production
+
+      - name: Subir solo el contenido de dist a la rama produccion
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          # Cambiar a la rama produccion o crearla si no existe
+          git checkout produccion || git checkout --orphan produccion
+
+          # Eliminar todo el contenido previo para evitar conflictos
+          git rm -rf . || true
+
+          # Mover el contenido de dist a la raíz
+          mv dist/* .
+          rm -rf dist
+
+          # Excluir node_modules al agregar archivos
+          git add . -- ':!node_modules'
+
+          # Confirmar los cambios
+          git commit -m "🚀 Build automático desde main"
+
+          # Forzar el push a la rama produccion
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git
+          git push --force origin produccion

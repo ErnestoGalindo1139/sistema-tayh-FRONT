@@ -90,7 +90,9 @@ export const HomePage = (): React.JSX.Element => {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Bienvenido al sistema de TAYH</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        Bienvenido al sistema de TAYH - Test
+      </h1>
 
       {/* Cards de Estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
