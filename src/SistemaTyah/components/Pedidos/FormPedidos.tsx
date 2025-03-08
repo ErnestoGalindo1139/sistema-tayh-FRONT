@@ -30,6 +30,7 @@ import {
   getTallas,
   getTipoPrendas,
   getTipoTelas,
+  getViasContactoClientes,
   getViasContactoCombo,
   updatePedidos,
 } from '../../helpers/apiPedidos';
@@ -111,6 +112,8 @@ export const FormPedidos = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cerrarFormulario, setCerrarFormulario] = useState(false);
 
+  const [tieneViasContacto, setTieneViasContacto] = useState(false);
+
   // Referencias al Detalle del Pedido
   const de_GeneroRef = useRef<HTMLSelectElement>(null);
   const id_ModeloRef = useRef<HTMLSelectElement>(null);
@@ -169,10 +172,12 @@ export const FormPedidos = ({
   }, []);
 
   useEffect(() => {
-    setFormPedidos({
-      ...formPedidos,
-      de_ViaContacto: '',
-    });
+    if (!tieneViasContacto) {
+      setFormPedidos({
+        ...formPedidos,
+        de_ViaContacto: '',
+      });
+    }
   }, [formPedidos.id_ViaContacto]);
 
   useEffect(() => {
@@ -193,6 +198,38 @@ export const FormPedidos = ({
 
     fetchViasContacto();
   }, []);
+
+  useEffect(() => {
+    const fetchViasContactoClientes = async (): Promise<void> => {
+      try {
+        const viasContactoClientesData =
+          await getViasContactoClientes(formPedidos); // Modulo de Pedidos
+
+        if (viasContactoClientesData.body[0]?.id_ViaContacto) {
+          setTieneViasContacto(true);
+        } else {
+          setTieneViasContacto(false);
+        }
+
+        setFormPedidos({
+          ...formPedidos,
+          id_ViaContacto: viasContactoClientesData.body[0]?.id_ViaContacto || 0,
+          de_ViaContacto:
+            viasContactoClientesData.body[0]?.de_ViaContacto || '',
+        });
+      } catch (error) {
+        const errorMessage =
+          (error as IApiError).message || 'Ocurrió un error desconocido';
+        Toast.fire({
+          icon: 'error',
+          title: 'Ocurrió un Error',
+          text: errorMessage,
+        });
+      }
+    };
+
+    fetchViasContactoClientes();
+  }, [formPedidos.id_Cliente]);
 
   useEffect(() => {
     const fetchModelos = async (): Promise<void> => {
@@ -318,7 +355,8 @@ export const FormPedidos = ({
 
   useEffect(() => {
     // Calcular el SubTotal
-    const im_SubTotal = formPedidos.nu_Cantidad * formPedidos.im_PrecioUnitario;
+    const im_SubTotal =
+      Number(formPedidos.nu_Cantidad) * Number(formPedidos.im_PrecioUnitario);
 
     setFormPedidos({
       ...formPedidos,
@@ -329,7 +367,9 @@ export const FormPedidos = ({
   useEffect(() => {
     // Calcular el Total y redondearlo a 2 decimales
     const im_Total = parseFloat(
-      (formPedidos.im_SubTotal * (1 + formPedidos.im_Impuesto)).toFixed(2)
+      (formPedidos.im_SubTotal * (1 + Number(formPedidos.im_Impuesto))).toFixed(
+        2
+      )
     );
 
     setFormPedidos({
@@ -617,29 +657,38 @@ export const FormPedidos = ({
   };
 
   const limpiarFormulario = (): void => {
-    setFormPedidos({
-      id_Pedido: formPedidos.id_Pedido,
-      id_Cliente: 0,
-      fh_Pedido: '',
-      fh_EnvioProduccion: '',
-      fh_EntregaEstimada: '',
-      id_ViaContacto: 0,
-      de_ViaContacto: '',
-      id_Estatus: '',
-      de_Estatus: '',
-      id_Modelo: '',
-      id_Talla: '',
-      id_Color: '',
-      id_TipoTela: '',
-      id_TipoPrenda: '',
-      de_Concepto: '',
-      nu_Cantidad: 0,
-      im_PrecioUnitario: 0,
-      im_SubTotal: 0,
-      im_Impuesto: 0,
-      im_Total: 0,
-      de_Genero: '',
-    });
+    if (cerrarFormulario) {
+      setFormPedidos({
+        id_Pedido: formPedidos.id_Pedido,
+        id_Cliente: 0,
+        fh_Pedido: '',
+        fh_EnvioProduccion: '',
+        fh_EntregaEstimada: '',
+        id_ViaContacto: 0,
+        de_ViaContacto: '',
+        id_Estatus: '',
+        de_Estatus: '',
+        id_Modelo: '',
+        id_Talla: '',
+        id_Color: '',
+        id_TipoTela: '',
+        id_TipoPrenda: '',
+        de_Concepto: '',
+        nu_Cantidad: 0,
+        im_PrecioUnitario: 0,
+        im_SubTotal: 0,
+        im_Impuesto: 0,
+        im_Total: 0,
+        de_Genero: '',
+      });
+    } else {
+      setFormPedidos({
+        ...formPedidos,
+        fh_EnvioProduccion: '',
+        fh_EntregaEstimada: '',
+        de_Concepto: '',
+      });
+    }
   };
 
   return (
@@ -730,6 +779,8 @@ export const FormPedidos = ({
               color={`${estatusValido ? '' : 'failure'}`}
               value={formPedidos.id_Estatus}
               onChange={onInputChange}
+              id="id_Estatus"
+              name="id_Estatus"
               onBlur={() => setEstatusValido(true)}
               sizing="lg"
               style={{
