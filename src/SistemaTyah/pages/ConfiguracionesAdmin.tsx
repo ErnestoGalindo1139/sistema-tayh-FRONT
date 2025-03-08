@@ -21,8 +21,8 @@ const items = [
     color: 'bg-pink-500',
   },
   {
-    title: 'Usuarios',
-    path: '/usuarios',
+    title: 'Inventario',
+    path: '/inventario',
     icon: <FaUsers size={30} className="m-auto" />,
     color: 'bg-blue-500',
   },
