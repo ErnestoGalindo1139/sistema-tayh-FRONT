@@ -3,10 +3,10 @@ import {
   IColores,
   IEspecificacionesPedidos,
   IFiltrosPedidos,
-  IFormDetallesPedidos,
   IFormPedidos,
   IModelos,
   IPedidos,
+  IPedidosDetalles,
   IPedidosDisponiblesCombo,
   ITallas,
   ITipoPrendas,
@@ -30,6 +30,26 @@ export const getPedidos = async (
     });
 
     const data: ApiResponse<IPedidos[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener Clientes:', error);
+    throw error;
+  }
+};
+
+export const getPedidosDetalle = async (
+  pedido: Partial<IFormPedidos>
+): Promise<ApiResponse<IPedidosDetalles[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getPedidosDetalle`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(pedido), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IPedidosDetalles[]> = await response.json();
     return data;
   } catch (error) {
     console.error('Error al obtener Clientes:', error);

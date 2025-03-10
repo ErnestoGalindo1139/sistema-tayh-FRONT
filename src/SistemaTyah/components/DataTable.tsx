@@ -36,6 +36,10 @@ export const DataTable = <T,>({
 
   // Se reinicia el paginado cada vez que se realiza una busqueda
   useEffect(() => {
+    // if (data.length === 0) {
+    //   setCurrentPage(0);
+    //   return;
+    // }
     setCurrentPage(1);
   }, [data]);
 

@@ -183,18 +183,13 @@ export const PedidosAdmin = (): React.JSX.Element => {
       de_ViaContacto: '',
       id_Estatus: '1',
       de_Estatus: '',
-      id_Modelo: '',
-      id_Talla: '',
-      id_Color: '',
-      id_TipoTela: '',
-      id_TipoPrenda: '',
-      de_Concepto: '',
-      nu_Cantidad: 0,
-      im_PrecioUnitario: 0,
-      im_SubTotal: 0,
       im_Impuesto: 0,
-      im_Total: 0,
-      de_Genero: '',
+      im_TotalImpuesto: 0,
+      im_TotalPedido: 0,
+      im_SubTotal: 0,
+      sn_EnvioDomicilio: 0,
+      im_EnvioDomicilio: 0,
+      pedidosDetalles: [],
     });
   };
 
@@ -221,6 +216,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
           setSn_Editar={setSn_Editar}
           sn_Editar={sn_Editar}
           sn_Visualizar={sn_Visualizar}
+          sn_Agregar={sn_Agregar}
           row={
             pedido
               ? pedido
@@ -234,19 +230,13 @@ export const PedidosAdmin = (): React.JSX.Element => {
                   de_ViaContacto: '',
                   id_Estatus: 1,
                   de_Estatus: '',
-                  // id_Detalle: '',
-                  id_Modelo: '',
-                  id_Talla: '',
-                  id_Color: '',
-                  id_TipoTela: '',
-                  id_TipoPrenda: '',
-                  de_Concepto: '',
-                  nu_Cantidad: 0,
-                  im_PrecioUnitario: 0,
-                  im_SubTotal: 0,
                   im_Impuesto: 0,
-                  im_Total: 0,
-                  de_Genero: '',
+                  im_TotalImpuesto: 0,
+                  im_TotalPedido: 0,
+                  im_SubTotal: 0,
+                  sn_EnvioDomicilio: 0,
+                  im_EnvioDomicilio: 0,
+                  pedidosDetalles: [],
                 }
           }
           actualizarPedidos={setPedidos}
