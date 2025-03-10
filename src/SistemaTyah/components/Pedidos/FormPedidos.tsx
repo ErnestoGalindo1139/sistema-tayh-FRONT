@@ -2,14 +2,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   IFormPedidos,
-  IModelos,
-  ITallas,
-  IColores,
-  ITipoTelas,
-  ITipoPrendas,
   IViaContactoCombo,
   IPedidos,
   IFiltrosPedidos,
+  IPedidosDetalles,
+  IFormPedidosDetalle,
 } from '../../interfaces/interfacesPedidos';
 import {
   Datepicker,
@@ -17,25 +14,21 @@ import {
   Select,
   TextInput,
   DatepickerRef,
+  Tooltip,
 } from 'flowbite-react';
 import { customDatePickerTheme } from '../../themes/customDatePickerTheme';
 import { IApiError } from '../../interfaces/interfacesApi';
 import Toast from '../Toast';
 import {
   createPedidos,
-  getColores,
   getIdPedido,
-  getModelosCombo,
   getPedidos,
-  getTallas,
-  getTipoPrendas,
-  getTipoTelas,
+  getPedidosDetalle,
   getViasContactoClientes,
   getViasContactoCombo,
   updatePedidos,
 } from '../../helpers/apiPedidos';
-import { calcularPrecioUnitarioHelper } from '../../helpers/pedidos/calcularPrecioUnitarioHelper';
-import { Button } from '@chakra-ui/react';
+import { Button, useDisclosure } from '@chakra-ui/react';
 import { ModalConfirmacionAgregar } from '../../dialogs/ModalConfirmacionAgregar';
 import { getClientesCombo } from '../../helpers/apiClientes';
 import { IClientesCombo } from '../../interfaces/interfacesClientes';
@@ -44,7 +37,12 @@ import { IEstatus } from '../../interfaces/interfacesEstatus';
 import { useValidations } from '../../hooks/useValidations';
 import { useFormDate } from '../../hooks/useFormDate';
 import { useForm } from '../../hooks/useForm';
-import { useInputsInteraction } from '../../hooks/useInputsInteraction';
+import { DataTable } from '../DataTable';
+import { EyeIcon } from '../../icons/EyeIcon';
+import { EditIcon } from '../../icons/EditIcon';
+import { AddIcon } from '../../icons/AddIcon';
+import { ModalPedidosDetalleAgregar } from '../../dialogs/ModalPedidosDetalleAgregar';
+import { FaTrash } from 'react-icons/fa';
 
 interface IFormPedidosProps {
   setSn_Agregar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -52,6 +50,7 @@ interface IFormPedidosProps {
   setSn_Visualizar: React.Dispatch<React.SetStateAction<boolean>>;
   sn_Editar: boolean;
   sn_Visualizar: boolean;
+  sn_Agregar: boolean;
   row: IFormPedidos;
   actualizarPedidos: (pedidos: IPedidos[]) => void;
   filtros: IFiltrosPedidos;
@@ -64,6 +63,7 @@ export const FormPedidos = ({
   setSn_Visualizar,
   sn_Editar,
   sn_Visualizar,
+  sn_Agregar,
   row,
   actualizarPedidos,
   filtros,
@@ -78,13 +78,42 @@ export const FormPedidos = ({
     ...row,
   });
 
+  // const {
+  //   formState: formPedidosDetalle,
+  //   setFormState: setFormPedidosDetalle,
+  //   onInputChange: onInputChangeDetalle,
+  //   // onResetForm: limpiarFormulario,
+  // } = useForm<IFormPedidosDetalle>({
+  //   id_Detalle: 0,
+  //   id_Modelo: '',
+  //   id_Talla: '',
+  //   id_Color: '',
+  //   id_TipoTela: '',
+  //   id_TipoPrenda: '',
+  //   de_Concepto: '',
+  //   nu_Cantidad: 0,
+  //   im_PrecioUnitario: 0,
+  //   im_SubTotal: 0,
+  //   im_Impuesto: 0,
+  //   im_Total: 0,
+  //   de_Genero: '',
+  //   id_Pedido: 0,
+  //   de_GeneroCompleto: '',
+  //   de_Modelo: '',
+  //   de_Talla: '',
+  //   de_Color: '',
+  //   de_TipoTela: '',
+  //   de_TipoPrenda: '',
+  // });
+
+  const [pedidosDetalles, setPedidosDetalles] = useState<IPedidosDetalles[]>(
+    []
+  );
+
+  const [pedidosDetalle, setPedidosDetalle] = useState<IFormPedidosDetalle>();
+
   const [clientes, setClientes] = useState<IClientesCombo[]>([]);
   const [viasContacto, setViasContacto] = useState<IViaContactoCombo[]>([]);
-  const [modelos, setModelos] = useState<IModelos[]>([]);
-  const [tallas, setTallas] = useState<ITallas[]>([]);
-  const [colores, setColores] = useState<IColores[]>([]);
-  const [tipoTelas, setTipoTelas] = useState<ITipoTelas[]>([]);
-  const [tipoPrendas, setTipoPrendas] = useState<ITipoPrendas[]>([]);
 
   // Referencias al Pedido en General
   const fh_PedidoRef = useRef<DatepickerRef>(null);
@@ -94,12 +123,13 @@ export const FormPedidos = ({
   const id_EstatusRef = useRef<HTMLSelectElement>(null);
   const id_ViaContactoRef = useRef<HTMLSelectElement>(null);
   const de_ViaContactoRef = useRef<HTMLInputElement>(null);
+  const im_ImpuestoRef = useRef<HTMLSelectElement>(null);
+  const im_TotalRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
 
   // Hook para manejar todas las validaciones generales
-  const { validarCampo, validarNumeroNegativo, validarRangoFechas } =
-    useValidations();
+  const { validarCampo, validarRangoFechas } = useValidations();
 
   // Hook Para manejar el cambio de Fechas
   const { handleDateChange, getDateForPicker } = useFormDate(
@@ -107,26 +137,21 @@ export const FormPedidos = ({
     setFormPedidos
   );
 
-  const seleccionarTextoInput = useInputsInteraction();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cerrarFormulario, setCerrarFormulario] = useState(false);
 
-  const [tieneViasContacto, setTieneViasContacto] = useState(false);
+  const [sn_VisualizarDetalle, setSn_VisualizarDetalle] =
+    useState<boolean>(false);
+  const [sn_EditarDetalle, setSn_EditarDetalle] = useState<boolean>(false);
+  // const [sn_AgregarDetalle, setSn_AgregarDetalle] = useState<boolean>(false);
 
-  // Referencias al Detalle del Pedido
-  const de_GeneroRef = useRef<HTMLSelectElement>(null);
-  const id_ModeloRef = useRef<HTMLSelectElement>(null);
-  const id_TallaRef = useRef<HTMLSelectElement>(null);
-  const id_ColorRef = useRef<HTMLSelectElement>(null);
-  const id_TipoTelaRef = useRef<HTMLSelectElement>(null);
-  const id_TipoPrendaRef = useRef<HTMLSelectElement>(null);
-  const de_ConceptoRef = useRef<HTMLInputElement>(null);
-  const nu_CantidadRef = useRef<HTMLInputElement>(null);
-  const im_PrecioUnitarioRef = useRef<HTMLInputElement>(null);
-  const im_SubTotalRef = useRef<HTMLInputElement>(null);
-  const im_ImpuestoRef = useRef<HTMLSelectElement>(null);
-  const im_TotalRef = useRef<HTMLInputElement>(null);
+  const {
+    isOpen: isModalDetalleOpen,
+    onOpen: openDetalleModal,
+    onClose: closeDetalleModal,
+  } = useDisclosure();
+
+  const [tieneViasContacto, setTieneViasContacto] = useState(false);
 
   // Estados relacionados con Pedido en General
   const [fechaPedidoValida, setFechaPedidoValida] = useState(true);
@@ -137,20 +162,177 @@ export const FormPedidos = ({
   const [viaContactoValida, setViaContactoValida] = useState(true);
   const [DescripcionContactoValida, setDescripcionContactoValida] =
     useState(true);
-
-  // Estados relacionados con Detalle del Pedido
-  const [generoValido, setGeneroValido] = useState(true);
-  const [modeloValido, setModeloValido] = useState(true);
-  const [tallaValida, setTallaValida] = useState(true);
-  const [colorValido, setColorValido] = useState(true);
-  const [tipoTelaValida, setTipoTelaValida] = useState(true);
-  const [tipoPrendaValida, setTipoPrendaValida] = useState(true);
-  const [conceptoValido, setConceptoValido] = useState(true);
-  const [cantidadValida, setCantidadValida] = useState(true);
-  const [precioValido, setPrecioValido] = useState(true);
-  const [subtotalValido, setSubtotalValido] = useState(true);
   const [impuestoValido, setImpuestoValido] = useState(true);
   const [totalValido, setTotalValido] = useState(true);
+
+  useEffect(() => {
+    const fetchPedidos = async (): Promise<void> => {
+      try {
+        setIsLoading(true);
+        const pedidosDetalleData = await getPedidosDetalle(formPedidos);
+        setPedidosDetalles(pedidosDetalleData.body);
+      } catch (error) {
+        const errorMessage =
+          (error as IApiError).message || 'Ocurrió un error desconocido';
+        Toast.fire({
+          icon: 'error',
+          title: 'Ocurrió un Error',
+          text: errorMessage,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPedidos();
+  }, []);
+
+  useEffect(() => {
+    // Calcular el SubTotal de todos los detalles
+    const total = pedidosDetalles.reduce((acc, item) => {
+      return acc + item.im_SubTotal;
+    }, 0);
+
+    const im_TotalImpuesto = parseFloat(
+      (total * Number(formPedidos.im_Impuesto)).toFixed(2)
+    );
+
+    // Actualizar ambos el SubTotal y el Total Importe de Impuesto
+    setFormPedidos({
+      ...formPedidos,
+      im_SubTotal: total,
+      im_TotalImpuesto: im_TotalImpuesto,
+    });
+  }, [pedidosDetalles, formPedidos.im_Impuesto]); // Este hook depende de ambos cambios
+
+  useEffect(() => {
+    const im_EnvioDomicilio = formPedidos.sn_EnvioDomicilio == 1 ? 100 : 0;
+    setFormPedidos({
+      ...formPedidos,
+      im_EnvioDomicilio,
+    });
+  }, [formPedidos.sn_EnvioDomicilio]);
+
+  useEffect(() => {
+    // Calcular el impuesto y redondearlo a 2 decimales
+    const im_TotalImpuesto = parseFloat(
+      (formPedidos.im_SubTotal * Number(formPedidos.im_Impuesto)).toFixed(2)
+    );
+
+    setFormPedidos({
+      ...formPedidos,
+      im_TotalImpuesto,
+    });
+  }, [formPedidos.im_SubTotal, formPedidos.im_Impuesto]);
+
+  useEffect(() => {
+    // Calcular el Total a pagar y redondearlo a 2 decimales
+    const im_TotalPedido = parseFloat(
+      (
+        (formPedidos.im_SubTotal ?? 0) +
+        (formPedidos.im_TotalImpuesto ?? 0) +
+        (formPedidos.im_EnvioDomicilio ?? 0)
+      ).toFixed(2)
+    );
+
+    setFormPedidos({
+      ...formPedidos,
+      im_TotalPedido,
+    });
+  }, [
+    formPedidos.im_SubTotal,
+    formPedidos.im_TotalImpuesto,
+    formPedidos.im_EnvioDomicilio,
+  ]);
+
+  const columns: {
+    id: keyof IPedidosDetalles;
+    texto: string;
+    visible: boolean;
+    width: string;
+    bgColor?: string;
+    textAlign?: string;
+  }[] = [
+    { id: 'id_Detalle', texto: 'Folio Detalle', visible: true, width: '5%' },
+    { id: 'id_Modelo', texto: 'ID Modelo', visible: false, width: '5%' },
+    { id: 'id_Talla', texto: 'Talla', visible: false, width: '5%' },
+    { id: 'id_Color', texto: 'Color', visible: false, width: '5%' },
+    { id: 'id_TipoTela', texto: 'Tipo Tela', visible: false, width: '5%' },
+    { id: 'id_TipoPrenda', texto: 'Tipo Prenda', visible: false, width: '5%' },
+    { id: 'de_Genero', texto: 'Genero', visible: false, width: '5%' },
+    { id: 'de_GeneroCompleto', texto: 'Genero', visible: true, width: '10%' },
+    { id: 'de_Modelo', texto: 'Modelo', visible: true, width: '10%' },
+    { id: 'de_TipoPrenda', texto: 'Tipo Prenda', visible: true, width: '10%' },
+    { id: 'de_Talla', texto: 'Talla', visible: true, width: '10%' },
+    { id: 'de_Color', texto: 'Color', visible: true, width: '10%' },
+    { id: 'de_TipoTela', texto: 'Tipo Tela', visible: true, width: '10%' },
+    { id: 'nu_Cantidad', texto: 'Cantidad', visible: true, width: '10%' },
+    { id: 'im_PrecioUnitario', texto: 'Precio', visible: true, width: '10%' },
+    { id: 'im_SubTotal', texto: 'SubTotal', visible: true, width: '10%' },
+  ];
+
+  const actions = [
+    {
+      icono: <EyeIcon className="text-blue-500" />,
+      texto: 'Visualizar',
+      onClick: (row: IPedidosDetalles): void => {
+        setSn_VisualizarDetalle(true);
+        setSn_EditarDetalle(false);
+        // setSn_AgregarDetalle(false);
+        limpiarPedidoDetalle();
+        openDetalleModal();
+        setPedidosDetalle({
+          ...row,
+        });
+      },
+      width: '5%',
+    },
+    {
+      icono: <EditIcon className="text-[#a22694]" />,
+      texto: 'Editar',
+      onClick: (row: IPedidosDetalles): void => {
+        setSn_EditarDetalle(true);
+        setSn_VisualizarDetalle(false);
+        // setSn_AgregarDetalle(false);
+        limpiarPedidoDetalle();
+        openDetalleModal();
+        setPedidosDetalle({
+          ...row,
+        });
+      },
+    },
+    {
+      icono: <FaTrash className="text-[#ff0000]" />,
+      texto: 'Eliminar',
+      onClick: (row: IPedidosDetalles): void => {
+        setSn_EditarDetalle(false);
+        setSn_VisualizarDetalle(false);
+        // setSn_AgregarDetalle(false);
+        eliminarPedidoDetalle(row.id_Detalle);
+      },
+    },
+  ];
+
+  const filteredActions = sn_Visualizar
+    ? actions.filter((action) => action.texto === 'Visualizar')
+    : actions;
+
+  const eliminarPedidoDetalle = (id_Detalle: number): void => {
+    setPedidosDetalles((prevDetalles) => {
+      // Filtra el elemento eliminado
+      const nuevosDetalles = prevDetalles.filter(
+        (item) => item.id_Detalle !== id_Detalle
+      );
+
+      // Reasigna los IDs de manera consecutiva
+      const detallesReasignados = nuevosDetalles.map((item, index) => ({
+        ...item,
+        id_Detalle: index + 1, // Los IDs comienzan desde 1
+      }));
+
+      return detallesReasignados;
+    });
+  };
 
   useEffect(() => {
     const fetchClientes = async (): Promise<void> => {
@@ -232,106 +414,9 @@ export const FormPedidos = ({
   }, [formPedidos.id_Cliente]);
 
   useEffect(() => {
-    const fetchModelos = async (): Promise<void> => {
-      try {
-        if (formPedidos.de_Genero) {
-          const modelosData = await getModelosCombo(formPedidos.de_Genero); // Modulo de Pedidos
-          setModelos(modelosData.body);
-        }
-      } catch (error) {
-        const errorMessage =
-          (error as IApiError).message || 'Ocurrió un error desconocido';
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: errorMessage,
-        });
-      }
-    };
-
-    fetchModelos();
-  }, [formPedidos.de_Genero]);
-
-  useEffect(() => {
-    const fetchTallas = async (): Promise<void> => {
-      try {
-        const tallasData = await getTallas(); // Modulo de Pedidos
-        setTallas(tallasData.body);
-      } catch (error) {
-        const errorMessage =
-          (error as IApiError).message || 'Ocurrió un error desconocido';
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: errorMessage,
-        });
-      }
-    };
-
-    fetchTallas();
-  }, []);
-
-  useEffect(() => {
-    const fetchColores = async (): Promise<void> => {
-      try {
-        const coloresData = await getColores(formPedidos.de_Genero); // Modulo de Pedidos
-        setColores(coloresData.body);
-      } catch (error) {
-        const errorMessage =
-          (error as IApiError).message || 'Ocurrió un error desconocido';
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: errorMessage,
-        });
-      }
-    };
-
-    fetchColores();
-  }, [formPedidos.de_Genero]);
-
-  useEffect(() => {
-    const fetchTipoTelas = async (): Promise<void> => {
-      try {
-        const tipoTelasData = await getTipoTelas(); // Modulo de Pedidos
-        setTipoTelas(tipoTelasData.body);
-      } catch (error) {
-        const errorMessage =
-          (error as IApiError).message || 'Ocurrió un error desconocido';
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: errorMessage,
-        });
-      }
-    };
-
-    fetchTipoTelas();
-  }, []);
-
-  useEffect(() => {
-    const fetchTipoPrendas = async (): Promise<void> => {
-      try {
-        const tipoPrendasData = await getTipoPrendas();
-        setTipoPrendas(tipoPrendasData.body);
-      } catch (error) {
-        const errorMessage =
-          (error as IApiError).message || 'Ocurrió un error desconocido';
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: errorMessage,
-        });
-      }
-    };
-
-    fetchTipoPrendas();
-  }, []);
-
-  useEffect(() => {
     const fetchIdPedido = async (): Promise<void> => {
       try {
-        if (!sn_Editar) {
+        if (sn_Agregar) {
           const idPedido = await getIdPedido(formPedidos); // Modulo de Pedidos
 
           setFormPedidos({
@@ -353,54 +438,54 @@ export const FormPedidos = ({
     fetchIdPedido();
   }, []);
 
-  useEffect(() => {
-    // Calcular el SubTotal
-    const im_SubTotal =
-      Number(formPedidos.nu_Cantidad) * Number(formPedidos.im_PrecioUnitario);
-
-    setFormPedidos({
-      ...formPedidos,
-      im_SubTotal,
+  const limpiarPedidoDetalle = (): void => {
+    setPedidosDetalle({
+      id_Detalle: 0,
+      id_Modelo: '',
+      id_Talla: '',
+      id_Color: '',
+      id_TipoTela: '',
+      id_TipoPrenda: '',
+      de_Concepto: '',
+      nu_Cantidad: 0,
+      im_PrecioUnitario: 0,
+      im_SubTotal: 0,
+      im_Impuesto: 0,
+      im_Total: 0,
+      de_Genero: '',
+      id_Pedido: 0,
+      de_GeneroCompleto: '',
+      de_Modelo: '',
+      de_Talla: '',
+      de_Color: '',
+      de_TipoTela: '',
+      de_TipoPrenda: '',
     });
-  }, [formPedidos.nu_Cantidad, formPedidos.im_PrecioUnitario]);
-
-  useEffect(() => {
-    // Calcular el Total y redondearlo a 2 decimales
-    const im_Total = parseFloat(
-      (formPedidos.im_SubTotal * (1 + Number(formPedidos.im_Impuesto))).toFixed(
-        2
-      )
-    );
-
-    setFormPedidos({
-      ...formPedidos,
-      im_Total,
-    });
-  }, [formPedidos.im_SubTotal, formPedidos.im_Impuesto]);
-
-  const obtenerPrecioUnitario = async (
-    target: HTMLSelectElement
-  ): Promise<void> => {
-    const { name, value } = target;
-
-    // Actualizamos el campo correspondiente en el estado
-    setFormPedidos((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Llamamos a la función para obtener el nuevo precio unitario
-    const calculo = await calcularPrecioUnitarioHelper({
-      ...formPedidos,
-      [name]: value,
-    });
-
-    // Actualizamos el estado con el nuevo precio unitario
-    setFormPedidos((prev) => ({
-      ...prev,
-      im_PrecioUnitario: calculo.body,
-    }));
   };
+
+  // const obtenerPrecioUnitario = async (
+  //   target: HTMLSelectElement
+  // ): Promise<void> => {
+  //   const { name, value } = target;
+
+  //   // Actualizamos el campo correspondiente en el estado
+  //   setFormPedidos((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+
+  //   // Llamamos a la función para obtener el nuevo precio unitario
+  //   const calculo = await calcularPrecioUnitarioHelper({
+  //     ...formPedidos,
+  //     [name]: value,
+  //   });
+
+  //   // Actualizamos el estado con el nuevo precio unitario
+  //   setFormPedidos((prev) => ({
+  //     ...prev,
+  //     im_PrecioUnitario: calculo.body,
+  //   }));
+  // };
 
   const validarDatosFormulario = (cerrarForm: boolean = true): void => {
     // Campos Nulos o Vacíos
@@ -442,77 +527,25 @@ export const FormPedidos = ({
         'Via de Contacto'
       ) ||
       !validarCampo(
-        formPedidos.de_Concepto,
-        de_ConceptoRef,
-        setConceptoValido,
-        'Concepto'
-      ) ||
-      !validarCampo(
-        formPedidos.de_Genero,
-        de_GeneroRef,
-        setGeneroValido,
-        'Genero'
-      ) ||
-      !validarCampo(
-        formPedidos.id_Modelo,
-        id_ModeloRef,
-        setModeloValido,
-        'Modelo'
-      ) ||
-      !validarCampo(
-        formPedidos.id_TipoPrenda,
-        id_TipoPrendaRef,
-        setTipoPrendaValida,
-        'Tipo Prenda'
-      ) ||
-      !validarCampo(
-        formPedidos.id_Talla,
-        id_TallaRef,
-        setTallaValida,
-        'Talla'
-      ) ||
-      !validarCampo(
-        formPedidos.id_Color,
-        id_ColorRef,
-        setColorValido,
-        'Color'
-      ) ||
-      !validarCampo(
-        formPedidos.id_TipoTela,
-        id_TipoTelaRef,
-        setTipoTelaValida,
-        'Tipo Tela'
-      ) ||
-      !validarCampo(
-        formPedidos.nu_Cantidad,
-        nu_CantidadRef,
-        setCantidadValida,
-        'Cantidad'
-      ) ||
-      !validarCampo(
-        formPedidos.im_PrecioUnitario,
-        im_PrecioUnitarioRef,
-        setPrecioValido,
-        'Precio'
-      ) ||
-      !validarCampo(
-        formPedidos.im_SubTotal,
-        im_SubTotalRef,
-        setSubtotalValido,
-        'SubTotal'
-      ) ||
-      !validarCampo(
         formPedidos.im_Impuesto,
         im_ImpuestoRef,
         setImpuestoValido,
         'Impuesto'
-      ) ||
-      !validarCampo(formPedidos.im_Total, im_TotalRef, setTotalValido, 'Total')
+      )
+      // !validarCampo(formPedidos.im_Total, im_TotalRef, setTotalValido, 'Total')
     ) {
       return;
     }
 
     // Validaciones más especificas
+    if (!pedidosDetalles.length) {
+      Toast.fire({
+        icon: 'warning',
+        title: 'Detalles Vacíos',
+        text: 'Por favor, Ingrese por lo menos un Detalle...',
+      });
+      return;
+    }
 
     // Fecha de Envio a producción no puede ser menor a la del pedido
     if (
@@ -544,17 +577,17 @@ export const FormPedidos = ({
       return;
     }
 
-    // No se puede agragar Cantidad Negativa
-    if (
-      !validarNumeroNegativo(
-        formPedidos.nu_Cantidad,
-        nu_CantidadRef,
-        setCantidadValida,
-        'Cantidad'
-      )
-    ) {
-      return;
-    }
+    // // No se puede agragar Cantidad Negativa
+    // if (
+    //   !validarNumeroNegativo(
+    //     formPedidos.nu_Cantidad,
+    //     nu_CantidadRef,
+    //     setCantidadValida,
+    //     'Cantidad'
+    //   )
+    // ) {
+    //   return;
+    // }
 
     // Validar que si se eligió una vía de contacto (Online u Otros), tenga valor la especificación
     if (formPedidos.id_ViaContacto == 1 || formPedidos.id_ViaContacto == 6) {
@@ -593,6 +626,7 @@ export const FormPedidos = ({
       // Armar el Payload
       const payload = {
         ...formPedidos,
+        pedidosDetalles,
       };
 
       if (sn_Editar) {
@@ -668,25 +702,18 @@ export const FormPedidos = ({
         de_ViaContacto: '',
         id_Estatus: '',
         de_Estatus: '',
-        id_Modelo: '',
-        id_Talla: '',
-        id_Color: '',
-        id_TipoTela: '',
-        id_TipoPrenda: '',
-        de_Concepto: '',
-        nu_Cantidad: 0,
-        im_PrecioUnitario: 0,
-        im_SubTotal: 0,
         im_Impuesto: 0,
-        im_Total: 0,
-        de_Genero: '',
+        im_TotalImpuesto: 0,
+        im_TotalPedido: 0,
+        im_SubTotal: 0,
+        pedidosDetalles: [],
       });
     } else {
       setFormPedidos({
         ...formPedidos,
         fh_EnvioProduccion: '',
         fh_EntregaEstimada: '',
-        de_Concepto: '',
+        // de_Concepto: '',
       });
     }
   };
@@ -734,7 +761,7 @@ export const FormPedidos = ({
               ref={id_ClienteRef}
               value={formPedidos.id_Cliente}
               color={`${clienteValido ? '' : 'failure'}`}
-              className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${modeloValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+              className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${clienteValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               id="id_Cliente"
               name="id_Cliente"
               onChange={onInputChange}
@@ -887,7 +914,7 @@ export const FormPedidos = ({
               ref={id_ViaContactoRef}
               value={formPedidos.id_ViaContacto || ''}
               color={`${viaContactoValida ? '' : 'failure'}`}
-              className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${modeloValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+              className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${viaContactoValida ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
               id="id_ViaContacto"
               name="id_ViaContacto"
               onChange={onInputChange}
@@ -940,7 +967,7 @@ export const FormPedidos = ({
                 id="de_ViaContacto"
                 name="de_ViaContacto"
                 color={`${DescripcionContactoValida ? '' : 'failure'}`}
-                className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${conceptoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${DescripcionContactoValida ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
                 value={formPedidos.de_ViaContacto || ''}
                 onChange={onInputChange}
                 style={{
@@ -956,8 +983,49 @@ export const FormPedidos = ({
         </div>
       </div>
 
+      <br />
+      <br />
+      <br />
+
+      <div className="flex items-center justify-between">
+        <div className="dark:text-white">
+          <h2 className="font-bold text-[2.5rem]">Detalles del Pedido</h2>
+        </div>
+
+        <Tooltip
+          content="Agregar Detalle"
+          className="text-[1.3rem]"
+          placement="bottom"
+        >
+          <button
+            hidden={sn_Visualizar}
+            onClick={() => {
+              // setSn_AgregarDetalle(false);
+              setSn_EditarDetalle(false);
+              setSn_VisualizarDetalle(false);
+              limpiarPedidoDetalle();
+              openDetalleModal();
+            }}
+          >
+            <AddIcon width="4em" height="4em" />
+          </button>
+        </Tooltip>
+      </div>
+
+      {/* Segunda tabla para los detalles */}
+      <div className="table-container dark:bg-transparent">
+        <DataTable
+          data={pedidosDetalles}
+          columns={columns}
+          actions={filteredActions}
+          initialRowsPerPage={10}
+        />
+      </div>
+
+      <br />
+
       {/* Datos de DetallesPedido */}
-      <div>
+      {/* <div>
         <p className="mt-[3rem] text-[1.8rem] font-semibold">
           Datos Especificos del Pedido
         </p>
@@ -1358,56 +1426,254 @@ export const FormPedidos = ({
             />
           </div>
         </div>
+      </div> */}
+
+      <div className="w-full">
+        <div className="dark:text-white mt-[2rem] flex flex-col">
+          {/* SubTotal */}
+          <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
+            <Label className="sm:text-[2rem] text-[1.6rem] font-bold col-span-3 sm:text-right text-left">
+              SubTotal
+            </Label>
+            <TextInput
+              disabled={sn_Visualizar}
+              readOnly
+              type="number"
+              addon="$"
+              className="dark:text-white mb-2 col-span-2 rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black"
+              id="im_SubTotal"
+              name="im_SubTotal"
+              value={formPedidos.im_SubTotal}
+              onChange={onInputChange}
+              style={{
+                fontSize: '1.4rem',
+                border: '1px solid #b9b9b9',
+                backgroundColor: '#F5F5F5',
+              }}
+              sizing="lg"
+            />
+          </div>
+
+          {/* Impuesto */}
+          <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
+            <Label className="sm:text-[2rem] text-[1.6rem] font-bold col-span-3 sm:text-right text-left">
+              Impuesto
+            </Label>
+            <div className="col-span-2 flex gap-6">
+              <Select
+                color={`${impuestoValido ? '' : 'failure'}`}
+                ref={im_ImpuestoRef}
+                disabled={sn_Visualizar}
+                value={formPedidos.im_Impuesto}
+                onChange={onInputChange}
+                className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${impuestoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                id="im_Impuesto"
+                name="im_Impuesto"
+                onBlur={() => setImpuestoValido(true)}
+                sizing="lg"
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#ffffff',
+                }}
+              >
+                <option value="" disabled={!!formPedidos.im_Impuesto}>
+                  Seleccione un Impuesto
+                </option>
+                {[
+                  { id: 0.16, texto: 'IVA - 16%' },
+                  { id: 0.3, texto: 'ISR - 30%' },
+                  { id: 0.012612, texto: 'IEPS - 1.2612%' },
+                  { id: 0.15, texto: 'Arancel - 15%' },
+                ].map((impuesto) => (
+                  <option key={impuesto.id} value={impuesto.id}>
+                    {impuesto.texto}
+                  </option>
+                ))}
+              </Select>
+              <TextInput
+                disabled={sn_Visualizar}
+                readOnly
+                type="number"
+                addon="$"
+                className="dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black"
+                id="im_TotalImpuesto"
+                name="im_TotalImpuesto"
+                value={formPedidos.im_TotalImpuesto}
+                onChange={onInputChange}
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#F5F5F5',
+                }}
+                sizing="lg"
+              />
+            </div>
+          </div>
+
+          {/* Envío */}
+          <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
+            <Label className="sm:text-[2rem] text-[1.6rem] font-bold col-span-3 sm:text-right text-left">
+              Envío a Domicilio
+            </Label>
+            <div className="col-span-2 flex gap-6">
+              <Select
+                disabled={sn_Visualizar}
+                value={formPedidos.sn_EnvioDomicilio}
+                className="dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black"
+                id="sn_EnvioDomicilio"
+                name="sn_EnvioDomicilio"
+                onChange={onInputChange}
+                sizing="lg"
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#ffffff',
+                }}
+              >
+                <option className="dark:text-black" value="0">
+                  No
+                </option>
+                <option className="dark:text-black" value="1">
+                  Si
+                </option>
+              </Select>
+              <TextInput
+                disabled={sn_Visualizar}
+                readOnly
+                type="number"
+                addon="$"
+                className="dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black"
+                id="im_EnvioDomicilio"
+                name="im_EnvioDomicilio"
+                value={formPedidos.im_EnvioDomicilio}
+                onChange={onInputChange}
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#F5F5F5',
+                }}
+                sizing="lg"
+              />
+            </div>
+          </div>
+
+          {/* Total */}
+          <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
+            <Label className="sm:text-[2rem] text-[1.6rem] font-bold col-span-3 sm:text-right text-left">
+              Total
+            </Label>
+            <TextInput
+              disabled={sn_Visualizar}
+              color={`${totalValido ? '' : 'failure'}`}
+              ref={im_TotalRef}
+              readOnly
+              type="number"
+              addon="$"
+              placeholder="Total"
+              className={`dark:text-white mb-2 col-span-2 rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${totalValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+              value={formPedidos.im_TotalPedido}
+              id="im_Total"
+              name="im_Total"
+              onChange={onInputChange}
+              style={{
+                fontSize: '1.4rem',
+                border: '1px solid #b9b9b9',
+                backgroundColor: '#F5F5F5',
+              }}
+              onBlur={() => setTotalValido(true)}
+              sizing="lg"
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-end gap-4 border-t-[0.3rem] mt-[3rem] border-[#d1cece]">
-        <Button
-          hidden={sn_Visualizar || sn_Editar}
-          colorScheme="pink"
-          // onClick={addRedSocial}
-          // disabled={sn_Visualizar}
-          mt={4}
-          style={{
-            fontSize: '1.8rem',
-            padding: '1.6rem',
-          }}
-          onClick={() => validarDatosFormulario(false)}
-        >
-          Guardar y agregar otro Pedido
-        </Button>
-        <Button
-          hidden={sn_Visualizar}
-          colorScheme="blue"
-          // onClick={addRedSocial}
-          // disabled={sn_Visualizar}
-          mt={4}
-          style={{
-            fontSize: '1.8rem',
-            padding: '1.6rem',
-          }}
-          onClick={() => validarDatosFormulario(true)}
-        >
-          Guardar
-        </Button>
+      <div className="border-t-[0.3rem] mt-[3rem] border-[#d1cece]">
+        <div className="flex justify-end gap-4 mt-4">
+          {/* <Button
+            hidden={sn_Visualizar || sn_Editar}
+            colorScheme="pink"
+            // onClick={addRedSocial}
+            // disabled={sn_Visualizar}
+            mt={4}
+            style={{
+              fontSize: '1.8rem',
+              padding: '1.6rem',
+            }}
+            onClick={() => validarDatosFormulario(false)}
+          >
+            Guardar y agregar otro Pedido
+          </Button> */}
+          <Button
+            hidden={sn_Visualizar}
+            colorScheme="blue"
+            // onClick={addRedSocial}
+            // disabled={sn_Visualizar}
+            mt={4}
+            style={{
+              fontSize: '1.8rem',
+              padding: '1.6rem',
+            }}
+            onClick={() => validarDatosFormulario(true)}
+          >
+            Guardar Pedido
+          </Button>
 
-        <Button
-          colorScheme="orange"
-          // onClick={addRedSocial}
-          // disabled={sn_Visualizar}
-          mt={4}
-          style={{
-            fontSize: '1.8rem',
-            padding: '1.6rem',
-          }}
-          onClick={() => {
-            setSn_Agregar(false);
-            setSn_Editar(false);
-            setSn_Visualizar(false);
-          }}
-        >
-          Regresar
-        </Button>
+          <Button
+            colorScheme="orange"
+            // onClick={addRedSocial}
+            // disabled={sn_Visualizar}
+            mt={4}
+            style={{
+              fontSize: '1.8rem',
+              padding: '1.6rem',
+            }}
+            onClick={() => {
+              setSn_Agregar(false);
+              setSn_Editar(false);
+              setSn_Visualizar(false);
+            }}
+          >
+            Regresar
+          </Button>
+        </div>
       </div>
+
+      {/* Modal para Agregar */}
+      <ModalPedidosDetalleAgregar
+        isOpen={isModalDetalleOpen}
+        onClose={closeDetalleModal}
+        actualizarDetalles={setPedidosDetalles}
+        row={
+          pedidosDetalle
+            ? pedidosDetalle
+            : {
+                id_Detalle: 0,
+                id_Modelo: '',
+                id_Talla: '',
+                id_Color: '',
+                id_TipoTela: '',
+                id_TipoPrenda: '',
+                de_Concepto: '',
+                nu_Cantidad: 0,
+                im_PrecioUnitario: 0,
+                im_SubTotal: 0,
+                im_Impuesto: 0,
+                im_Total: 0,
+                de_Genero: '',
+                id_Pedido: 0,
+                de_GeneroCompleto: '',
+                de_Modelo: '',
+                de_Talla: '',
+                de_Color: '',
+                de_TipoTela: '',
+                de_TipoPrenda: '',
+              }
+        }
+        sn_Editar={sn_EditarDetalle}
+        sn_Visualizar={sn_VisualizarDetalle}
+        pedidosDetalles={pedidosDetalles}
+      />
 
       <ModalConfirmacionAgregar
         isOpen={isModalOpen}
