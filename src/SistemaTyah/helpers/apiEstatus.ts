@@ -1,5 +1,6 @@
 import { ApiResponse } from '../interfaces/interfacesApi';
 import { IEstatus } from '../interfaces/interfacesEstatus';
+import { IFormPedidos } from '../interfaces/interfacesPedidos';
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -8,7 +9,7 @@ export const getEstatus = async (
   modulo: number | string
 ): Promise<ApiResponse<IEstatus[]>> => {
   const payload = {
-    id_modulo: modulo,
+    id_Modulo: modulo,
   };
 
   try {
@@ -24,6 +25,28 @@ export const getEstatus = async (
     return data;
   } catch (error) {
     console.error('Error al obtener Clientes:', error);
+    throw error;
+  }
+};
+
+// Actualizar producto
+export const updateEstatus = async (
+  pedido: Partial<IFormPedidos>
+): Promise<ApiResponse<IFormPedidos>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/updateEstatus`, {
+      method: 'POST', // El método sigue siendo POST
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...pedido }),
+    });
+
+    const data: ApiResponse<IFormPedidos> = await response.json();
+
+    return data; // Devuelve el producto actualizado
+  } catch (error) {
+    console.error('Error al actualizar el estatus:', error);
     throw error;
   }
 };

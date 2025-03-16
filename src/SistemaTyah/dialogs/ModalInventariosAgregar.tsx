@@ -99,6 +99,10 @@ export const ModalInventariosAgregar = ({
     id_Talla: '',
     id_Color: '',
     id_TipoPrenda: '',
+    de_Modelo: '',
+    de_Talla: '',
+    de_Color: '',
+    de_TipoPrenda: '',
     de_Genero: '',
     de_GeneroCompleto: '',
     nu_Cantidad: '',
@@ -150,8 +154,12 @@ export const ModalInventariosAgregar = ({
   useEffect(() => {
     const fetchColores = async (): Promise<void> => {
       try {
-        const coloresData = await getColores(formInventarios.de_Genero); // Modulo de Pedidos
-        setColores(coloresData.body);
+        if (formInventarios.de_Genero) {
+          const coloresData = await getColores(formInventarios.de_Genero); // Modulo de Pedidos
+          setColores(coloresData.body);
+        } else {
+          setColores([]);
+        }
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';

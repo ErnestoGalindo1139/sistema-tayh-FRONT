@@ -98,9 +98,12 @@ export interface IFiltrosPedidos {
   id_Pedido: string;
   id_Cliente: string;
   nb_Cliente: string;
-  fh_Pedido: string;
-  fh_EnvioProduccion: string;
-  fh_EntregaEstimada: string;
+  fh_InicioPedido: string;
+  fh_FinPedido: string;
+  fh_InicioEnvioProduccion: string;
+  fh_FinEnvioProduccion: string;
+  fh_InicioEntregaEstimada: string;
+  fh_FinEntregaEstimada: string;
   id_Estatus: string;
 }
 

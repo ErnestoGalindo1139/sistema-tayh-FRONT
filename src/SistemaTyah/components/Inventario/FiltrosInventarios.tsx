@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Label, Select, Tooltip } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
 import { SearchIcon } from '../../icons/SearchIcon';
@@ -9,7 +10,7 @@ import {
   ITallas,
   ITipoPrendas,
 } from '../../interfaces/interfacesPedidos';
-import { useInputsInteraction } from '../../hooks/useInputsInteraction';
+// import { useInputsInteraction } from '../../hooks/useInputsInteraction';
 import {
   IFiltrosInventarios,
   IInventarios,
@@ -42,7 +43,7 @@ export const FiltrosInventarios = ({
   const [modelos, setModelos] = useState<IModelos[]>([]);
   const [colores, setColores] = useState<IColores[]>([]);
 
-  const seleccionarTextoInput = useInputsInteraction();
+  // const seleccionarTextoInput = useInputsInteraction();
 
   useEffect(() => {
     const fetchModelos = async (): Promise<void> => {
@@ -82,7 +83,7 @@ export const FiltrosInventarios = ({
       } finally {
         setFiltros({
           ...filtros,
-          id_Modelo: 0,
+          id_Modelo: '',
         });
       }
     };
@@ -131,8 +132,12 @@ export const FiltrosInventarios = ({
   useEffect(() => {
     const fetchColores = async (): Promise<void> => {
       try {
-        const coloresData = await getColores(filtros.de_Genero); // Modulo de Pedidos
-        setColores(coloresData.body);
+        if (filtros.de_Genero) {
+          const coloresData = await getColores(filtros.de_Genero); // Modulo de Pedidos
+          setColores(coloresData.body);
+        } else {
+          setColores([]);
+        }
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';
@@ -144,7 +149,7 @@ export const FiltrosInventarios = ({
       } finally {
         setFiltros({
           ...filtros,
-          id_Color: 0,
+          id_Color: '',
         });
       }
     };
