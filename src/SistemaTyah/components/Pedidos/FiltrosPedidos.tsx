@@ -139,34 +139,57 @@ export const FiltrosPedidos = ({
           </div>
 
           <div className="dark:text-white">
-            <Label className="text-[1.6rem]">Fecha Pedido</Label>
+            <Label className="text-[1.6rem]">Fecha Inicio Pedido</Label>
             <Datepicker
-              placeholder="Fecha Pedido"
-              id="fh_Pedido"
-              name="fh_Pedido"
-              value={getDateForPicker(filtros.fh_Pedido)} // Convertimos el string a Date ajustado a UTC
+              placeholder="Fecha Inicio Pedido"
+              id="fh_InicioPedido"
+              name="fh_InicioPedido"
+              value={getDateForPicker(filtros.fh_InicioPedido)} // Convertimos el string a Date ajustado a UTC
               onChange={(date) => {
-                handleDateChange(date, 'fh_Pedido');
+                handleDateChange(date, 'fh_InicioPedido');
               }}
               className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               language="es-MX"
               style={{ fontSize: '1.4rem', height: '4rem' }}
               theme={customDatePickerTheme}
               autoHide={false}
-              key={filtros.fh_Pedido || 'fh_Pedido'} // Cambia la clave cuando el valor cambia
+              key={filtros.fh_InicioPedido || 'fh_InicioPedido'} // Cambia la clave cuando el valor cambia
             />
           </div>
 
           <div className="dark:text-white">
-            <Label className="text-[1.6rem]">Fecha Envío Producción</Label>
+            <Label className="text-[1.6rem]">Fecha Fin Pedido</Label>
             <Datepicker
-              key={filtros.fh_EnvioProduccion || 'fh_EnvioProduccion'} // Cambia la clave cuando el valor cambia
-              placeholder="Fecha Envío Producción"
-              id="fh_EnvioProduccion"
-              name="fh_EnvioProduccion"
-              value={getDateForPicker(filtros.fh_EnvioProduccion)} // Convertimos el string a Date ajustado a UTC
+              placeholder="Fecha Fin Pedido"
+              id="fh_FinPedido"
+              name="fh_FinPedido"
+              value={getDateForPicker(filtros.fh_FinPedido)} // Convertimos el string a Date ajustado a UTC
               onChange={(date) => {
-                handleDateChange(date, 'fh_EnvioProduccion');
+                handleDateChange(date, 'fh_FinPedido');
+              }}
+              className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+              language="es-MX"
+              style={{ fontSize: '1.4rem', height: '4rem' }}
+              theme={customDatePickerTheme}
+              autoHide={false}
+              key={filtros.fh_FinPedido || 'fh_FinPedido'} // Cambia la clave cuando el valor cambia
+            />
+          </div>
+
+          <div className="dark:text-white">
+            <Label className="text-[1.6rem]">
+              Fecha Inicio Envío Producción
+            </Label>
+            <Datepicker
+              key={
+                filtros.fh_InicioEnvioProduccion || 'fh_InicioEnvioProduccion'
+              } // Cambia la clave cuando el valor cambia
+              placeholder="Fecha Inicio Envío Producción"
+              id="fh_InicioEnvioProduccion"
+              name="fh_InicioEnvioProduccion"
+              value={getDateForPicker(filtros.fh_InicioEnvioProduccion)} // Convertimos el string a Date ajustado a UTC
+              onChange={(date) => {
+                handleDateChange(date, 'fh_InicioEnvioProduccion');
               }}
               className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               language="es-MX"
@@ -177,21 +200,63 @@ export const FiltrosPedidos = ({
           </div>
 
           <div className="dark:text-white">
-            <Label className="text-[1.6rem]">Fecha Entrega Estimada</Label>
+            <Label className="text-[1.6rem]">Fecha Fin Envío Producción</Label>
             <Datepicker
-              placeholder="Fecha Entrega Estimada"
-              id="fh_EntregaEstimada"
-              name="fh_EntregaEstimada"
-              value={getDateForPicker(filtros.fh_EntregaEstimada)} // Convertimos el string a Date ajustado a UTC
+              key={filtros.fh_FinEnvioProduccion || 'fh_FinEnvioProduccion'} // Cambia la clave cuando el valor cambia
+              placeholder="Fecha Fin Envío Producción"
+              id="fh_FinEnvioProduccion"
+              name="fh_FinEnvioProduccion"
+              value={getDateForPicker(filtros.fh_FinEnvioProduccion)} // Convertimos el string a Date ajustado a UTC
               onChange={(date) => {
-                handleDateChange(date, 'fh_EntregaEstimada');
+                handleDateChange(date, 'fh_FinEnvioProduccion');
               }}
               className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
               language="es-MX"
               style={{ fontSize: '1.4rem', height: '4rem' }}
               theme={customDatePickerTheme}
               autoHide={false}
-              key={filtros.fh_EntregaEstimada || 'fh_EntregaEstimada'} // Cambia la clave cuando el valor cambia
+            />
+          </div>
+
+          <div className="dark:text-white">
+            <Label className="text-[1.6rem]">
+              Fecha Inicio Entrega Estimada
+            </Label>
+            <Datepicker
+              placeholder="Fecha Inicio Entrega Estimada"
+              id="fh_InicioEntregaEstimada"
+              name="fh_InicioEntregaEstimada"
+              value={getDateForPicker(filtros.fh_InicioEntregaEstimada)} // Convertimos el string a Date ajustado a UTC
+              onChange={(date) => {
+                handleDateChange(date, 'fh_InicioEntregaEstimada');
+              }}
+              className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+              language="es-MX"
+              style={{ fontSize: '1.4rem', height: '4rem' }}
+              theme={customDatePickerTheme}
+              autoHide={false}
+              key={
+                filtros.fh_InicioEntregaEstimada || 'fh_InicioEntregaEstimada'
+              } // Cambia la clave cuando el valor cambia
+            />
+          </div>
+
+          <div className="dark:text-white">
+            <Label className="text-[1.6rem]">Fecha Fin Entrega Estimada</Label>
+            <Datepicker
+              placeholder="Fecha Fin Entrega Estimada"
+              id="fh_FinEntregaEstimada"
+              name="fh_FinEntregaEstimada"
+              value={getDateForPicker(filtros.fh_FinEntregaEstimada)} // Convertimos el string a Date ajustado a UTC
+              onChange={(date) => {
+                handleDateChange(date, 'fh_FinEntregaEstimada');
+              }}
+              className={`mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+              language="es-MX"
+              style={{ fontSize: '1.4rem', height: '4rem' }}
+              theme={customDatePickerTheme}
+              autoHide={false}
+              key={filtros.fh_FinEntregaEstimada || 'fh_FinEntregaEstimada'} // Cambia la clave cuando el valor cambia
             />
           </div>
         </div>

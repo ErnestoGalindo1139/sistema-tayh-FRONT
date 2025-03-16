@@ -21,6 +21,7 @@ import { getEstatus } from '../helpers/apiEstatus';
 import { FormPedidos } from '../components/Pedidos/FormPedidos';
 import { FiltrosPedidos } from '../components/Pedidos/FiltrosPedidos';
 import { useForm } from '../hooks/useForm';
+import { ModalCambiarEstatus } from '../dialogs/ModalCambiarEstatus';
 
 export const PedidosAdmin = (): React.JSX.Element => {
   const [pedidos, setPedidos] = useState<IPedidos[]>([]);
@@ -32,6 +33,8 @@ export const PedidosAdmin = (): React.JSX.Element => {
     IEstatus[]
   >([]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const {
     formState: filtros,
     setFormState: setFiltros,
@@ -39,9 +42,12 @@ export const PedidosAdmin = (): React.JSX.Element => {
   } = useForm<IFiltrosPedidos>({
     id_Pedido: '',
     id_Cliente: '',
-    fh_Pedido: '',
-    fh_EnvioProduccion: '',
-    fh_EntregaEstimada: '',
+    fh_InicioPedido: '',
+    fh_FinPedido: '',
+    fh_InicioEnvioProduccion: '',
+    fh_FinEnvioProduccion: '',
+    fh_InicioEntregaEstimada: '',
+    fh_FinEntregaEstimada: '',
     nb_Cliente: '',
     id_Estatus: '',
   });
@@ -79,7 +85,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
   useEffect(() => {
     const fetchEstatusPedidos = async (): Promise<void> => {
       try {
-        const estatusData = await getEstatus(3); // Modulo de Pedidos
+        const estatusData = await getEstatus(4); // Modulo de Pedidos
         setEstatusPedidos(estatusData.body);
         setEstatusPedidosFormulario(estatusData.body);
       } catch (error) {
@@ -163,11 +169,12 @@ export const PedidosAdmin = (): React.JSX.Element => {
     },
     {
       icono: <RetweetIcon className="text-black" />,
-      texto: 'Finalizar Pedido',
+      texto: 'Cambiar Estatus',
       onClick: (row: IPedidos): void => {
         setSn_Editar(false);
         setSn_Visualizar(false);
         setPedido({ ...row });
+        abrirModalCambiarEstatus();
       },
     },
   ];
@@ -203,6 +210,14 @@ export const PedidosAdmin = (): React.JSX.Element => {
     } else {
       return;
     }
+  };
+
+  const abrirModalCambiarEstatus = (): void => {
+    setIsModalOpen(true);
+  };
+
+  const cerrarModalCambiarEstatus = (): void => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -294,6 +309,34 @@ export const PedidosAdmin = (): React.JSX.Element => {
           </section>
         </div>
       )}
+      <ModalCambiarEstatus
+        isOpen={isModalOpen}
+        onClose={cerrarModalCambiarEstatus}
+        actualizarPedidos={setPedidos}
+        row={
+          pedido
+            ? pedido
+            : {
+                id_Pedido: 0,
+                id_Cliente: 0,
+                fh_Pedido: '',
+                fh_EnvioProduccion: '',
+                fh_EntregaEstimada: '',
+                id_ViaContacto: 0,
+                de_ViaContacto: '',
+                id_Estatus: 1,
+                de_Estatus: '',
+                im_Impuesto: 0,
+                im_TotalImpuesto: 0,
+                im_TotalPedido: 0,
+                im_SubTotal: 0,
+                sn_EnvioDomicilio: 0,
+                im_EnvioDomicilio: 0,
+                pedidosDetalles: [],
+              }
+        }
+        id_Modulo={4}
+      />
     </>
   );
 };

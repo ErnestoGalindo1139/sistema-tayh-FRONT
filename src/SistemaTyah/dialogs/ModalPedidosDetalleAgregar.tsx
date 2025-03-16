@@ -159,8 +159,12 @@ export const ModalPedidosDetalleAgregar = ({
   useEffect(() => {
     const fetchColores = async (): Promise<void> => {
       try {
-        const coloresData = await getColores(formPedidosDetalle.de_Genero); // Modulo de Pedidos
-        setColores(coloresData.body);
+        if (formPedidosDetalle.de_Genero) {
+          const coloresData = await getColores(formPedidosDetalle.de_Genero); // Modulo de Pedidos
+          setColores(coloresData.body);
+        } else {
+          setColores([]);
+        }
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';
