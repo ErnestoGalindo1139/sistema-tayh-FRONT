@@ -33,7 +33,8 @@ export interface IFacturacion {
 
 export interface IFormFacturacion {
   id_Factura: number;
-  id_Pedido: number | string;
+  id_Pedido: CustomSelectValue[] | number;
+  pedidos?: string;
   id_Cliente: number;
   de_Domicilio: string;
   nu_Telefono: string;

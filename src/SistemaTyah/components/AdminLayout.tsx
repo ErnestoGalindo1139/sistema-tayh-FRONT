@@ -105,11 +105,11 @@ export default function AdminLayout(): React.JSX.Element {
       </aside>
 
       <main className="main-content dark:bg-[#19232c]">
-        <header className="header dark:bg-[#19232c]">
+        {/* <header className="header dark:bg-[#19232c]">
           <h1 className="dark:text-white text-[1.6rem]">
             Bienvenido al Panel de Administración
           </h1>
-        </header>
+        </header> */}
         {/* Aquí se renderizarán las rutas hijas */}
         <Outlet />
       </main>

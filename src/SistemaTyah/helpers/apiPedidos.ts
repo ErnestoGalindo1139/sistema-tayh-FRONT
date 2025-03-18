@@ -1,13 +1,13 @@
 import { ApiResponse } from '../interfaces/interfacesApi';
 import {
   IColores,
-  IEspecificacionesPedidos,
   IFiltrosPedidos,
   IFormDetallesPedidos,
   IFormPedidos,
   IModelos,
   IPedidos,
   IPedidosDisponiblesCombo,
+  IPedidosDisponiblesComboParams,
   ITallas,
   ITipoPrendas,
   ITipoTelas,
@@ -220,26 +220,6 @@ export const getTipoPrendas = async (): Promise<
   }
 };
 
-export const getEspecificacionesPedidos = async (
-  filtros: Partial<IEspecificacionesPedidos>
-): Promise<ApiResponse<IEspecificacionesPedidos[]>> => {
-  try {
-    const response = await fetch(`${BASE_URL}/getEspecificacionesPedidos`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(filtros), // Mandar los filtros en la petición
-    });
-
-    const data: ApiResponse<IEspecificacionesPedidos[]> = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error al obtener Especificaciones del Pedido:', error);
-    throw error;
-  }
-};
-
 export const getIdPedido = async (
   payload: Partial<IFormPedidos>
 ): Promise<ApiResponse<number>> => {
@@ -281,7 +261,7 @@ export const getViasContactoCombo = async (): Promise<
 
 // Obtener pedidos disponibles
 export const getPedidosDisponiblesCombo = async (
-  filtros?: Partial<IPedidosDisponiblesCombo>
+  filtros?: IPedidosDisponiblesComboParams
 ): Promise<ApiResponse<IPedidosDisponiblesCombo[]>> => {
   try {
     const response = await fetch(`${BASE_URL}/getPedidosSinRelacionarCombo`, {

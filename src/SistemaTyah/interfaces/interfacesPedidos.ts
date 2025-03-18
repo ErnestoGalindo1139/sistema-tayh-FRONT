@@ -116,13 +116,9 @@ export interface IViaContactoCombo {
   de_ViaContacto: string;
 }
 
-export interface IEspecificacionesPedidos {
-  id_Especificacion: number;
-  de_Especificacion: string;
-  nu_Especificacion: number;
-  id_Modelo: number;
-  id_Talla: number;
-  de_Genero: string;
+export interface IPedidosDisponiblesComboParams {
+  sn_Todos?: number;
+  id_Cliente?: number;
 }
 
 export interface IPedidosDisponiblesCombo {
@@ -130,4 +126,5 @@ export interface IPedidosDisponiblesCombo {
   id_Cliente?: string;
   de_Pedido?: string;
   de_CorreoElectronico?: string;
+  nu_Telofono?: string;
 }

@@ -35,7 +35,7 @@ export const columns: {
   },
   {
     id: 'de_CorreoElectronico',
-    texto: 'Correo Electronico',
+    texto: 'Correo Electrónico',
     visible: true,
     width: '14%',
   },
@@ -47,7 +47,7 @@ export const columns: {
   },
   {
     id: 'de_Regimen',
-    texto: 'Regimen',
+    texto: 'Régimen',
     visible: true,
     width: '14%',
   },
