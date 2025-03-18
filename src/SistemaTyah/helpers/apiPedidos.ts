@@ -2,10 +2,10 @@ import { ApiResponse } from '../interfaces/interfacesApi';
 import {
   IColores,
   IFiltrosPedidos,
-  IFormDetallesPedidos,
   IFormPedidos,
   IModelos,
   IPedidos,
+  IPedidosDetalles,
   IPedidosDisponiblesCombo,
   IPedidosDisponiblesComboParams,
   ITallas,
@@ -30,6 +30,26 @@ export const getPedidos = async (
     });
 
     const data: ApiResponse<IPedidos[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener Clientes:', error);
+    throw error;
+  }
+};
+
+export const getPedidosDetalle = async (
+  pedido: Partial<IFormPedidos>
+): Promise<ApiResponse<IPedidosDetalles[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getPedidosDetalle`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(pedido), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IPedidosDetalles[]> = await response.json();
     return data;
   } catch (error) {
     console.error('Error al obtener Clientes:', error);
@@ -276,6 +296,26 @@ export const getPedidosDisponiblesCombo = async (
     return data;
   } catch (error) {
     console.error('Error al obtener el combo de pedidos:', error);
+    throw error;
+  }
+};
+
+export const getViasContactoClientes = async (
+  pedido: Partial<IPedidos>
+): Promise<ApiResponse<IViaContactoCombo[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getViasContactoClientes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(pedido), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IViaContactoCombo[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener Las vias de contacto del cliente:', error);
     throw error;
   }
 };

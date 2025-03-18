@@ -23,8 +23,33 @@ export interface IPedidos {
   im_PrecioUnitario: number;
   im_SubTotal: number;
   im_Impuesto: number;
+  im_TotalImpuesto: number;
+  im_TotalPedido: number;
+  de_Genero: string;
+  pedidosDetalles: IPedidosDetalles[];
+}
+
+export interface IPedidosDetalles {
+  id_Detalle: number;
+  id_Pedido: number;
+  id_Modelo: string;
+  id_Talla: string;
+  id_Color: string;
+  id_TipoTela: string;
+  id_TipoPrenda: string;
+  de_Concepto: string;
+  nu_Cantidad: number;
+  im_PrecioUnitario: number;
+  im_SubTotal: number;
+  im_Impuesto: number;
   im_Total: number;
   de_Genero: string;
+  de_GeneroCompleto: string;
+  de_Modelo: string;
+  de_Talla: string;
+  de_Color: string;
+  de_TipoTela: string;
+  de_TipoPrenda: string;
 }
 
 export interface IFormPedidos {
@@ -37,23 +62,18 @@ export interface IFormPedidos {
   de_ViaContacto: string;
   id_Estatus: string | number;
   de_Estatus: string;
-  id_Modelo: string;
-  id_Talla: string;
-  id_Color: string;
-  id_TipoTela: string;
-  id_TipoPrenda: string;
-  de_Concepto: string;
-  nu_Cantidad: number;
-  im_PrecioUnitario: number;
-  im_SubTotal: number;
   im_Impuesto: number;
-  im_Total: number;
-  de_Genero: string;
+  im_TotalImpuesto: number;
+  im_SubTotal: number;
+  im_TotalPedido: number;
+  im_EnvioDomicilio?: number;
+  sn_EnvioDomicilio?: number;
+  pedidosDetalles: IPedidosDetalles[];
 }
 
-export interface IFormDetallesPedidos {
-  id_Detalle: string;
-  id_Pedido: string;
+export interface IFormPedidosDetalle {
+  id_Detalle: number;
+  id_Pedido: number;
   id_Modelo: string;
   id_Talla: string;
   id_Color: string;
@@ -66,15 +86,24 @@ export interface IFormDetallesPedidos {
   im_Impuesto: number;
   im_Total: number;
   de_Genero: string;
+  de_GeneroCompleto: string;
+  de_Modelo: string;
+  de_Talla: string;
+  de_Color: string;
+  de_TipoTela: string;
+  de_TipoPrenda: string;
 }
 
 export interface IFiltrosPedidos {
   id_Pedido: string;
   id_Cliente: string;
   nb_Cliente: string;
-  fh_Pedido: string;
-  fh_EnvioProduccion: string;
-  fh_EntregaEstimada: string;
+  fh_InicioPedido: string;
+  fh_FinPedido: string;
+  fh_InicioEnvioProduccion: string;
+  fh_FinEnvioProduccion: string;
+  fh_InicioEntregaEstimada: string;
+  fh_FinEntregaEstimada: string;
   id_Estatus: string;
 }
 
