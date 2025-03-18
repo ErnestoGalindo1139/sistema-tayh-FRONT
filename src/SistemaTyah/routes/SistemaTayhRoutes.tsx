@@ -12,6 +12,7 @@ import { OrdenTrabajo } from '../pages/OrdenTrabajo';
 import { PreciosAdmin } from '../pages/PreciosAdmin';
 import { ModelosAdmin } from '../pages/ModelosAdmin';
 import { FacturacionAdmin } from '../pages/FacturacionAdmin';
+import { SeleccionarOrdenTrabajo } from '../pages/SeleccionarOrdenTrabajo';
 import { InventarioAdmin } from '../pages/InventarioAdmin';
 
 export const SistemaTayhRoutes = (): React.JSX.Element => {
@@ -29,15 +30,17 @@ export const SistemaTayhRoutes = (): React.JSX.Element => {
           <Route path="configuraciones" element={<ConfiguracionesAdmin />} />
           <Route path="precios" element={<PreciosAdmin />} />
           <Route path="modelos" element={<ModelosAdmin />} />
+          <Route
+            path="/seleccionarOrdenTrabajo"
+            // element={<OrdenTrabajo de_Genero="M" id_Modelo={1} id_Talla={1} />}
+            element={<SeleccionarOrdenTrabajo />}
+          />
           <Route path="inventario" element={<InventarioAdmin />} />
           {/* <Route path="reportes" element={<ReportesAdmin />} /> */}
         </Route>
 
         {/* Ruta independiente, fuera del layout de administración */}
-        <Route
-          path="/ordentrabajo"
-          element={<OrdenTrabajo de_Genero="M" id_Modelo={1} id_Talla={1} />}
-        />
+        <Route path="/ordentrabajo/:id" element={<OrdenTrabajo />} />
         <Route path="/login" element={<LoginPage />} />
       </Routes>
       {/* Aquí va el FooterComponent si aplica */}

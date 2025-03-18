@@ -1,12 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 const flowbite = require("flowbite-react/tailwind");
+const animated = require('tailwindcss-animated');
+
 export default {
   darkMode: 'class', // Cambia de 'media' a 'class' para controlar el modo oscuro manualmente
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}', flowbite.content(),],
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+    flowbite.content(),
+  ],
   theme: {
     extend: {},
   },
   plugins: [
     flowbite.plugin(),
+    animated, // Agrega el plugin de animaciones
   ],
 };

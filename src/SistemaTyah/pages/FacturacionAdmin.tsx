@@ -12,7 +12,6 @@ import { getClientesComboMultiSelect } from '../helpers/apiClientes';
 import { RetweetIcon } from '../icons/RetweetIcon';
 import { Tooltip, Label } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
-import { ModalEnvios } from '../dialogs/ModalEnvios';
 import { useForm } from '../hooks/useForm';
 import { CustomInput } from '../components/custom/CustomInput';
 import { CustomMultiSelect } from '../components/custom/CustomMultiSelect';
@@ -222,7 +221,9 @@ export const FacturacionAdmin = (): React.JSX.Element => {
           <div className="flex items-center justify-between">
             <div className="dark:text-white">
               <h2 className="font-bold text-[2.5rem]">Facturacion</h2>
-              <p className="text-[1.6rem]">Aquí puedes gestionar los Envios.</p>
+              <p className="text-[1.6rem]">
+                Aquí puedes gestionar las Facturas.
+              </p>
             </div>
 
             <Tooltip
@@ -286,7 +287,7 @@ export const FacturacionAdmin = (): React.JSX.Element => {
                   <Label className="text-[1.6rem]">RFC</Label>
                   <CustomInput
                     type="text"
-                    placeholder="Escribe su dirección"
+                    placeholder="Ingrese un RFC"
                     className=""
                     id="de_RFC"
                     name="de_RFC"
@@ -327,10 +328,10 @@ export const FacturacionAdmin = (): React.JSX.Element => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-y-4 gap-x-[2.5rem] mt-[1rem]">
                 <div className="dark:text-white">
-                  <Label className="text-[1.6rem]">Regimen</Label>
+                  <Label className="text-[1.6rem]">Régimen</Label>
                   <CustomInput
                     type="text"
-                    placeholder="Escribe un regimen"
+                    placeholder="Escribe un régimen"
                     className=""
                     id="de_Regimen"
                     name="de_Regimen"

@@ -32,6 +32,8 @@ import { CustomInput } from '../../components/custom/CustomInput';
 import { ModalConfirmacionAgregar } from '../ModalConfirmacionAgregar';
 import { IPedidosDisponiblesCombo } from '../../interfaces/interfacesPedidos';
 import { getPedidosDisponiblesCombo } from '../../helpers/apiPedidos';
+import { CustomMultiSelect } from '../../components/custom/CustomMultiSelect';
+import { CustomSelectValue } from '../../interfaces/interfacesGlobales';
 
 interface ModalFacturasProps {
   isOpen: boolean;
@@ -94,6 +96,7 @@ export const ModalFacturacion = ({
     useForm<IFormFacturacion>({
       id_Factura: 0,
       id_Pedido: 0,
+      pedidos: '',
       id_Cliente: 0,
       de_Domicilio: '',
       nu_Telefono: '',
@@ -104,6 +107,38 @@ export const ModalFacturacion = ({
       sn_ConstanciaFiscal: null,
       sn_Activo: null,
     });
+
+  const fetchPedidosDisponiblesCombo = async (
+    sn_Todos?: number,
+    id_Cliente?: number
+  ): Promise<void> => {
+    try {
+      const params = {
+        sn_Todos,
+        id_Cliente,
+      };
+
+      const arregloCombo = await getPedidosDisponiblesCombo(params);
+
+      if (
+        !arregloCombo.body ||
+        !Array.isArray(arregloCombo.body) ||
+        arregloCombo.body.length === 0
+      ) {
+        setPedidosDisponiblesCombo([]);
+      } else {
+        setPedidosDisponiblesCombo(arregloCombo.body);
+      }
+    } catch (error) {
+      const errorMessage =
+        (error as IApiError).message || 'Ocurrió un error desconocido';
+      Toast.fire({
+        icon: 'error',
+        title: 'Ocurrió un Error',
+        text: errorMessage,
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchEnvios = async (): Promise<void> => {
@@ -137,35 +172,22 @@ export const ModalFacturacion = ({
       }
     };
 
-    const fetchPedidosDisponiblesCombo = async (): Promise<void> => {
-      try {
-        const arregloCombo = await getPedidosDisponiblesCombo();
-        setPedidosDisponiblesCombo(arregloCombo.body);
-      } catch (error) {
-        const errorMessage =
-          (error as IApiError).message || 'Ocurrió un error desconocido';
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error',
-          text: errorMessage,
-        });
-      }
-    };
-
     fetchEnvios();
     fetchClientesCombo();
-    fetchPedidosDisponiblesCombo();
   }, []);
 
   // Limpiar Formulario
   useEffect(() => {
     if (isOpen) {
       if (sn_Editar) {
+        fetchPedidosDisponiblesCombo(1);
+
         setFormState({
           ...row,
           id_Cliente: Number(row.id_Cliente),
         });
       } else if (sn_Visualizar) {
+        fetchPedidosDisponiblesCombo(1);
         setFormState({
           ...row,
           id_Cliente: Number(row.id_Cliente),
@@ -177,12 +199,48 @@ export const ModalFacturacion = ({
   }, [isOpen, row]);
 
   useEffect(() => {
-    if (formState.id_Pedido) {
-      actualizarInfoCliente();
+    const actualizarInfoPedido = async (
+      sn_Todos?: number,
+      id_Cliente?: number
+    ): Promise<void> => {
+      setFormState((prevState) => ({
+        ...prevState,
+        id_Pedido: (prevState.id_Pedido = 0), // Cambia temporalmente para forzar el cambio
+      }));
+
+      await fetchPedidosDisponiblesCombo(sn_Todos, id_Cliente);
+
+      if (!pedidosDisponiblesCombo) return;
+
+      const pedidoInfo = pedidosDisponiblesCombo.filter((pedido) => {
+        return formState.id_Cliente === Number(pedido.id_Cliente);
+      });
+
+      if (pedidoInfo.length === 0) return; // Si no hay coincidencias, salir
+
+      const { de_CorreoElectronico } = pedidoInfo[0];
+
+      setFormState((prevState) => ({
+        ...prevState,
+        id_Cliente: Number(pedidoInfo[0].id_Cliente),
+        de_CorreoElectronico: de_CorreoElectronico || '',
+      }));
+    };
+
+    if (formState.id_Cliente) {
+      actualizarInfoPedido(undefined, formState.id_Cliente);
     }
-  }, [formState.id_Pedido]);
+  }, [formState.id_Cliente]);
 
   const guardarFactura = async (): Promise<void> => {
+    const pedidos = Array.isArray(formState.id_Pedido)
+      ? formState.id_Pedido
+          .map((pedido: { value: unknown }) => pedido.value)
+          .toString()
+      : '';
+
+    formState.pedidos = pedidos;
+
     const payload = {
       ...formState,
     };
@@ -305,7 +363,9 @@ export const ModalFacturacion = ({
   const validarDatosFormulario = async (): Promise<void> => {
     if (
       !validarCampo(
-        formState.id_Pedido,
+        Array.isArray(formState.id_Pedido)
+          ? Number(formState.id_Pedido[0])
+          : Number(formState.id_Pedido),
         id_PedidoRef,
         setPedidoValido,
         'Seleccione un Pedido'
@@ -380,25 +440,15 @@ export const ModalFacturacion = ({
     abrirModalConfirmacion();
   };
 
-  const actualizarInfoCliente = () => {
-    const pedidoInfo = pedidosDisponiblesCombo.filter((pedido) => {
-      return formState.id_Pedido == pedido.id_Pedido;
-    });
-
-    if (pedidoInfo.length === 0) return; // Si no hay coincidencias, salir
-
-    const { id_Cliente, de_CorreoElectronico } = pedidoInfo[0];
-
-    setFormState((prevState) => ({
-      ...prevState,
-      id_Cliente: Number(id_Cliente),
-      de_CorreoElectronico: de_CorreoElectronico || '',
-    }));
-  };
-
-  const handlePedidosChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onInputChange(event);
-  };
+  const arregloComboPedidos = pedidosDisponiblesCombo.map((pedido) => {
+    // Asegurarse de que `id_Pedido` sea siempre un número, o un string si lo prefieres
+    const value = pedido.id_Pedido ?? 0; // Asigna 0 si `id_Cliente` es `undefined`
+    return {
+      value:
+        typeof value === 'number' || !isNaN(Number(value)) ? Number(value) : 0, // Asegúrate de convertir el valor a un número si es posible
+      label: pedido.de_Pedido || 'Cliente desconocido', // Asegúrate de que `label` siempre tenga un valor
+    };
+  });
 
   return (
     <>
@@ -428,43 +478,6 @@ export const ModalFacturacion = ({
           <ModalBody pb={6}>
             <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-[2rem] mb-[1rem]">
               <div className="w-full">
-                <Label className="text-[1.6rem]">Folio Pedido</Label>
-                <CustomSelect
-                  disabled={sn_Visualizar}
-                  color={`${pedidoValido ? '' : 'failure'}`}
-                  onBlur={() => setPedidoValido(true)}
-                  className={`dark:text-white mt-2 mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${pedidoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
-                  ref={id_PedidoRef}
-                  name="id_Pedido"
-                  value={formState.id_Pedido}
-                  onChange={handlePedidosChange}
-                >
-                  <option value="">Seleccionar</option>
-                  {pedidosDisponiblesCombo.map((pedido) => (
-                    <option key={pedido.id_Pedido} value={pedido.id_Pedido}>
-                      {pedido.de_Pedido}
-                    </option>
-                  ))}
-                </CustomSelect>
-                {/* <CustomInput
-                  color={`${pedidoValido ? '' : 'failure'}`}
-                  onBlur={() => setPedidoValido(true)}
-                  disabled={sn_Visualizar}
-                  ref={id_PedidoRef}
-                  placeholder="Dirección del Envio"
-                  required
-                  type="text"
-                  autoComplete="off"
-                  id="id_Pedido"
-                  name="id_Pedido"
-                  value={formState.id_Pedido}
-                  onChange={onInputChange}
-                  className={`mb-2 w-full rounded-lg py-2 focus:outline-none focus:ring-1 focus:${id_PedidoRef ? 'ring-[#656ed3e1]' : 'ring-red-500'} text-black`}
-                  style={{ fontSize: '1.4rem' }}
-                  sizing="lg"
-                /> */}
-              </div>
-              <div className="w-full">
                 <Label className="text-[1.6rem]">Cliente</Label>
                 <CustomSelect
                   disabled={sn_Visualizar}
@@ -483,6 +496,41 @@ export const ModalFacturacion = ({
                     </option>
                   ))}
                 </CustomSelect>
+              </div>
+              <div className="w-full">
+                <Label className="text-[1.6rem]">Folio Pedido</Label>
+                {/* <CustomSelect
+                  disabled={sn_Visualizar}
+                  color={`${pedidoValido ? '' : 'failure'}`}
+                  onBlur={() => setPedidoValido(true)}
+                  className={`dark:text-white mt-2 mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${pedidoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                  ref={id_PedidoRef}
+                  name="id_Pedido"
+                  value={formState.id_Pedido}
+                  onChange={handlePedidosChange}
+                >
+                  <option value="">Seleccionar</option>
+                  {pedidosDisponiblesCombo.map((pedido) => (
+                    <option key={pedido.id_Pedido} value={pedido.id_Pedido}>
+                      {pedido.de_Pedido}
+                    </option>
+                  ))}
+                </CustomSelect> */}
+                <CustomMultiSelect
+                  className={`mt-2 mb-2 text-black focus:${pedidoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                  options={arregloComboPedidos}
+                  value={
+                    Array.isArray(formState.id_Pedido)
+                      ? formState.id_Pedido
+                      : []
+                  } // Asegura que el valor se controle por el estado
+                  onChange={(newValue) => {
+                    setFormState((prevState) => ({
+                      ...prevState,
+                      id_Pedido: newValue as unknown as number,
+                    }));
+                  }}
+                />
               </div>
               <div className="w-full">
                 <Label className="text-[1.6rem]">Domicilio</Label>
