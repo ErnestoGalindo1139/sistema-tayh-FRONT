@@ -1,31 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { IEspecificacionesPedidos } from '../interfaces/interfacesPedidos';
+import React, { useState, useEffect, useRef } from 'react';
 import { IApiError } from '../interfaces/interfacesApi';
 import Toast from '../components/Toast';
-import { getEspecificacionesPedidos } from '../helpers/apiPedidos';
+import { getEspecificacionesOrdenTrabajo } from '../helpers/ordenTrabajo/apiOrdenTrabajo';
+import { IEspecificacionesOrdenTrabajo } from '../interfaces/interfacesOrdenTrabajo';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Pagination } from 'flowbite-react';
+import { customPaginationOrdenTrabajoTheme } from '../themes/customPaginationOrdenTrabajoTheme';
+import { useDisclosure } from '@chakra-ui/react';
+import { ModalFinalizarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalFinalizarOrdenTrabajo';
 
-// Definición de las props que se enviarán a la API
-interface OrdenTrabajoProps {
-  id_Especificacion?: number;
-  de_Especificacion?: string;
-  id_Modelo: number;
-  id_Talla: number;
-  de_Genero: string;
-}
-
-export const OrdenTrabajo = (props: OrdenTrabajoProps): React.JSX.Element => {
+export const OrdenTrabajo = (): React.JSX.Element => {
   const [especificacionesPedidos, setEspecificacionesPedidos] = useState<
-    IEspecificacionesPedidos[]
+    IEspecificacionesOrdenTrabajo[]
   >([]);
+  const [
+    especificacionesPedidosPerspectivas,
+    setEspecificacionesPedidosPerspectivas,
+  ] = useState<IEspecificacionesOrdenTrabajo[]>([]);
+  const [perspectivaActual, setPerspectivaActual] = useState(1);
+  const [totalPerspectivas, setTotalPerspectivas] = useState(0);
+  const [finOrdenTrabajo, setFinOrdenTrabajo] = useState(0);
+  const [key, setKey] = useState(0);
+
+  const { id } = useParams();
+
+  // Referencia para controlar el intervalo
+  const intervalRef = useRef<number | null>(null);
+
+  const navigate = useNavigate();
+
+  const {
+    isOpen: isModalOpen,
+    onOpen: openModal,
+    onClose: closeModal,
+  } = useDisclosure();
+
+  // Función para restablecer el cambio automático
+  const resetAutoChange = (): void => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = window.setInterval(() => {
+      setPerspectivaActual((prev) => {
+        const nextPage = prev < totalPerspectivas ? prev + 1 : 1;
+        onPageChange(nextPage);
+        return nextPage;
+      });
+    }, 10000);
+  };
 
   useEffect(() => {
     const fetchEspecificacionesPedidos = async (): Promise<void> => {
       try {
-        const especificacionesPedidosData = await getEspecificacionesPedidos({
-          ...props,
-        });
+        const especificacionesPedidosData =
+          await getEspecificacionesOrdenTrabajo({
+            id_OrdenTrabajo: id,
+          });
 
         setEspecificacionesPedidos(especificacionesPedidosData.body);
+
+        if (
+          especificacionesPedidosData.body &&
+          especificacionesPedidosData.body.length > 0
+        ) {
+          setTotalPerspectivas(
+            especificacionesPedidosData.body[0].totalModeloPerspectiva
+          );
+          const pedidosFiltrados = especificacionesPedidosData.body.filter(
+            (item) => {
+              return item.id_ModeloPerspectiva === perspectivaActual;
+            }
+          );
+          setEspecificacionesPedidosPerspectivas(pedidosFiltrados);
+        }
       } catch (error) {
         const errorMessage =
           (error as IApiError).message || 'Ocurrió un error desconocido';
@@ -40,61 +86,179 @@ export const OrdenTrabajo = (props: OrdenTrabajoProps): React.JSX.Element => {
     fetchEspecificacionesPedidos();
   }, []);
 
+  useEffect(() => {
+    resetAutoChange(); // Inicia el intervalo al montar el componente
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [totalPerspectivas, especificacionesPedidos]);
+
+  // Actualiza la perspectiva y fuerza el reinicio de la animación
+  const onPageChange = (page: number): void => {
+    const pedidosFiltrados = especificacionesPedidos.filter(
+      (item) => item.id_ModeloPerspectiva === page
+    );
+
+    setEspecificacionesPedidosPerspectivas(pedidosFiltrados);
+    setPerspectivaActual(page);
+
+    // Forzar el reinicio de las animaciones
+    setKey((prev) => prev + 1);
+
+    resetAutoChange();
+  };
+
+  const handleRegresar = (): void => {
+    navigate(-1);
+  };
+
+  const handleFinalizarOrdenTrabajo = (): void => {
+    openModal();
+  };
+
   return (
-    <div className="bg-[#C0DFE7] min-h-screen pr-16 pl-16">
-      {/* Header */}
-      <header className="flex flex-col sm:flex-row justify-between items-center pt-8 mb-8 border-b border-gray-400 pb-4">
-        {/* Logo de la empresa */}
-        <img
-          src="img/Logo-Tayh_Horizontal-Negro.png" // Reemplaza con la ruta correcta del logo
-          alt="Logo Empresa"
-          className="w-60 sm:w-96 h-auto object-contain mb-4 sm:mb-0 pl-8 pr-8"
-        />
-        {/* Título de la Orden */}
-        <h1 className="text-4xl font-bold text-center sm:text-right">
-          Orden de Trabajo
-        </h1>
-      </header>
+    <>
+      <div key={key} className="min-h-screen pt-[2rem] bg-[#F8F9FA]">
+        {/* Texto de especificaciones */}
 
-      {/* Texto de especificaciones */}
-      <h2 className="text-6xl font-semibold text-center mb-[6rem]">
-        Especificaciones
-      </h2>
-
-      {/* Contenedor de imagen y especificaciones */}
-      <div className="flex flex-col md:flex-row items-center gap-8">
-        {/* Imagen editada a la izquierda */}
-        <div className="flex justify-center md:justify-start md:w-1/2">
-          <img
-            src="img/Filipina Prueba Azul.png"
-            alt="Imagen Editada"
-            className="w-[40rem] h-auto rounded-lg m-auto"
-          />
-        </div>
-
-        {/* Lista de especificaciones a la derecha */}
-        <div className="md:w-2/3 space-y-4">
-          {/* {modelos && modelos.length > 0 ? ( */}
-
-          {especificacionesPedidos && especificacionesPedidos.length > 0 ? (
-            especificacionesPedidos.map((especificacion) => (
-              <div
-                key={especificacion.id_Especificacion}
-                className="flex items-center justify-between p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-300"
-              >
-                <div className="font-bold mr-4 text-4xl text-blue-700">
-                  {especificacion.nu_Especificacion}.
-                </div>
-                <div className="flex-grow text-4xl text-gray-800">
-                  {especificacion.de_Especificacion}
-                </div>
+        {/* Contenedor de imagen y especificaciones */}
+        <div className="grid grid-cols-[1fr_2fr_1fr]">
+          <div className="pl-[3rem]">
+            <div className="bg-[#1E40AF] p-[1.5rem] animate-fade-right animate-duration-1000 animate-ease-in rounded-2xl">
+              <h2 className="text-[3rem] font-bold text-white">
+                Orden de Trabajo - #
+                {especificacionesPedidosPerspectivas[0]?.id_OrdenTrabajo}
+              </h2>
+              <div>
+                <p className="text-[2.5rem] text-white">
+                  Color de tela:{' '}
+                  {especificacionesPedidosPerspectivas[0]?.de_ColorTela}
+                </p>
+                <p className="text-[2.5rem] text-white">
+                  Cantidad Total:{' '}
+                  {especificacionesPedidosPerspectivas[0]?.nu_Cantidad}
+                </p>
+                <p className="text-[2.5rem] text-white">
+                  Cantidad Pendiente:{' '}
+                  {especificacionesPedidosPerspectivas[0]?.nu_CantidadPendiente}
+                </p>
+                <p className="text-[2.5rem] text-white">
+                  Modelo: {especificacionesPedidosPerspectivas[0]?.de_Modelo}
+                </p>
+                <p className="text-[2.5rem] text-white">
+                  Tipo de tela:{' '}
+                  {especificacionesPedidosPerspectivas[0]?.de_TipoTela}
+                </p>
+                <p className="text-[2.5rem] text-white">
+                  Talla: {especificacionesPedidosPerspectivas[0]?.de_Talla}
+                </p>
               </div>
-            ))
-          ) : (
-            <></>
-          )}
+            </div>
+          </div>
+
+          {/* Imagen editada a la izquierda */}
+          <div className="m-auto pt-[.4rem] animate-fade-down animate-ease-in">
+            <img
+              src={`${especificacionesPedidosPerspectivas[0]?.de_Ruta}`}
+              alt="Imagen Editada"
+              className="w-[60rem] h-auto m-auto bg-[#E3ECFF] rounded-[18rem]"
+            />
+          </div>
+
+          {/* Lista de especificaciones a la derecha */}
+          <div className="pr-[2.4rem] animate-fade-left animate-duration-1000 animate-ease-in">
+            <div>
+              <h2 className="text-[3rem] font-semibold text-center bg-[#1E3A8A] rounded-t-2xl text-white">
+                Especificaciones
+              </h2>
+
+              <div className="space-y-4 bg-[#E3ECFF] rounded-b-2xl">
+                {/* {modelos && modelos.length > 0 ? ( */}
+
+                {especificacionesPedidosPerspectivas &&
+                especificacionesPedidosPerspectivas.length > 0 ? (
+                  especificacionesPedidosPerspectivas.map((especificacion) => (
+                    <ul
+                      key={especificacion.id_Especificacion}
+                      className="flex items-center justify-between p-4"
+                    >
+                      <li className="font-bold mr-4 text-4xl text-[#2563EB]">
+                        {especificacion.nu_Especificacion}.{' '}
+                        <span className="font-normal text-[2.4rem] text-[#111827]">
+                          {especificacion.de_Especificacion}
+                        </span>
+                      </li>
+                    </ul>
+                  ))
+                ) : (
+                  <></>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+
+        <footer className="flex flex-col sm:flex-row justify-start items-center border-gray-400 animate-flip-up animate-ease-out">
+          {/* Logo de la empresa */}
+          <img
+            src="img/Logo-Tayh_Horizontal-Negro.png" // Reemplaza con la ruta correcta del logo
+            alt="Logo Empresa"
+            className="w-60 sm:w-96 h-auto object-contain mb-4 sm:mb-0 pl-8 pr-8"
+          />
+
+          <Pagination
+            currentPage={perspectivaActual}
+            totalPages={totalPerspectivas}
+            onPageChange={onPageChange}
+            showIcons
+            theme={customPaginationOrdenTrabajoTheme}
+            className="ml-[2rem]"
+          />
+
+          <div className="w-[100%] text-end mr-[4rem]">
+            <button
+              className="text-[2.4rem] bg-[#1a9a1a] hover:bg-[#2eb92e] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
+              onClick={handleFinalizarOrdenTrabajo}
+            >
+              Finalizar Orden de Trabajo
+            </button>
+            <button
+              className="text-[2.4rem] bg-[#ff6b16] hover:bg-[#ff7425] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo"
+              onClick={handleRegresar}
+            >
+              Regresar
+            </button>
+          </div>
+        </footer>
       </div>
-    </div>
+
+      <ModalFinalizarOrdenTrabajo
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        finalizarOrdenTrabajo={setFinOrdenTrabajo}
+        row={
+          especificacionesPedidosPerspectivas.length > 0
+            ? especificacionesPedidosPerspectivas[0]
+            : {
+                id_OrdenTrabajo: 0,
+                de_ColorTela: '',
+                nu_Cantidad: 0,
+                nu_CantidadPendiente: 0,
+                de_Modelo: '',
+                de_TipoTela: '',
+                de_Talla: '',
+                de_Ruta: '',
+                id_ModeloPerspectiva: 0,
+                totalModeloPerspectiva: 0,
+                id_Especificacion: 0,
+                nu_Especificacion: 0,
+                de_Especificacion: '',
+                de_Genero: '',
+                id_ModeloImagen: 0,
+                sn_ActivoImagen: 0,
+              }
+        }
+      />
+    </>
   );
 };

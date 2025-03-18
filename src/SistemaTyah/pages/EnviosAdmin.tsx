@@ -285,7 +285,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
             </div>
 
             <Tooltip
-              content="Agregar Envio"
+              content="Agregar Envío"
               className="text-[1.3rem]"
               placement="bottom"
             >
@@ -355,7 +355,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-[2.5rem] mt-[1rem]">
                 <div>
                   <Label className="text-[1.6rem] dark:text-white">
-                    Telefono de Red Local
+                    Teléfono de Red Local
                   </Label>
                   <CustomInput
                     type="number"
@@ -371,7 +371,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
                 </div>
                 <div>
                   <Label className="text-[1.6rem] dark:text-white">
-                    Telefono Celular
+                    Teléfono Celular
                   </Label>
                   <CustomInput
                     type="number"
