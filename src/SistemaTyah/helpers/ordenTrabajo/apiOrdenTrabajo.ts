@@ -4,12 +4,13 @@ import {
   IEspecificacionesOrdenTrabajo,
   IEspecificacionesOrdenTrabajoParams,
   IFiltrosOrdenTrabajo,
+  IFormCancelarOrdenTrabajo,
   IFormFinalizarOrdenTrabajo,
   IOrdenesTrabajo,
   IOrdenTrabajoCombo,
 } from '../../interfaces/interfacesOrdenTrabajo';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // Obtener ordenes de trabajo
 export const getOrdenesTrabajo = async (
@@ -125,6 +126,36 @@ export const updateFinalizarOrdenesTrabajo = async (
     return data; // Devuelve el producto actualizado
   } catch (error) {
     console.error('Error al actualizar producto:', error);
+    throw error;
+  }
+};
+
+// Cancelar orden de trabajo
+export const cancelarOrdenTrabajo = async (
+  ordenTrabajo: Partial<IFormCancelarOrdenTrabajo>
+): Promise<ApiResponse<void>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/cancelarOrdenTrabajo`, {
+      method: 'POST', // El método sigue siendo POST
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...ordenTrabajo }), // Incluye el ID y los datos a actualizar
+    });
+
+    const data: ApiResponse<IFormFinalizarOrdenTrabajo> = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+
+    return {
+      message: 'Orden de trabajo cancelada',
+      success: true,
+      body: undefined,
+    };
+  } catch (error) {
+    console.error('Error al cancelar / reanudar pedido:', error);
     throw error;
   }
 };
