@@ -422,7 +422,7 @@ export const ModalClientes = ({
       >
         <ModalOverlay />
         <ModalContent
-          width="65%"
+          width="85%"
           maxWidth="1200px"
           height="auto"
           className="p-[1rem] mt-[4rem]"

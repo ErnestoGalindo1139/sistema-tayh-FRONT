@@ -157,3 +157,43 @@ export interface IPedidosDisponiblesCombo {
   de_CorreoElectronico?: string;
   nu_Telofono?: string;
 }
+
+export interface IPedidosExcel {
+  id_Pedido: number;
+  id_Cliente: number;
+  nb_Cliente: string;
+  fh_Pedido: string;
+  fh_EnvioProduccion: string;
+  fh_EntregaEstimada: string;
+  fh_PedidoFormat?: string;
+  fh_EnvioProduccionFormat?: string;
+  fh_EntregaEstimadaFormat?: string;
+  id_ViaContacto: number;
+  de_ViaContacto: string;
+  id_Estatus: string | number;
+  de_Estatus: string;
+  im_TotalImpuesto: number;
+  im_TotalPedido: number;
+  id_Detalle: number;
+  id_Modelo: string;
+  id_Talla: string;
+  id_Color: string;
+  id_TipoTela: string;
+  id_TipoPrenda: string;
+  de_Concepto: string;
+  nu_Cantidad: number;
+  im_PrecioUnitario: number;
+  im_SubTotalPedido: number;
+  im_SubTotal: number;
+  im_Impuesto: number;
+  im_Total: number;
+  de_Genero: string;
+  de_GeneroCompleto: string;
+  de_Modelo: string;
+  de_Talla: string;
+  de_Color: string;
+  de_TipoTela: string;
+  de_TipoPrenda: string;
+  sn_EnvioDomicilio: string;
+  im_EnvioDomicilio: number;
+}

@@ -48,21 +48,21 @@ export interface IFormClientes {
 export interface IFiltrosClientes {
   id_Cliente: string;
   nb_Cliente: string;
-  de_Direccion: string;
-  de_CorreoElectronico: string;
-  de_FolioCliente: string;
-  nb_Atendio: string;
-  id_UsuarioRegistra: string;
-  id_UsuarioModifica: string;
-  id_UsuarioElimina: string;
+  // de_Direccion: string;
+  // de_CorreoElectronico: string;
+  // de_FolioCliente: string;
+  // nb_Atendio: string;
+  // id_UsuarioRegistra: string;
+  // id_UsuarioModifica: string;
+  // id_UsuarioElimina: string;
   fh_Cumpleanos: string;
-  fh_CumpleanosEmpresa: string;
-  nu_TelefonoRedLocal: string;
-  nu_TelefonoCelular: string;
-  nu_TelefonoWhatsApp: string;
-  fh_Registro: string;
-  fh_Modificacion: string;
-  fh_Eliminacion: string;
+  // fh_CumpleanosEmpresa: string;
+  // nu_TelefonoRedLocal: string;
+  // nu_TelefonoCelular: string;
+  // nu_TelefonoWhatsApp: string;
+  // fh_Registro: string;
+  // fh_Modificacion: string;
+  // fh_Eliminacion: string;
   sn_Activo: string;
 }
 

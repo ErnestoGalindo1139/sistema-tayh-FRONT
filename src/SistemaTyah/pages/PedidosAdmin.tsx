@@ -22,6 +22,7 @@ import { FormPedidos } from '../components/Pedidos/FormPedidos';
 import { FiltrosPedidos } from '../components/Pedidos/FiltrosPedidos';
 import { useForm } from '../hooks/useForm';
 import { ModalCambiarEstatus } from '../dialogs/ModalCambiarEstatus';
+import { PedidosExcel } from '../excel/PedidosExcel';
 
 export const PedidosAdmin = (): React.JSX.Element => {
   const [pedidos, setPedidos] = useState<IPedidos[]>([]);
@@ -270,22 +271,26 @@ export const PedidosAdmin = (): React.JSX.Element => {
                 </p>
               </div>
 
-              <Tooltip
-                content="Agregar Pedido"
-                className="text-[1.3rem]"
-                placement="bottom"
-              >
-                <button
-                  onClick={() => {
-                    setSn_Agregar(true);
-                    setSn_Editar(false);
-                    setSn_Visualizar(false);
-                    limpiarPedido();
-                  }}
+              <div className="flex gap-2">
+                <PedidosExcel filtros={filtros} estatus={estatusPedidos} />
+
+                <Tooltip
+                  content="Agregar Pedido"
+                  className="text-[1.3rem]"
+                  placement="bottom"
                 >
-                  <AddIcon width="4em" height="4em" />
-                </button>
-              </Tooltip>
+                  <button
+                    onClick={() => {
+                      setSn_Agregar(true);
+                      setSn_Editar(false);
+                      setSn_Visualizar(false);
+                      limpiarPedido();
+                    }}
+                  >
+                    <AddIcon width="4em" height="4em" />
+                  </button>
+                </Tooltip>
+              </div>
             </div>
 
             {/* Filtros */}

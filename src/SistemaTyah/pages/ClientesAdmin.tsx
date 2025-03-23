@@ -20,6 +20,7 @@ import { Tooltip } from 'flowbite-react';
 import { FiltrosClientes } from '../components/Clientes/FiltrosClientes';
 import { ModalConfirmacionActivarInactivar } from '../dialogs/ModalConfirmacionActivarInactivar';
 import { useForm } from '../hooks/useForm';
+import { ClientesExcel } from '../excel/clientesExcel';
 
 export const ClientesAdmin = (): React.JSX.Element => {
   const [clientes, setClientes] = useState<IClientes[]>([]);
@@ -32,21 +33,21 @@ export const ClientesAdmin = (): React.JSX.Element => {
   } = useForm<IFiltrosClientes>({
     id_Cliente: '',
     nb_Cliente: '',
-    de_Direccion: '',
-    de_CorreoElectronico: '',
-    de_FolioCliente: '',
-    nb_Atendio: '',
-    id_UsuarioRegistra: '',
-    id_UsuarioModifica: '',
-    id_UsuarioElimina: '',
+    // de_Direccion: '',
+    // de_CorreoElectronico: '',
+    // de_FolioCliente: '',
+    // nb_Atendio: '',
+    // id_UsuarioRegistra: '',
+    // id_UsuarioModifica: '',
+    // id_UsuarioElimina: '',
     fh_Cumpleanos: '',
-    fh_CumpleanosEmpresa: '',
-    nu_TelefonoRedLocal: '',
-    nu_TelefonoCelular: '',
-    nu_TelefonoWhatsApp: '',
-    fh_Registro: '',
-    fh_Modificacion: '',
-    fh_Eliminacion: '',
+    // fh_CumpleanosEmpresa: '',
+    // nu_TelefonoRedLocal: '',
+    // nu_TelefonoCelular: '',
+    // nu_TelefonoWhatsApp: '',
+    // fh_Registro: '',
+    // fh_Modificacion: '',
+    // fh_Eliminacion: '',
     sn_Activo: '1',
   });
 
@@ -292,22 +293,26 @@ export const ClientesAdmin = (): React.JSX.Element => {
               </p>
             </div>
 
-            <Tooltip
-              content="Agregar Cliente"
-              className="text-[1.3rem]"
-              placement="bottom"
-            >
-              <button
-                onClick={() => {
-                  setSn_Editar(false);
-                  setSn_Visualizar(false);
-                  limpiarCliente();
-                  openModal();
-                }}
+            <div className="flex gap-2">
+              <ClientesExcel filtros={filtros} />
+
+              <Tooltip
+                content="Agregar Cliente"
+                className="text-[1.3rem]"
+                placement="bottom"
               >
-                <AddIcon width="4em" height="4em" />
-              </button>
-            </Tooltip>
+                <button
+                  onClick={() => {
+                    setSn_Editar(false);
+                    setSn_Visualizar(false);
+                    limpiarCliente();
+                    openModal();
+                  }}
+                >
+                  <AddIcon width="4em" height="4em" />
+                </button>
+              </Tooltip>
+            </div>
           </div>
 
           {/* Filtros */}
