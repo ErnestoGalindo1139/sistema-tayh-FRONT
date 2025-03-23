@@ -1,7 +1,8 @@
 export interface IEstatus {
-  id_Estatus: string;
+  id_Estatus: number;
   id_Modulo: string;
   de_Estatus: string;
+  color_Estatus: string;
 }
 
 export interface IEstatusComboMultiSelect {

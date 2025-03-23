@@ -11,6 +11,7 @@ import {
   IFiltrosPedidos,
   IPedidosExcel,
 } from '../interfaces/interfacesPedidos';
+import { IEstatus } from '../interfaces/interfacesEstatus';
 
 // Definición de estilos reutilizables para celdas (Estilos Globales)
 const style = {
@@ -48,6 +49,31 @@ const style = {
       pattern: 'solid',
       fgColor: { argb: 'D9EAF7' }, // Azul claro
     },
+  },
+  number: {
+    alignment: { horizontal: 'right' as const },
+  },
+  currency: {
+    alignment: { horizontal: 'right' as const },
+    numFmt: '"$"#,##0.00',
+  },
+  status: (
+    id_Estatus: number,
+    estatusArray: IEstatus[]
+  ): Partial<ExcelJS.Style> => {
+    const estatusEncontrado = estatusArray.find(
+      (e) => e.id_Estatus == id_Estatus
+    );
+
+    return {
+      alignment: { horizontal: 'center' as const },
+      fill: {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: estatusEncontrado?.color_Estatus || 'FFFFFF00' }, // Usa el color si lo encuentra, de lo contrario amarillo
+      },
+      font: { bold: true, color: { argb: 'FFFFFFFF' } },
+    };
   },
 };
 
@@ -152,10 +178,12 @@ const columnas = [
 
 interface IPedidosExcelProps {
   filtros: IFiltrosPedidos;
+  estatus: IEstatus[];
 }
 
 export const PedidosExcel = ({
   filtros,
+  estatus,
 }: IPedidosExcelProps): React.JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -332,9 +360,8 @@ export const PedidosExcel = ({
       let totalSubtotal = 0;
       let totalPedido = 0;
 
-      // Obtener valores generales del pedido (impuesto y envío)
-      const impuesto = pedidoDetails[0].im_TotalImpuesto || 0; // Tomar el impuesto del primer detalle
-      const envio = pedidoDetails[0].im_EnvioDomicilio || 0; // Tomar el envío del primer detalle
+      const impuesto = pedidoDetails[0].im_TotalImpuesto || 0;
+      const envio = pedidoDetails[0].im_EnvioDomicilio || 0;
 
       // Agregar detalles del pedido
       pedidoDetails.forEach((item) => {
@@ -354,54 +381,67 @@ export const PedidosExcel = ({
           item.nu_Cantidad,
           item.im_PrecioUnitario,
           item.im_SubTotal,
-          '', // Impuesto (no se muestra en detalles)
-          '', // Envío a domicilio (no se muestra en detalles)
-          '', // Total Pedido (no se muestra en detalles)
+          '',
+          '',
+          '',
           item.de_Estatus,
         ]);
 
-        row.eachCell((cell) => {
-          cell.style = style.body;
+        // Aplicar estilos dinámicos
+        row.eachCell((cell, colNumber) => {
+          const isNumber = [1, 13, 14, 15].includes(colNumber);
+          const isCurrency = [14, 15].includes(colNumber);
+          const isStatus = colNumber === 19;
+
+          if (isStatus) {
+            cell.style = {
+              ...style.body,
+              ...style.status(Number(item.id_Estatus), estatus),
+            };
+          } else if (isCurrency) {
+            cell.style = { ...style.body, ...style.currency };
+          } else if (isNumber) {
+            cell.style = { ...style.body, ...style.number };
+          } else {
+            cell.style = style.body;
+          }
         });
 
-        // Sumar valores para el total del pedido
         totalSubtotal += item.im_SubTotal || 0;
       });
 
-      // Calcular el total del pedido (subtotal + impuesto + envío)
       totalPedido = totalSubtotal + impuesto + envio;
 
       // Agregar fila de totales para el pedido
       const totalRow = worksheet.addRow([
-        '', // ID Pedido
-        '', // Nombre Cliente
-        '', // Fecha Pedido
-        '', // Fecha Producción
-        '', // Fecha Entrega
-        '', // Concepto
-        '', // Género
-        '', // Modelo
-        '', // Tipo Prenda
-        '', // Talla
-        '', // Color
-        '', // Tipo Tela
-        '', // Cantidad
-        '', // Precio
-        totalSubtotal, // Subtotal
-        impuesto, // Impuesto
-        envio, // Envío a Domicilio
-        totalPedido, // Total Pedido
-        '', // Estatus
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        totalSubtotal,
+        impuesto,
+        envio,
+        totalPedido,
+        '',
       ]);
 
-      // Aplicar estilo a la fila de totales
       totalRow.eachCell((cell) => {
         cell.style = {
           font: { bold: true, size: 11 },
           fill: {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: 'E4E4E4' }, // Gris claro
+            fgColor: { argb: 'E4E4E4' },
           },
           border: {
             top: { style: 'thin', color: { argb: 'FF000000' } },
@@ -409,15 +449,16 @@ export const PedidosExcel = ({
             bottom: { style: 'thin', color: { argb: 'FF000000' } },
             right: { style: 'thin', color: { argb: 'FF000000' } },
           },
+          alignment: { horizontal: 'right' },
+          numFmt: '"$"#,##0.00',
         };
       });
 
-      // Agregar una fila vacía como separador entre pedidos
       worksheet.addRow([]);
     });
 
     // Congelar hasta la fila de encabezado
-    worksheet.views = [{ state: 'frozen', ySplit: 7 }];
+    worksheet.views = [{ state: 'frozen', ySplit: 7, xSplit: 3 }];
 
     // Exportar Excel
     const buffer = await workbook.xlsx.writeBuffer();

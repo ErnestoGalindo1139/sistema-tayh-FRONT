@@ -196,8 +196,8 @@ export const ModalModelosAgregar = ({
       >
         <ModalOverlay />
         <ModalContent
-          width="35%"
-          maxWidth="1200px"
+          width="85%"
+          maxWidth="600px"
           height="auto"
           className="p-[1rem] mt-[4rem]"
           style={{ marginTop: '4rem' }}
@@ -274,34 +274,34 @@ export const ModalModelosAgregar = ({
           </ModalBody>
 
           <ModalFooter>
-            <Button
-              hidden={sn_Editar}
-              colorScheme="pink"
-              mr={3}
-              onClick={() => validarDatosFormulario(false)}
-              fontSize="2xl"
-              size="lg"
-            >
-              Guardar y agregar Otro
-            </Button>
-            <Button
-              isDisabled={sn_Visualizar}
-              colorScheme="blue"
-              mr={3}
-              onClick={() => validarDatosFormulario(true)}
-              fontSize="2xl"
-              size="lg"
-            >
-              Guardar
-            </Button>
-            <Button
-              onClick={onClose}
-              fontSize="2xl"
-              size="lg"
-              colorScheme="orange"
-            >
-              Cancelar
-            </Button>
+            <div className="grid m-auto w-full gap-4 sm:grid-flow-col-dense sm:m-0 sm:w-auto">
+              <Button
+                hidden={sn_Editar}
+                colorScheme="pink"
+                onClick={() => validarDatosFormulario(false)}
+                fontSize="2xl"
+                size="lg"
+              >
+                Guardar y agregar Otro
+              </Button>
+              <Button
+                isDisabled={sn_Visualizar}
+                colorScheme="blue"
+                onClick={() => validarDatosFormulario(true)}
+                fontSize="2xl"
+                size="lg"
+              >
+                Guardar
+              </Button>
+              <Button
+                onClick={onClose}
+                fontSize="2xl"
+                size="lg"
+                colorScheme="orange"
+              >
+                Cancelar
+              </Button>
+            </div>
           </ModalFooter>
         </ModalContent>
       </Modal>

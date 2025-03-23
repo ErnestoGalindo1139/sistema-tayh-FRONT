@@ -272,7 +272,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
               </div>
 
               <div className="flex gap-2">
-                <PedidosExcel filtros={filtros} />
+                <PedidosExcel filtros={filtros} estatus={estatusPedidos} />
 
                 <Tooltip
                   content="Agregar Pedido"

@@ -811,7 +811,6 @@ export const ModalPedidosDetalleAgregar = ({
               <Button
                 hidden={sn_Editar || sn_Visualizar}
                 colorScheme="pink"
-                mr={3}
                 onClick={() => validarDatosFormulario(false)}
                 fontSize="2xl"
                 size="lg"
@@ -822,7 +821,6 @@ export const ModalPedidosDetalleAgregar = ({
               <Button
                 hidden={sn_Visualizar}
                 colorScheme="blue"
-                mr={3}
                 onClick={() => validarDatosFormulario(true)}
                 fontSize="2xl"
                 size="lg"
