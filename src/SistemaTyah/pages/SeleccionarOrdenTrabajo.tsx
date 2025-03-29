@@ -22,6 +22,7 @@ import { WaitScreen } from '../components/WaitScreen';
 import { ModalOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalOrdenTrabajo';
 import { useDisclosure } from '@chakra-ui/react';
 import { customPaginationTheme } from '../themes/customPaginationTheme';
+import { ModalConfirmarIniciarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalConfirmarIniciarOrdenTrabajo';
 
 export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
   const [ordenesTrabajo, setOrdenesTrabajo] = useState<IOrdenesTrabajo[]>([]);
@@ -137,6 +138,10 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
     fetchEstatusOrdenTrabajoCombo();
   }, []);
 
+  useEffect(() => {
+    closeModal();
+  }, [ordenesTrabajo]);
+
   const buscarOrdenesTrabajo = async (
     filtros: IFiltrosOrdenTrabajo
   ): Promise<void> => {
@@ -157,10 +162,10 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
     filtros.pedidos = pedidos;
     filtros.estatus = estatus;
 
-    const enviosData = await buscarOrdenesTrabajoHelper(filtros);
+    const ordenesTrabajoData = await buscarOrdenesTrabajoHelper(filtros);
 
-    if (enviosData.success) {
-      setOrdenesTrabajo(enviosData.body);
+    if (ordenesTrabajoData.success) {
+      setOrdenesTrabajo(ordenesTrabajoData.body);
       setIsLoading(false);
     } else {
       setOrdenesTrabajo([]);
@@ -188,7 +193,7 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
         </h1>
       </div>
 
-      <div className="grid grid-cols-[25%_25%_20%_20%_10%] gap-[2rem] mx-[2rem] mt-[4rem] w-full">
+      <div className="grid grid-cols-[25%_25%_20%_20%_10%] gap-[2rem] mx-auto mt-[4rem] w-[92%]">
         <div>
           <label className="text-[1.8rem] font-bold">Pedidos</label>
           <CustomMultiSelect
@@ -219,7 +224,7 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
             placeholder="Fecha Inicio"
             id="fh_Inicio"
             name="fh_Inicio"
-            value={getDateForPicker(formState.fh_Inicio)} // Convertimos el string a Date ajustado a UTC
+            value={getDateForPicker(formState.fh_Inicio || '')} // Convertimos el string a Date ajustado a UTC
             onChange={(date) => {
               handleDateChange(date, 'fh_Inicio');
             }}
@@ -237,7 +242,7 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
             placeholder="Fecha Fin"
             id="fh_Fin"
             name="fh_Fin"
-            value={getDateForPicker(formState.fh_Fin)} // Convertimos el string a Date ajustado a UTC
+            value={getDateForPicker(formState.fh_Fin || '')} // Convertimos el string a Date ajustado a UTC
             onChange={(date) => {
               handleDateChange(date, 'fh_Fin');
             }}
@@ -344,7 +349,7 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
       <ModalOrdenTrabajo
         isOpen={isModalOpen}
         onClose={closeModal}
-        actualizarOrdenTrabajo={setOrdenesTrabajo}
+        actualizarOrdenesTrabajo={setOrdenesTrabajo}
         row={
           ordenTrabajo
             ? ordenTrabajo
@@ -367,6 +372,7 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
                 de_Estatus: '',
                 color_Estatus: '',
                 de_Talla: '',
+                de_ComentarioCancelacion: '',
               }
         }
         sn_Editar={false}

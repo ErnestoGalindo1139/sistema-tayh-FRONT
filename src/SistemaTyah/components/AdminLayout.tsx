@@ -94,9 +94,15 @@ export default function AdminLayout(): React.JSX.Element {
               <li
                 key={modulo.id}
                 style={{ color: sidebarTextColor }}
-                className="font-semibold text-xl"
+                className="font-semibold text-[1.8rem] flex items-center gap-3"
                 onClick={() => handleMenuClick(modulo.ruta)}
               >
+                <img
+                  width="24"
+                  height="24"
+                  src={modulo.icono.url}
+                  alt="dashboard-layout"
+                />
                 {modulo.texto}
               </li>
             ))}

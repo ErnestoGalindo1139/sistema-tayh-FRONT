@@ -1,11 +1,67 @@
 import React from 'react';
+import { useForm } from '../hooks/useForm';
+import { useAuth } from '../../auth/AuthProvider';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { authLogin, AuthResponse } from '../../interfaces/interfacesLogin';
+import { ApiResponse } from '../interfaces/interfacesApi';
 
 export const LoginPage = (): React.JSX.Element => {
+  const { formState, setFormState, onInputChange, onResetForm } = useForm({
+    usuario: '',
+    password: '',
+  });
+
+  const navigate = useNavigate();
+
+  const auth = useAuth();
+
+  if (auth.isAuthenticated) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  const BASE_URL = import.meta.env.VITE_API_URL;
+
+  const handleLogin = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formState), // Mandar los filtros en la petición
+      });
+
+      const data: ApiResponse<authLogin> = await response.json();
+
+      if (data.success) {
+        console.log('Inicio de Sesion Exitoso');
+
+        const json = data as unknown as AuthResponse;
+
+        if (json.body.accessToken && json.body.refreshToken) {
+          auth.saveUser(json);
+        }
+
+        navigate('/dashboard');
+      } else {
+        console.log('Inicio de Sesion Fallido');
+      }
+    } catch (error) {
+      console.error('Error al iniciar sesion:', error);
+      throw error;
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-2 w-full">
         <div className="m-auto w-full">
-          <form className="flex flex-col justify-self-center w-3/4 2xl:w-2/4 xl:pl-[4.8rem]">
+          <form
+            className="flex flex-col justify-self-center w-3/4 2xl:w-2/4 xl:pl-[4.8rem]"
+            onSubmit={handleLogin}
+          >
             <h2 className="text-left text-[3.7rem] font-bold mt-[10rem] lg:mt-0">
               Bienvenido 👋
             </h2>
@@ -25,12 +81,15 @@ export const LoginPage = (): React.JSX.Element => {
             <input
               type="text"
               id="usuario"
+              name="usuario"
               className="border-2 border-neutral-200 p-[.8rem] rounded-2xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-[1.6rem]"
               placeholder="correo@gmail.com"
+              onChange={onInputChange}
+              value={formState.usuario}
             />
 
             <label
-              htmlFor="usuario"
+              htmlFor="password"
               className="mt-[1.6rem] mb-[.5rem] text-[1.8rem] font-bold"
             >
               Contraseña:
@@ -38,8 +97,12 @@ export const LoginPage = (): React.JSX.Element => {
 
             <input
               type="text"
+              id="password"
+              name="password"
               className="border-2 border-neutral-200 p-[.8rem] rounded-2xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-[1.6rem]"
               placeholder="Minimo 12 caracteres"
+              onChange={onInputChange}
+              value={formState.password}
             />
 
             <p className="text-end mt-2 text-blue-500 cursor-pointer text-[1.6rem]">

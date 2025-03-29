@@ -6,7 +6,7 @@ import {
 } from '../../interfaces/interfacesFacturacion';
 
 // const BASE_URL = import.meta.env.VITE_BASE_URL;
-const BASE_URL = 'https://apis-grstechs.com';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // Obtener facturas
 export const getFacturas = async (

@@ -1,10 +1,13 @@
 import Toast from '../../components/Toast';
 import { ApiResponse } from '../../interfaces/interfacesApi';
-import { IOrdenesTrabajo } from '../../interfaces/interfacesOrdenTrabajo';
+import {
+  IFiltrosOrdenTrabajo,
+  IOrdenesTrabajo,
+} from '../../interfaces/interfacesOrdenTrabajo';
 import { getOrdenesTrabajo } from './apiOrdenTrabajo';
 
 export const buscarOrdenesTrabajoHelper = async (
-  filtros: object
+  filtros: IFiltrosOrdenTrabajo
 ): Promise<ApiResponse<IOrdenesTrabajo[]>> => {
   try {
     const ordenesTrabajoData = await getOrdenesTrabajo(filtros);

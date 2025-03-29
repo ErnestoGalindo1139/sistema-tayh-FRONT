@@ -2,12 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { IApiError } from '../interfaces/interfacesApi';
 import Toast from '../components/Toast';
 import { getEspecificacionesOrdenTrabajo } from '../helpers/ordenTrabajo/apiOrdenTrabajo';
-import { IEspecificacionesOrdenTrabajo } from '../interfaces/interfacesOrdenTrabajo';
+import {
+  IEspecificacionesOrdenTrabajo,
+  IFormFinalizarOrdenTrabajo,
+} from '../interfaces/interfacesOrdenTrabajo';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Pagination } from 'flowbite-react';
 import { customPaginationOrdenTrabajoTheme } from '../themes/customPaginationOrdenTrabajoTheme';
 import { useDisclosure } from '@chakra-ui/react';
 import { ModalFinalizarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalFinalizarOrdenTrabajo';
+import { ModalConfirmarCancelarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalConfirmarCancelarOrdenTrabajo';
+import { cancelarOrdenTrabajoHelper } from '../helpers/ordenTrabajo/cancelarOrdenTrabajoHelper';
+import { ModalCancelarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalCancelarOrdenTrabajo';
 
 export const OrdenTrabajo = (): React.JSX.Element => {
   const [especificacionesPedidos, setEspecificacionesPedidos] = useState<
@@ -33,6 +39,12 @@ export const OrdenTrabajo = (): React.JSX.Element => {
     isOpen: isModalOpen,
     onOpen: openModal,
     onClose: closeModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isModalCancelarOpen,
+    onOpen: openModalCancelar,
+    onClose: closeModalCancelar,
   } = useDisclosure();
 
   // Función para restablecer el cambio automático
@@ -114,6 +126,10 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
   const handleFinalizarOrdenTrabajo = (): void => {
     openModal();
+  };
+
+  const abrirModalCancelarOrdenTrabajo = (): void => {
+    openModalCancelar();
   };
 
   return (
@@ -217,13 +233,19 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
           <div className="w-[100%] text-end mr-[4rem]">
             <button
-              className="text-[2.4rem] bg-[#1a9a1a] hover:bg-[#2eb92e] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
+              className="text-[2.2rem] bg-[#1a9a1a] hover:bg-[#2eb92e] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
               onClick={handleFinalizarOrdenTrabajo}
             >
               Finalizar Orden de Trabajo
             </button>
             <button
-              className="text-[2.4rem] bg-[#ff6b16] hover:bg-[#ff7425] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo"
+              className="text-[2.2rem] bg-[#ff1a1a] hover:bg-[#ff3535] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
+              onClick={abrirModalCancelarOrdenTrabajo}
+            >
+              Cancelar
+            </button>
+            <button
+              className="text-[2.2rem] bg-[#ff6b16] hover:bg-[#ff7425] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo"
               onClick={handleRegresar}
             >
               Regresar
@@ -258,6 +280,34 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                 sn_ActivoImagen: 0,
               }
         }
+      />
+
+      <ModalCancelarOrdenTrabajo
+        isOpen={isModalCancelarOpen}
+        onClose={closeModalCancelar}
+        row={
+          especificacionesPedidosPerspectivas.length > 0
+            ? especificacionesPedidosPerspectivas[0]
+            : {
+                id_OrdenTrabajo: 0,
+                de_ColorTela: '',
+                nu_Cantidad: 0,
+                nu_CantidadPendiente: 0,
+                de_Modelo: '',
+                de_TipoTela: '',
+                de_Talla: '',
+                de_Ruta: '',
+                id_ModeloPerspectiva: 0,
+                totalModeloPerspectiva: 0,
+                id_Especificacion: 0,
+                nu_Especificacion: 0,
+                de_Especificacion: '',
+                de_Genero: '',
+                id_ModeloImagen: 0,
+                sn_ActivoImagen: 0,
+              }
+        }
+        sn_PantallaOrdenTrabajo={true}
       />
     </>
   );

@@ -1,12 +1,12 @@
 import { CustomSelectValue } from './interfacesGlobales';
 
 export interface IFiltrosOrdenTrabajo {
-  id_Pedido: CustomSelectValue[] | string;
-  pedidos: string;
-  id_Estatus: CustomSelectValue[] | string;
-  estatus: string;
-  fh_Inicio: string;
-  fh_Fin: string;
+  id_Pedido?: CustomSelectValue[] | string;
+  pedidos?: string;
+  id_Estatus?: CustomSelectValue[] | string;
+  estatus?: string;
+  fh_Inicio?: string;
+  fh_Fin?: string;
 }
 
 export interface IOrdenesTrabajo {
@@ -28,6 +28,7 @@ export interface IOrdenesTrabajo {
   de_Estatus: string;
   color_Estatus: string;
   de_Talla: string;
+  de_ComentarioCancelacion: string;
 }
 
 export interface IOrdenTrabajoCombo {
@@ -63,6 +64,11 @@ export interface IEspecificacionesOrdenTrabajo {
 
 export interface IFormFinalizarOrdenTrabajo {
   id_OrdenTrabajo: number;
-  nu_CantidadPendiente: number | string;
+  nu_CantidadPendiente: number;
   sn_OrdenFinalizada: number;
+}
+
+export interface IFormCancelarOrdenTrabajo {
+  id_OrdenTrabajo: number;
+  de_ComentarioCancelacion: string;
 }
