@@ -8,6 +8,7 @@ import {
   IPedidosDetalles,
   IPedidosDisponiblesCombo,
   IPedidosDisponiblesComboParams,
+  IPedidosExcel,
   ITallas,
   ITipoPrendas,
   ITipoTelas,
@@ -16,7 +17,7 @@ import {
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-// Obtener categorias
+// Obtener Pedidos
 export const getPedidos = async (
   filtros: Partial<IFiltrosPedidos>
 ): Promise<ApiResponse<IPedidos[]>> => {
@@ -30,6 +31,26 @@ export const getPedidos = async (
     });
 
     const data: ApiResponse<IPedidos[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener Clientes:', error);
+    throw error;
+  }
+};
+
+export const getPedidosExcel = async (
+  filtros: Partial<IFiltrosPedidos>
+): Promise<ApiResponse<IPedidosExcel[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getPedidosExcel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IPedidosExcel[]> = await response.json();
     return data;
   } catch (error) {
     console.error('Error al obtener Clientes:', error);
