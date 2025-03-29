@@ -14,6 +14,7 @@ import { ModelosAdmin } from '../pages/ModelosAdmin';
 import { FacturacionAdmin } from '../pages/FacturacionAdmin';
 import { SeleccionarOrdenTrabajo } from '../pages/SeleccionarOrdenTrabajo';
 import { InventarioAdmin } from '../pages/InventarioAdmin';
+import { ProteccionAutenticacion } from '../pages/ProteccionAutenticacion';
 
 export const SistemaTayhRoutes = (): React.JSX.Element => {
   return (
@@ -21,22 +22,24 @@ export const SistemaTayhRoutes = (): React.JSX.Element => {
       {/* Aquí va el NavbarComponent si aplica */}
       <Routes>
         {/* Rutas de administración con layout común */}
-        <Route path="/" element={<AdminLayout />}>
-          <Route path="dashboard" element={<HomePage />} />
-          <Route path="clientes" element={<ClientesAdmin />} />
-          <Route path="envios" element={<EnviosAdmin />} />
-          <Route path="pedidos" element={<PedidosAdmin />} />
-          <Route path="facturacion" element={<FacturacionAdmin />} />
-          <Route path="configuraciones" element={<ConfiguracionesAdmin />} />
-          <Route path="precios" element={<PreciosAdmin />} />
-          <Route path="modelos" element={<ModelosAdmin />} />
-          <Route
-            path="/seleccionarOrdenTrabajo"
-            // element={<OrdenTrabajo de_Genero="M" id_Modelo={1} id_Talla={1} />}
-            element={<SeleccionarOrdenTrabajo />}
-          />
-          <Route path="inventario" element={<InventarioAdmin />} />
-          {/* <Route path="reportes" element={<ReportesAdmin />} /> */}
+        <Route path="/" element={<ProteccionAutenticacion />}>
+          <Route element={<AdminLayout />}>
+            <Route path="dashboard" element={<HomePage />} />
+            <Route path="clientes" element={<ClientesAdmin />} />
+            <Route path="envios" element={<EnviosAdmin />} />
+            <Route path="pedidos" element={<PedidosAdmin />} />
+            <Route path="facturacion" element={<FacturacionAdmin />} />
+            <Route path="configuraciones" element={<ConfiguracionesAdmin />} />
+            <Route path="precios" element={<PreciosAdmin />} />
+            <Route path="modelos" element={<ModelosAdmin />} />
+            <Route
+              path="/seleccionarOrdenTrabajo"
+              // element={<OrdenTrabajo de_Genero="M" id_Modelo={1} id_Talla={1} />}
+              element={<SeleccionarOrdenTrabajo />}
+            />
+            <Route path="inventario" element={<InventarioAdmin />} />
+            {/* <Route path="reportes" element={<ReportesAdmin />} /> */}
+          </Route>
         </Route>
 
         {/* Ruta independiente, fuera del layout de administración */}
