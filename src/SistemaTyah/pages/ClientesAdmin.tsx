@@ -20,7 +20,7 @@ import { Tooltip } from 'flowbite-react';
 import { FiltrosClientes } from '../components/Clientes/FiltrosClientes';
 import { ModalConfirmacionActivarInactivar } from '../dialogs/ModalConfirmacionActivarInactivar';
 import { useForm } from '../hooks/useForm';
-import { ClientesExcel } from '../excel/clientesExcel';
+import { ClientesExcel } from '../excel/ClientesExcel';
 
 export const ClientesAdmin = (): React.JSX.Element => {
   const [clientes, setClientes] = useState<IClientes[]>([]);
