@@ -128,7 +128,7 @@ export const LoginPage = (): React.JSX.Element => {
         </div>
         <div className="w-full h-screen hidden lg:block">
           <img
-            src="./assets/imageLogin.png"
+            src="./img/imageLogin.png"
             alt="imageLogin"
             className="p-[1.6rem] object-cover h-auto xl:h-[90%] 2xl:h-full mx-auto"
           />
