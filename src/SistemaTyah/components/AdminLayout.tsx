@@ -108,6 +108,17 @@ export default function AdminLayout(): React.JSX.Element {
             ))}
           </ul>
         </nav>
+        {/* <div className="flex items-center mb-[1rem] pt-[1rem] border-t-2 justify-center">
+          <button className="flex items-center gap-2">
+            <img
+              width="44"
+              height="44"
+              src="https://img.icons8.com/external-solid-adri-ansyah/44/FFFFFF/external-exit-essentials-ui-solid-adri-ansyah.png"
+              alt="external-exit-essentials-ui-solid-adri-ansyah"
+            />
+            <p className="text-[2rem]">Cerrar Sesión</p>
+          </button>
+        </div> */}
       </aside>
 
       <main className="main-content dark:bg-[#19232c]">
