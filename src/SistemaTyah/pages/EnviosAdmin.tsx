@@ -10,7 +10,7 @@ import { IApiError } from '../interfaces/interfacesApi';
 import { WaitScreen } from '../components/WaitScreen';
 import { getClientesCombo } from '../helpers/apiClientes';
 import { RetweetIcon } from '../icons/RetweetIcon';
-import { Tooltip, Label } from 'flowbite-react';
+import { Tooltip, Label, Datepicker } from 'flowbite-react';
 import { SearchIcon } from '../icons/SearchIcon';
 import {
   IEnvios,
@@ -29,6 +29,9 @@ import { eliminarEnvioHelper } from '../helpers/envios/eliminarEnvioHelper';
 import { CustomSelect } from '../components/custom/CustomSelect';
 import { IEstatus } from '../interfaces/interfacesEstatus';
 import { getEstatus } from '../helpers/apiEstatus';
+import { EnviosExcel } from '../excel/EnviosExcel';
+import { useFormDate } from '../hooks/useFormDate';
+import { customDatePickerTheme } from '../themes/customDatePickerTheme';
 
 export const EnviosAdmin = (): React.JSX.Element => {
   const [envios, setEnvios] = useState<IEnvios[]>([]);
@@ -44,6 +47,8 @@ export const EnviosAdmin = (): React.JSX.Element => {
     nu_TelefonoRedLocal: '',
     de_FolioGuia: '',
     id_Estatus: '',
+    fh_Inicio: '',
+    fh_Fin: '',
   });
 
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);
@@ -232,6 +237,37 @@ export const EnviosAdmin = (): React.JSX.Element => {
   const buscarEnvios = async (filtros: IFiltrosEnvios): Promise<void> => {
     setIsLoading(true);
 
+    if (
+      !formState.fh_Inicio ||
+      formState.fh_Inicio == '' ||
+      !formState.fh_Fin ||
+      formState.fh_Fin == ''
+    ) {
+      Toast.fire({
+        icon: 'info',
+        title: 'Ocurrió un Error',
+        text: 'La fecha inicio y la fecha fin no pueden estar vacias',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Asegúrate de convertir a Date si es necesario
+    const fechaInicio = new Date(formState.fh_Inicio);
+    const fechaFin = new Date(formState.fh_Fin);
+
+    if (fechaInicio > fechaFin) {
+      Toast.fire({
+        icon: 'info',
+        title: 'Ocurrió un Error',
+        text: 'La fecha inicio no puede ser mayor a la fecha fin',
+      });
+
+      setIsLoading(false);
+
+      return;
+    }
+
     const clientes = Array.isArray(filtros.id_Cliente)
       ? filtros.id_Cliente
           .map((cliente: { value: unknown }) => cliente.value)
@@ -272,6 +308,11 @@ export const EnviosAdmin = (): React.JSX.Element => {
     }
   };
 
+  const { handleDateChange, getDateForPicker } = useFormDate(
+    formState,
+    setFormState
+  );
+
   return (
     <>
       {isLoading && <WaitScreen message="cargando..." />}
@@ -283,23 +324,26 @@ export const EnviosAdmin = (): React.JSX.Element => {
               <h2 className="font-bold text-[2.5rem]">Envios</h2>
               <p className="text-[1.6rem]">Aquí puedes gestionar los Envios.</p>
             </div>
+            <div className="flex gap-2">
+              <EnviosExcel filtros={formState} />
 
-            <Tooltip
-              content="Agregar Envío"
-              className="text-[1.3rem]"
-              placement="bottom"
-            >
-              <button
-                onClick={() => {
-                  setSn_Editar(false);
-                  setSn_Visualizar(false);
-                  onResetForm();
-                  openModal();
-                }}
+              <Tooltip
+                content="Agregar Envío"
+                className="text-[1.3rem]"
+                placement="bottom"
               >
-                <AddIcon width="4em" height="4em" />
-              </button>
-            </Tooltip>
+                <button
+                  onClick={() => {
+                    setSn_Editar(false);
+                    setSn_Visualizar(false);
+                    onResetForm();
+                    openModal();
+                  }}
+                >
+                  <AddIcon width="4em" height="4em" />
+                </button>
+              </Tooltip>
+            </div>
           </div>
 
           {/* Filtros */}
@@ -424,6 +468,44 @@ export const EnviosAdmin = (): React.JSX.Element => {
                       </option>
                     ))}
                   </CustomSelect>
+                </div>
+                <div>
+                  <label className="text-[1.6rem] font-bold">
+                    Fecha Inicio
+                  </label>
+                  <Datepicker
+                    placeholder="Fecha Inicio"
+                    id="fh_Inicio"
+                    name="fh_Inicio"
+                    value={getDateForPicker(formState.fh_Inicio || '')} // Convertimos el string a Date ajustado a UTC
+                    onChange={(date) => {
+                      handleDateChange(date, 'fh_Inicio');
+                    }}
+                    className={`w-full rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+                    language="es-MX"
+                    style={{ fontSize: '1.4rem', height: '3.7rem' }}
+                    theme={customDatePickerTheme}
+                    autoHide={true}
+                    key={formState.fh_Inicio || 'fh_Inicio'} // Cambia la clave cuando el valor cambia
+                  />
+                </div>
+                <div>
+                  <label className="text-[1.6rem] font-bold">Fecha Fin</label>
+                  <Datepicker
+                    placeholder="Fecha Fin"
+                    id="fh_Fin"
+                    name="fh_Fin"
+                    value={getDateForPicker(formState.fh_Fin || '')} // Convertimos el string a Date ajustado a UTC
+                    onChange={(date) => {
+                      handleDateChange(date, 'fh_Fin');
+                    }}
+                    className={`w-full rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+                    language="es-MX"
+                    style={{ fontSize: '1.4rem', height: '3.7rem' }}
+                    theme={customDatePickerTheme}
+                    autoHide={true}
+                    key={formState.fh_Inicio || 'fh_Fin'} // Cambia la clave cuando el valor cambia
+                  />
                 </div>
               </div>
 

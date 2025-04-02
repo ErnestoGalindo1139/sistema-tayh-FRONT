@@ -13,6 +13,8 @@ export interface IFiltrosFacturacion {
   de_Uso: string;
   sn_ConstanciaFiscal: boolean | null;
   sn_Activo: boolean | null;
+  fh_Inicio: string;
+  fh_Fin: string;
 }
 
 export interface IFacturacion {

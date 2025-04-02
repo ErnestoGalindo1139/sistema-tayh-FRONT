@@ -96,7 +96,7 @@ export const LoginPage = (): React.JSX.Element => {
             </label>
 
             <input
-              type="text"
+              type="password"
               id="password"
               name="password"
               className="border-2 border-neutral-200 p-[.8rem] rounded-2xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-[1.6rem]"

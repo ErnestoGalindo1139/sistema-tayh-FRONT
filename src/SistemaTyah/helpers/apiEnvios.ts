@@ -105,3 +105,24 @@ export const deleteEnvios = async (
     throw error;
   }
 };
+
+// Obtener envios
+export const getEnviosExcel = async (
+  filtros: Partial<IFiltrosEnvios>
+): Promise<ApiResponse<IEnvios[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getEnviosExcel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IEnvios[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener los Envios:', error);
+    throw error;
+  }
+};

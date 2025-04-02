@@ -187,13 +187,13 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
   return (
     <>
       {isLoading && <WaitScreen message="cargando..." />}
-      <div className="mx-auto w-1/3 rounded-xl bg-[#068bff]">
+      <div className="mx-auto w-full lg:w-1/3 rounded-xl bg-[#068bff]">
         <h1 className="text-[3rem] text-center font-bold text-white">
           Orden de Trabajo
         </h1>
       </div>
 
-      <div className="grid grid-cols-[25%_25%_20%_20%_10%] gap-[2rem] mx-auto mt-[4rem] w-[92%]">
+      <div className="grid grid-cols-1 xl:grid-cols-[25%_25%_20%_20%_10%] gap-[2rem] mx-auto mt-[4rem] w-[92%]">
         <div>
           <label className="text-[1.8rem] font-bold">Pedidos</label>
           <CustomMultiSelect
@@ -268,12 +268,12 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-[14rem] gap-y-[4rem] mt-[4rem] mb-[10rem] place-items-center w-[120rem] mx-auto">
+      <div className="grid grid-cols-1 2xl:grid-cols-2 gap-x-[14rem] gap-y-[4rem] mt-[4rem] mb-[10rem] place-items-center w-auto xl:w-[73%] mx-auto">
         {ordenesTrabajoPaginadas.map((ordenTrabajo) => (
           <div
             key={ordenTrabajo.id_OrdenTrabajo}
             // className={`border-[.3rem] rounded-[3rem] bg-white shadowOrdenTrabajo w-[60rem]`}
-            className={`rounded-[3rem] bg-white shadowOrdenTrabajo w-[54rem]`}
+            className={`rounded-[3rem] bg-white shadowOrdenTrabajo w-full sm:w-[54rem]`}
             // style={{ borderColor: ordenTrabajo.color_Estatus }}
           >
             <p

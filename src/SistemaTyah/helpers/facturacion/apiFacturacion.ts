@@ -106,3 +106,24 @@ export const deleteFacturas = async (
     throw error;
   }
 };
+
+// Obtener facturas excel
+export const getFacturasExcel = async (
+  filtros: Partial<IFiltrosFacturacion>
+): Promise<ApiResponse<IFacturacion[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getFacturasExcel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IFacturacion[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener las Facturas:', error);
+    throw error;
+  }
+};
