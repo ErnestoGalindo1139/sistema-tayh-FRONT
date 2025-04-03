@@ -186,7 +186,7 @@ export const ClientesExcel = ({
 
     // Cargar imagen y agregarla al Excel
     const base64Image = await loadImageAsBase64(
-      '/public/img/Logo-Tayh_Horizontal-Negro.png'
+      'img/Logo-Tayh_Horizontal-Negro.png'
     );
     const logoId = workbook.addImage({
       base64: base64Image.split(',')[1],

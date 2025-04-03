@@ -144,10 +144,14 @@ input[type="number"] {
 }
 
 .header {
-	background-color: #bdc3c7;
+	background-color: rgb(15, 21, 26);;
+	color: white;
 	padding: 10px;
 	text-align: center;
 	margin-bottom: 20px;
+	margin-top: -20px;
+	margin-right: -20px;
+	margin-left: -20px;
 }
 
 .content {
@@ -163,12 +167,13 @@ input[type="number"] {
 	padding: 10px;
 	background-color: #2c3e50;
 	color: white;
-	cursor: pointer;
+	/* cursor: pointer; */
 	text-align: left; /* Alineado a la izquierda */
 }
 
 .hamburger-icon {
 	font-size: 30px;
+	cursor: pointer;
 }
 
 @media (max-width: 768px) {
@@ -196,9 +201,9 @@ input[type="number"] {
 		display: block;
 	}
 
-	.main-content {
+	/* .main-content {
 		margin-top: 50px;
-	}
+	} */
 }
 
 
