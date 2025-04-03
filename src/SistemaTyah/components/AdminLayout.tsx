@@ -5,6 +5,7 @@ import { Image } from '@chakra-ui/react';
 
 import { modulosData } from '../data/modulosData';
 import { useTheme } from '../../ThemeContext';
+import { Tooltip } from 'flowbite-react';
 
 export default function AdminLayout(): React.JSX.Element {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -20,6 +21,13 @@ export default function AdminLayout(): React.JSX.Element {
   const handleMenuClick = (ruta: string): void => {
     navigate(ruta);
     setIsSidebarOpen(false);
+  };
+
+  // Función para manejar el cierre de sesión
+  const handleLogout = (): void => {
+    // Aquí iría la lógica para cerrar sesión
+    console.log('Cerrando sesión...');
+    // Por ejemplo: navigate('/login');
   };
 
   // Detectar clics fuera del sidebar
@@ -59,8 +67,10 @@ export default function AdminLayout(): React.JSX.Element {
   return (
     <div className={`admin-container ${isDarkMode ? 'dark' : ''}`}>
       {/* Menú Hamburguesa para móviles */}
-      <div className="hamburger" onClick={toggleSidebar}>
-        <span className="hamburger-icon">&#9776;</span>
+      <div className="hamburger">
+        <span className="hamburger-icon" onClick={toggleSidebar}>
+          &#9776;
+        </span>
       </div>
 
       <aside
@@ -108,25 +118,37 @@ export default function AdminLayout(): React.JSX.Element {
             ))}
           </ul>
         </nav>
-        {/* <div className="flex items-center mb-[1rem] pt-[1rem] border-t-2 justify-center">
-          <button className="flex items-center gap-2">
-            <img
-              width="44"
-              height="44"
-              src="https://img.icons8.com/external-solid-adri-ansyah/44/FFFFFF/external-exit-essentials-ui-solid-adri-ansyah.png"
-              alt="external-exit-essentials-ui-solid-adri-ansyah"
-            />
-            <p className="text-[2rem]">Cerrar Sesión</p>
-          </button>
-        </div> */}
       </aside>
 
       <main className="main-content dark:bg-[#19232c]">
-        {/* <header className="header dark:bg-[#19232c]">
-          <h1 className="dark:text-white text-[1.6rem]">
-            Bienvenido al Panel de Administración
+        {/* Nuevo Header */}
+        <header className="header dark:bg-[#19232c] flex justify-between items-center border-b dark:border-gray-700]">
+          <div className="md:flex-1"></div>{' '}
+          {/* Espacio vacío para balancear el layout */}
+          <h1 className="dark:text-white text-3xl tracking-[0.3rem] font-bold flex-1 md:text-center text-left">
+            Sistema Tayh
           </h1>
-        </header> */}
+          <div className="flex justify-end mr-2 flex-1">
+            <Tooltip
+              content="Cerrar sesión"
+              className="text-[1.3rem]"
+              placement="left"
+            >
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 dark:text-white hover:bg-gray-700 p-2 rounded"
+              >
+                <img
+                  width="24"
+                  height="24"
+                  src="https://img.icons8.com/ios-filled/50/FFFFFF/exit.png"
+                  alt="logout"
+                />
+              </button>
+            </Tooltip>
+          </div>
+        </header>
+
         {/* Aquí se renderizarán las rutas hijas */}
         <Outlet />
       </main>

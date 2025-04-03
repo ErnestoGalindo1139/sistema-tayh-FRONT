@@ -175,7 +175,7 @@ export const FacturasExcel = ({
 
     // Cargar imagen y agregarla al Excel
     const base64Image = await loadImageAsBase64(
-      '/public/img/Logo-Tayh_Horizontal-Negro.png'
+      'img/Logo-Tayh_Horizontal-Negro.png'
     );
     const logoId = workbook.addImage({
       base64: base64Image.split(',')[1],
@@ -184,7 +184,7 @@ export const FacturasExcel = ({
 
     // Agregar la imagen y definir su tamaño en píxeles
     worksheet.addImage(logoId, {
-      tl: { col: 1, row: 0.5 }, // Esquina superior izquierda
+      tl: { col: 1, row: 1.3 }, // Esquina superior izquierda
       ext: { width: 300, height: 70 }, // Tamaño en píxeles
     });
 
