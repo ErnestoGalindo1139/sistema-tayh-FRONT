@@ -146,25 +146,25 @@ export const EnviosAdmin = (): React.JSX.Element => {
     },
     {
       id: 'de_Direccion',
-      texto: 'Direccion',
+      texto: 'Dirección',
       visible: true,
       width: '',
     },
     {
       id: 'de_CorreoElectronico',
-      texto: 'CorreoElectronico',
+      texto: 'Correo Electrónico',
       visible: true,
       width: '',
     },
     {
       id: 'nu_TelefonoCelular',
-      texto: 'Telefono Celular',
+      texto: 'Teléfono Celular',
       visible: true,
       width: '',
     },
     {
       id: 'nu_TelefonoRedLocal',
-      texto: 'Telefono Red Local',
+      texto: 'Teléfono Red Local',
       visible: true,
       width: '',
     },
@@ -321,14 +321,14 @@ export const EnviosAdmin = (): React.JSX.Element => {
           {/* contenedor */}
           <div className="flex items-center justify-between">
             <div className="dark:text-white">
-              <h2 className="font-bold text-[2.5rem]">Envios</h2>
-              <p className="text-[1.6rem]">Aquí puedes gestionar los Envios.</p>
+              <h2 className="font-bold text-[2.5rem]">Envíos</h2>
+              <p className="text-[1.6rem]">Aquí puedes gestionar los Envíos.</p>
             </div>
             <div className="flex gap-2">
               <EnviosExcel filtros={formState} />
 
               <Tooltip
-                content="Agregar Envío"
+                content="Agregar Envío"
                 className="text-[1.3rem]"
                 placement="bottom"
               >

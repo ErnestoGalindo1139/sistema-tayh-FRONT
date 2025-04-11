@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/AuthProvider';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { authLogin, AuthResponse } from '../../interfaces/interfacesLogin';
 import { ApiResponse } from '../interfaces/interfacesApi';
+import Toast from '../components/Toast';
 
 export const LoginPage = (): React.JSX.Element => {
   const { formState, setFormState, onInputChange, onResetForm } = useForm({
@@ -45,11 +46,29 @@ export const LoginPage = (): React.JSX.Element => {
         }
 
         navigate('/dashboard');
+
+        // Mostrar mensaje de éxito
+        Toast.fire({
+          icon: 'success',
+          title: 'Inicio de sesión exitoso',
+          text: 'Bienvenido de nuevo!',
+        });
       } else {
         console.log('Inicio de Sesion Fallido');
+        // Mostrar mensaje de éxito
+        Toast.fire({
+          icon: 'error',
+          title: 'Inicio de Sesion Fallido',
+          text: 'Intente de nuevo',
+        });
       }
     } catch (error) {
       console.error('Error al iniciar sesion:', error);
+      Toast.fire({
+        icon: 'error',
+        title: 'Ocurrio un error al iniciar sesion',
+        text: error as string,
+      });
       throw error;
     }
   };
@@ -67,7 +86,7 @@ export const LoginPage = (): React.JSX.Element => {
             </h2>
 
             <p className="text-justify mt-2 text-[1.9rem]">
-              Ingrese su correo y su contraseña para controlar los pedidos de
+              Ingrese su usuario y su contraseña para controlar los pedidos de
               sus filipinas
             </p>
 
@@ -83,7 +102,7 @@ export const LoginPage = (): React.JSX.Element => {
               id="usuario"
               name="usuario"
               className="border-2 border-neutral-200 p-[.8rem] rounded-2xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-[1.6rem]"
-              placeholder="correo@gmail.com"
+              placeholder="Ingrese su usuario"
               onChange={onInputChange}
               value={formState.usuario}
             />
@@ -100,26 +119,26 @@ export const LoginPage = (): React.JSX.Element => {
               id="password"
               name="password"
               className="border-2 border-neutral-200 p-[.8rem] rounded-2xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none text-[1.6rem]"
-              placeholder="Minimo 12 caracteres"
+              placeholder="Ingrese su contraseña"
               onChange={onInputChange}
               value={formState.password}
             />
 
-            <p className="text-end mt-2 text-blue-500 cursor-pointer text-[1.6rem]">
+            {/* <p className="text-end mt-2 text-blue-500 cursor-pointer text-[1.6rem]">
               Olvidé mi contraseña?
-            </p>
+            </p> */}
 
             <button className="relative bg-slate-800 text-white p-[1rem] text-[1.9rem] mt-[2rem] rounded-2xl font overflow-hidden group">
               <span className="absolute inset-0 bg-slate-700 transform scale-0 origin-center transition-all duration-500 ease-in-out group-hover:scale-100 rounded-xl"></span>
               <span className="relative z-10">Iniciar Sesión</span>
             </button>
 
-            <p className="text-center mt-[4.8rem] text-[1.6rem]">
+            {/* <p className="text-center mt-[4.8rem] text-[1.6rem]">
               No tengo una cuenta?{' '}
               <span className="text-blue-500 cursor-pointer">
                 Solicitar cuenta
               </span>
-            </p>
+            </p> */}
 
             <p className="text-center text-[1.6rem] mt-[9.6rem] text-slate-400">
               @ 2025 Todos los derechos reservados

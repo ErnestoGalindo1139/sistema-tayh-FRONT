@@ -104,6 +104,15 @@ export const ModalFinalizarOrdenTrabajo = ({
   };
 
   const handlefinalizarOrdenTrabajo = async (): Promise<void> => {
+    if (Number(formState.nu_CantidadPendiente > row.nu_CantidadPendiente)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Ocurrió un Error',
+        text: 'La nueva cantidad pendiente ingresada no puede ser mayor a la ya guardada',
+      });
+      return;
+    }
+
     const payload = {
       id_OrdenTrabajo: row.id_OrdenTrabajo,
       nu_CantidadPendiente: Number(formState.nu_CantidadPendiente),
@@ -248,9 +257,7 @@ export const ModalFinalizarOrdenTrabajo = ({
             <div
               className={`mt-[.2rem] ${formState.sn_OrdenFinalizada == 2 ? '' : 'hidden'}`}
             >
-              <label className="text-[2.1rem]">
-                Orden de trabajo terminada:
-              </label>
+              <label className="text-[2.1rem]">Cantida Pendiente:</label>
               <CustomInput
                 color={`${cantidadPendienteValida ? '' : 'failure'}`}
                 onBlur={() => setCantidadPendienteValida(true)}

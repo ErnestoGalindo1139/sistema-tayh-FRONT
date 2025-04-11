@@ -134,86 +134,94 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
   return (
     <>
-      <div key={key} className="min-h-screen pt-[2rem] bg-[#F8F9FA]">
+      <div
+        key={key}
+        className="flex flex-col min-h-screen bg-[#F8F9FA] pt-[2rem]"
+      >
         {/* Texto de especificaciones */}
-
-        {/* Contenedor de imagen y especificaciones */}
-        <div className="grid grid-cols-[1fr_2fr_1fr]">
-          <div className="pl-[3rem]">
-            <div className="bg-[#1E40AF] p-[1.5rem] animate-fade-right animate-duration-1000 animate-ease-in rounded-2xl">
-              <h2 className="text-[3rem] font-bold text-white">
-                Orden de Trabajo - #
-                {especificacionesPedidosPerspectivas[0]?.id_OrdenTrabajo}
-              </h2>
-              <div>
-                <p className="text-[2.5rem] text-white">
-                  Color de tela:{' '}
-                  {especificacionesPedidosPerspectivas[0]?.de_ColorTela}
-                </p>
-                <p className="text-[2.5rem] text-white">
-                  Cantidad Total:{' '}
-                  {especificacionesPedidosPerspectivas[0]?.nu_Cantidad}
-                </p>
-                <p className="text-[2.5rem] text-white">
-                  Cantidad Pendiente:{' '}
-                  {especificacionesPedidosPerspectivas[0]?.nu_CantidadPendiente}
-                </p>
-                <p className="text-[2.5rem] text-white">
-                  Modelo: {especificacionesPedidosPerspectivas[0]?.de_Modelo}
-                </p>
-                <p className="text-[2.5rem] text-white">
-                  Tipo de tela:{' '}
-                  {especificacionesPedidosPerspectivas[0]?.de_TipoTela}
-                </p>
-                <p className="text-[2.5rem] text-white">
-                  Talla: {especificacionesPedidosPerspectivas[0]?.de_Talla}
-                </p>
+        <div className="flex-grow">
+          {/* Contenedor de imagen y especificaciones */}
+          <div className="grid grid-cols-[1fr_2fr_1fr]">
+            <div className="pl-[3rem]">
+              <div className="bg-[#1E40AF] p-[1.5rem] animate-fade-right animate-duration-1000 animate-ease-in rounded-2xl">
+                <h2 className="text-[3rem] font-bold text-white">
+                  Orden de Trabajo - #
+                  {especificacionesPedidosPerspectivas[0]?.id_OrdenTrabajo}
+                </h2>
+                <div>
+                  <p className="text-[2.5rem] text-white">
+                    Color de tela:{' '}
+                    {especificacionesPedidosPerspectivas[0]?.de_ColorTela}
+                  </p>
+                  <p className="text-[2.5rem] text-white">
+                    Cantidad Total:{' '}
+                    {especificacionesPedidosPerspectivas[0]?.nu_Cantidad}
+                  </p>
+                  <p className="text-[2.5rem] text-white">
+                    Cantidad Pendiente:{' '}
+                    {
+                      especificacionesPedidosPerspectivas[0]
+                        ?.nu_CantidadPendiente
+                    }
+                  </p>
+                  <p className="text-[2.5rem] text-white">
+                    Modelo: {especificacionesPedidosPerspectivas[0]?.de_Modelo}
+                  </p>
+                  <p className="text-[2.5rem] text-white">
+                    Tipo de tela:{' '}
+                    {especificacionesPedidosPerspectivas[0]?.de_TipoTela}
+                  </p>
+                  <p className="text-[2.5rem] text-white">
+                    Talla: {especificacionesPedidosPerspectivas[0]?.de_Talla}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Imagen editada a la izquierda */}
-          <div className="m-auto pt-[.4rem] animate-fade-down animate-ease-in">
-            <img
-              src={`${especificacionesPedidosPerspectivas[0]?.de_Ruta}`}
-              alt="Imagen Editada"
-              className="w-[60rem] h-auto m-auto bg-[#E3ECFF] rounded-[18rem]"
-            />
-          </div>
+            {/* Imagen editada a la izquierda */}
+            <div className="m-auto pt-[.4rem] animate-fade-down animate-ease-in">
+              <img
+                src={`${especificacionesPedidosPerspectivas[0]?.de_Ruta}`}
+                alt="Imagen Editada"
+                className="w-3/4 h-auto m-auto bg-[#E3ECFF] rounded-[18rem]"
+              />
+            </div>
 
-          {/* Lista de especificaciones a la derecha */}
-          <div className="pr-[2.4rem] animate-fade-left animate-duration-1000 animate-ease-in">
-            <div>
-              <h2 className="text-[3rem] font-semibold text-center bg-[#1E3A8A] rounded-t-2xl text-white">
-                Especificaciones
-              </h2>
+            {/* Lista de especificaciones a la derecha */}
+            <div className="pr-[2.4rem] animate-fade-left animate-duration-1000 animate-ease-in">
+              <div>
+                <h2 className="text-[3rem] font-semibold text-center bg-[#1E3A8A] rounded-t-2xl text-white">
+                  Especificaciones
+                </h2>
 
-              <div className="space-y-4 bg-[#E3ECFF] rounded-b-2xl">
-                {/* {modelos && modelos.length > 0 ? ( */}
+                <div className="space-y-4 bg-[#E3ECFF] rounded-b-2xl">
+                  {/* {modelos && modelos.length > 0 ? ( */}
 
-                {especificacionesPedidosPerspectivas &&
-                especificacionesPedidosPerspectivas.length > 0 ? (
-                  especificacionesPedidosPerspectivas.map((especificacion) => (
-                    <ul
-                      key={especificacion.id_Especificacion}
-                      className="flex items-center justify-between p-4"
-                    >
-                      <li className="font-bold mr-4 text-4xl text-[#2563EB]">
-                        {especificacion.nu_Especificacion}.{' '}
-                        <span className="font-normal text-[2.4rem] text-[#111827]">
-                          {especificacion.de_Especificacion}
-                        </span>
-                      </li>
-                    </ul>
-                  ))
-                ) : (
-                  <></>
-                )}
+                  {especificacionesPedidosPerspectivas &&
+                  especificacionesPedidosPerspectivas.length > 0 ? (
+                    especificacionesPedidosPerspectivas.map(
+                      (especificacion) => (
+                        <ul
+                          key={especificacion.id_Especificacion}
+                          className="flex items-center justify-between p-4"
+                        >
+                          <li className="font-bold mr-4 text-4xl text-[#2563EB]">
+                            {especificacion.nu_Especificacion}.{' '}
+                            <span className="font-normal text-[2.4rem] text-[#111827]">
+                              {especificacion.de_Especificacion}
+                            </span>
+                          </li>
+                        </ul>
+                      )
+                    )
+                  ) : (
+                    <></>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-
         <footer className="flex flex-col sm:flex-row justify-start items-center border-gray-400 animate-flip-up animate-ease-out">
           {/* Logo de la empresa */}
           <img

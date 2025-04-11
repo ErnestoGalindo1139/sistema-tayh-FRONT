@@ -24,6 +24,7 @@ export interface IEnvios {
   id_Estatus: number;
   de_Estatus?: string;
   color_Estatus?: string;
+  fh_Registro?: string;
 }
 
 export interface IFormEnvios {

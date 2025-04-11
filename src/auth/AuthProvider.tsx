@@ -17,6 +17,9 @@ const AuthContext = createContext({
   saveUser: (userData: AuthResponse) => {},
   getRefreshToken: () => {},
   getUser: () => ({}) as IUser | undefined,
+  setIsAuthenticated: (value: boolean) => {},
+  requestNewAccessToken: async (refreshToken: string): Promise<string | null> =>
+    null,
 });
 
 export const AuthProvider = ({
@@ -61,21 +64,26 @@ export const AuthProvider = ({
   };
 
   const getUserInfo = async (accessToken: string) => {
-    try {
-      const response = await fetch(`${BASE_URL}/auth/user`, {
-        method: 'GET',
-        headers: {
-          'Contest-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+    if (accessToken) {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/auth/getUsuarioInfoByAccessToken`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
-      const data: ApiResponse<IUser> = await response.json();
+        const data: ApiResponse<IUser> = await response.json();
 
-      return data.body;
-    } catch (error) {
-      console.log(error);
-      return null;
+        return data.body;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
     }
   };
 
@@ -88,7 +96,7 @@ export const AuthProvider = ({
       if (token) {
         const newAccessToken = await requestNewAccessToken(token);
         if (newAccessToken) {
-          const userInfo = await getUserInfo(newAccessToken);
+          const userInfo = await getUserInfo(token);
           if (userInfo) {
             saveSessionInfo(userInfo, newAccessToken, token);
           }
@@ -143,6 +151,8 @@ export const AuthProvider = ({
         saveUser,
         getRefreshToken,
         getUser,
+        setIsAuthenticated,
+        requestNewAccessToken,
       }}
     >
       {children}
