@@ -136,6 +136,15 @@ export const EnviosExcel = ({
   const fetchEnvios = async (): Promise<IEnvios[]> => {
     try {
       setIsLoading(true);
+
+      const clientes = Array.isArray(filtros.id_Cliente)
+        ? filtros.id_Cliente
+            .map((cliente: { value: unknown }) => cliente.value)
+            .toString()
+        : '';
+
+      filtros.clientes = clientes;
+
       const enviosData = await getEnviosExcel(filtros);
       return enviosData.body;
     } catch (error) {
@@ -190,13 +199,21 @@ export const EnviosExcel = ({
       ext: { width: 300, height: 70 }, // Tamaño en píxeles
     });
 
+    const clientes = Array.isArray(filtros.id_Cliente)
+      ? filtros.id_Cliente
+          .map((cliente: { label: unknown }) => cliente.label)
+          .toString()
+      : '';
+
+    filtros.clientes = clientes;
+
     // Definir los filtros como objetos
     const filtrosData = [
       {
         nb_Filtro1: 'Folio Envio:',
         de_Filtro1: filtros.id_Envio || 'Todos',
-        nb_Filtro2: 'Folio Cliente:',
-        de_Filtro2: filtros.id_Cliente || 'Todos',
+        nb_Filtro2: 'Clientes:',
+        de_Filtro2: filtros.clientes || 'Todos',
       },
       {
         nb_Filtro1: 'Direccion:',
@@ -291,6 +308,7 @@ export const EnviosExcel = ({
         item.nu_TelefonoRedLocal || '',
         item.de_FolioGuia || '',
         item.id_Estatus,
+        item.fh_Registro || '',
       ]);
 
       row.eachCell((cell, colNumber) => {

@@ -6,11 +6,16 @@ import { Image } from '@chakra-ui/react';
 import { modulosData } from '../data/modulosData';
 import { useTheme } from '../../ThemeContext';
 import { Tooltip } from 'flowbite-react';
+import { useAuth } from '../../auth/AuthProvider';
+import { cerrarSesion } from '../helpers/login/cerrarSesion';
+import { ModalConfirmarCerrarSesion } from '../dialogs/login/ModalConfirmarCerrarSesion';
 
 export default function AdminLayout(): React.JSX.Element {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { isDarkMode, sidebarColor, sidebarTextColor } = useTheme();
 
@@ -23,11 +28,20 @@ export default function AdminLayout(): React.JSX.Element {
     setIsSidebarOpen(false);
   };
 
+  const { getUser, setIsAuthenticated } = useAuth();
+
   // Función para manejar el cierre de sesión
-  const handleLogout = (): void => {
-    // Aquí iría la lógica para cerrar sesión
-    console.log('Cerrando sesión...');
-    // Por ejemplo: navigate('/login');
+  const handleLogout = async (): Promise<void> => {
+    const usuario = getUser();
+
+    if (usuario) {
+      const response = await cerrarSesion({ id_Usuario: usuario.id }); // Aquí se debe llamar a la función de cerrar sesión
+
+      if (response.success) {
+        setIsAuthenticated(false); // Cambia el estado de autenticación
+        navigate('/login');
+      }
+    }
   };
 
   // Detectar clics fuera del sidebar
@@ -62,6 +76,14 @@ export default function AdminLayout(): React.JSX.Element {
     b = Math.max(0, Math.min(255, Math.floor(b * factor)));
 
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  };
+
+  const abrirModalCerraSesion = (): void => {
+    setIsModalOpen(true);
+  };
+
+  const cerrarModalCerraSesion = (): void => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -135,7 +157,7 @@ export default function AdminLayout(): React.JSX.Element {
               placement="left"
             >
               <button
-                onClick={handleLogout}
+                onClick={abrirModalCerraSesion}
                 className="flex items-center gap-2 dark:text-white hover:bg-gray-700 p-2 rounded"
               >
                 <img
@@ -152,6 +174,12 @@ export default function AdminLayout(): React.JSX.Element {
         {/* Aquí se renderizarán las rutas hijas */}
         <Outlet />
       </main>
+
+      <ModalConfirmarCerrarSesion
+        isOpen={isModalOpen}
+        onClose={cerrarModalCerraSesion}
+        onConfirm={() => handleLogout()}
+      />
     </div>
   );
 }

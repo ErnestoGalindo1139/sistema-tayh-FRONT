@@ -3,19 +3,17 @@ import { Modal, Button } from 'flowbite-react';
 
 import { HiCheckCircle } from 'react-icons/hi';
 
-interface ModalIniciarOrdenTrabajoProps {
+interface ModalConfirmarCerrarSesionProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  objeto: string;
+  onConfirm: () => Promise<void>;
 }
 
-export const ModalConfirmarIniciarOrdenTrabajo = ({
+export const ModalConfirmarCerrarSesion = ({
   isOpen,
   onClose,
   onConfirm,
-  objeto,
-}: ModalIniciarOrdenTrabajoProps): React.JSX.Element => {
+}: ModalConfirmarCerrarSesionProps): React.JSX.Element => {
   return (
     <Modal
       show={isOpen}
@@ -25,14 +23,14 @@ export const ModalConfirmarIniciarOrdenTrabajo = ({
       className="z-[9999]"
     >
       <Modal.Header>
-        <p className="text-gray-700 text-[2rem] m-[1rem]">Iniciar {objeto}</p>
+        <p className="text-gray-700 text-[2rem] m-[1rem]">Cerrar Sesion</p>
       </Modal.Header>
       <Modal.Body>
         <HiCheckCircle className="mx-auto mb-4 h-14 w-14 text-green-500 dark:text-gray-200" />
 
         <div className="text-center">
           <p className="text-gray-700 text-[2rem]">
-            ¿Está seguro de que desea iniciar la orden de trabajo?
+            ¿Está seguro de que desea cerrar sesion?
           </p>
         </div>
       </Modal.Body>

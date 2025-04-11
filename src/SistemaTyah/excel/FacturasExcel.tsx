@@ -134,8 +134,17 @@ export const FacturasExcel = ({
   const fetchFacturas = async (): Promise<IFacturacion[]> => {
     try {
       setIsLoading(true);
-      const enviosData = await getFacturasExcel(filtros);
-      return enviosData.body;
+
+      const clientes = Array.isArray(filtros.id_Cliente)
+        ? filtros.id_Cliente
+            .map((cliente: { value: unknown }) => cliente.value)
+            .toString()
+        : '';
+
+      filtros.clientes = clientes;
+
+      const facturasData = await getFacturasExcel(filtros);
+      return facturasData.body;
     } catch (error) {
       const errorMessage =
         (error as IApiError).message || 'Ocurrió un error desconocido';
@@ -164,6 +173,37 @@ export const FacturasExcel = ({
 
   // Función principal para generar el archivo Excel
   const generateExcel = async (): Promise<void> => {
+    if (
+      !filtros.fh_Inicio ||
+      filtros.fh_Inicio == '' ||
+      !filtros.fh_Fin ||
+      filtros.fh_Fin == ''
+    ) {
+      Toast.fire({
+        icon: 'info',
+        title: 'Ocurrió un Error',
+        text: 'La fecha inicio y la fecha fin no pueden estar vacias',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Asegúrate de convertir a Date si es necesario
+    const fechaInicio = new Date(filtros.fh_Inicio);
+    const fechaFin = new Date(filtros.fh_Fin);
+
+    if (fechaInicio > fechaFin) {
+      Toast.fire({
+        icon: 'info',
+        title: 'Ocurrió un Error',
+        text: 'La fecha inicio no puede ser mayor a la fecha fin',
+      });
+
+      setIsLoading(false);
+
+      return;
+    }
+
     const dataApi = await fetchFacturas();
     if (dataApi.length === 0) {
       Toast.fire({ icon: 'warning', title: 'No hay datos para exportar' });
@@ -188,6 +228,14 @@ export const FacturasExcel = ({
       ext: { width: 300, height: 70 }, // Tamaño en píxeles
     });
 
+    const clientes = Array.isArray(filtros.id_Cliente)
+      ? filtros.id_Cliente
+          .map((cliente: { label: unknown }) => cliente.label)
+          .toString()
+      : '';
+
+    filtros.clientes = clientes;
+
     // Definir los filtros como objetos
     const filtrosData = [
       {
@@ -211,7 +259,7 @@ export const FacturasExcel = ({
         nb_Filtro1: 'Régimen:',
         de_Filtro1: filtros.de_Regimen || 'Todos',
         nb_Filtro2: 'Cliente:',
-        de_Filtro2: filtros.id_Cliente || 'Todos',
+        de_Filtro2: filtros.clientes || 'Todos',
       },
       {
         nb_Filtro1: 'Domicilio:',

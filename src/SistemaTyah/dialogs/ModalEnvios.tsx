@@ -401,7 +401,7 @@ export const ModalEnvios = ({
         >
           <ModalHeader fontSize="4xl">
             {sn_Visualizar ? 'Visualizar' : sn_Editar ? 'Editar' : 'Agregar'}{' '}
-            Envio
+            Envío
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
@@ -496,7 +496,7 @@ export const ModalEnvios = ({
                   onBlur={() => setTelefonoRedLocalValido(true)}
                   disabled={sn_Visualizar}
                   ref={nu_TelefonoRedLocalRef}
-                  placeholder="Teléfono de Celular"
+                  placeholder="Teléfono Red Local"
                   required
                   type="number"
                   id="nu_TelefonoRedLocal"
@@ -509,13 +509,13 @@ export const ModalEnvios = ({
                 />
               </div>
               <div className="w-full">
-                <Label className="text-[1.6rem]">Folio guia</Label>
+                <Label className="text-[1.6rem]">Folio guía</Label>
                 <CustomInput
                   color={`${folioGuiaValido ? '' : 'failure'}`}
                   onBlur={() => setFolioGuiaValido(true)}
                   disabled={sn_Visualizar}
                   ref={de_FolioGuiaRef}
-                  placeholder="Dirección del Envio"
+                  placeholder="Folio guía"
                   required
                   type="text"
                   autoComplete="off"
