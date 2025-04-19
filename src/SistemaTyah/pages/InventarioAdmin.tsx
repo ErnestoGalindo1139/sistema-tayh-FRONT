@@ -6,9 +6,6 @@ import { useDisclosure } from '@chakra-ui/react';
 import { useTheme } from '../../ThemeContext';
 import { WaitScreen } from '../components/WaitScreen';
 import { Tooltip } from 'flowbite-react';
-
-import { FiltrosModelos } from '../components/Modelos/FiltrosModelos';
-import { ModalModelosAgregar } from '../dialogs/ModalModelosAgregar';
 import { useForm } from '../hooks/useForm';
 import {
   IFiltrosInventarios,
@@ -54,23 +51,111 @@ export const InventarioAdmin = (): React.JSX.Element => {
     texto: string;
     visible: boolean;
     width: string;
+    textAlign: string;
   }[] = [
-    { id: 'id_Modelo', texto: 'Producto', visible: false, width: '20%' },
-    { id: 'id_Talla', texto: 'Talla', visible: false, width: '20%' },
-    { id: 'id_Color', texto: 'Color', visible: false, width: '20%' },
-    { id: 'id_TipoPrenda', texto: 'Color', visible: false, width: '20%' },
-    { id: 'de_Genero', texto: 'Genero', visible: false, width: '20%' },
-    { id: 'id_Inventario', texto: 'ID', visible: true, width: '5%' },
-    { id: 'de_GeneroCompleto', texto: 'Genero', visible: true, width: '15%' },
-    { id: 'de_Modelo', texto: 'Modelo', visible: true, width: '20%' },
-    { id: 'de_TipoPrenda', texto: 'Prenda', visible: true, width: '10%' },
-    { id: 'de_Talla', texto: 'Talla', visible: true, width: '10%' },
-    { id: 'de_Color', texto: 'Color', visible: true, width: '20%' },
     {
-      id: 'nu_Cantidad',
-      texto: 'Cantidad Disponible',
+      id: 'id_Modelo',
+      texto: 'Producto',
+      visible: false,
+      width: '20%',
+      textAlign: '',
+    },
+    {
+      id: 'id_Talla',
+      texto: 'Talla',
+      visible: false,
+      width: '20%',
+      textAlign: '',
+    },
+    {
+      id: 'id_Color',
+      texto: 'Color',
+      visible: false,
+      width: '20%',
+      textAlign: '',
+    },
+    {
+      id: 'id_TipoPrenda',
+      texto: 'Color',
+      visible: false,
+      width: '20%',
+      textAlign: '',
+    },
+    {
+      id: 'de_Genero',
+      texto: 'Genero',
+      visible: false,
+      width: '20%',
+      textAlign: '',
+    },
+    {
+      id: 'id_Inventario',
+      texto: 'ID',
+      visible: true,
+      width: '5%',
+      textAlign: '',
+    },
+    {
+      id: 'de_GeneroCompleto',
+      texto: 'Genero',
+      visible: true,
+      width: '15%',
+      textAlign: '',
+    },
+    {
+      id: 'de_Modelo',
+      texto: 'Modelo',
       visible: true,
       width: '20%',
+      textAlign: '',
+    },
+    {
+      id: 'de_TipoPrenda',
+      texto: 'Prenda',
+      visible: true,
+      width: '10%',
+      textAlign: '',
+    },
+    {
+      id: 'de_Talla',
+      texto: 'Talla',
+      visible: true,
+      width: '10%',
+      textAlign: '',
+    },
+    {
+      id: 'de_Color',
+      texto: 'Color',
+      visible: true,
+      width: '20%',
+      textAlign: '',
+    },
+    // {
+    //   id: 'nu_Cantidad',
+    //   texto: 'Cantidad Disponible',
+    //   visible: true,
+    //   width: '20%',
+    //   textAlign: 'right',
+    // },
+    {
+      id: 'nu_ExistenciaFisica',
+      texto: 'Existencia Fisica',
+      visible: true,
+      width: '10%',
+      textAlign: 'right',
+    },
+    {
+      id: 'nu_CantidadComprometida',
+      texto: 'Cantidad Comprometida',
+      visible: true,
+      width: '10%',
+      textAlign: 'right',
+    },
+    {
+      id: 'nu_CantidadDisponible',
+      texto: 'Cantidad Disponible',
+      visible: true,
+      width: '10%',
       textAlign: 'right',
     },
   ];
@@ -129,6 +214,9 @@ export const InventarioAdmin = (): React.JSX.Element => {
       de_Genero: '',
       de_GeneroCompleto: '',
       nu_Cantidad: '',
+      nu_ExistenciaFisica: '',
+      nu_CantidadComprometida: '',
+      nu_CantidadDisponible: '',
       sn_Activo: false,
       fh_Registro: '',
       fh_Actualizacion: '',
@@ -206,7 +294,7 @@ export const InventarioAdmin = (): React.JSX.Element => {
                     de_TipoPrenda: '',
                     de_Genero: '',
                     de_GeneroCompleto: '',
-                    nu_Cantidad: '',
+                    nu_ExistenciaFisica: '',
                     sn_Activo: false,
                     fh_Registro: '',
                     fh_Actualizacion: '',

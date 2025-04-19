@@ -21,7 +21,7 @@ export interface IFormInventarios {
   de_TipoPrenda: string;
   de_Genero: string;
   de_GeneroCompleto: string;
-  nu_Cantidad: string;
+  nu_ExistenciaFisica: string;
   sn_Activo: boolean;
   fh_Registro: string;
   fh_Actualizacion: string;
@@ -40,6 +40,9 @@ export interface IInventarios {
   de_Genero: string;
   de_GeneroCompleto: string;
   nu_Cantidad: string;
+  nu_ExistenciaFisica: string;
+  nu_CantidadComprometida: string;
+  nu_CantidadDisponible: string;
   sn_Activo: boolean;
   fh_Registro: string;
   fh_Actualizacion: string;

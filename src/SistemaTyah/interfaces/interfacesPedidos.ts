@@ -23,7 +23,11 @@ export interface IPedidos {
   im_PrecioUnitario: number;
   im_SubTotal: number;
   im_Impuesto: number;
+  im_IVA: number;
+  im_ISR: number;
   im_TotalImpuesto: number;
+  im_TotalIVA: number;
+  im_TotalISR: number;
   im_TotalPedido: number;
   de_Genero: string;
   pedidosDetalles: IPedidosDetalles[];
@@ -42,6 +46,7 @@ export interface IPedidosDetalles {
   im_PrecioUnitario: number;
   im_SubTotal: number;
   im_Impuesto: number;
+  pj_Descuento: number;
   im_Total: number;
   de_Genero: string;
   de_GeneroCompleto: string;
@@ -63,7 +68,11 @@ export interface IFormPedidos {
   id_Estatus: string | number;
   de_Estatus: string;
   im_Impuesto: number;
+  im_IVA: number;
+  im_ISR: number;
   im_TotalImpuesto: number;
+  im_TotalIVA: number;
+  im_TotalISR: number;
   im_SubTotal: number;
   im_TotalPedido: number;
   im_EnvioDomicilio?: number;
@@ -83,6 +92,7 @@ export interface IFormPedidosDetalle {
   nu_Cantidad: number;
   im_PrecioUnitario: number;
   im_SubTotal: number;
+  pj_Descuento: number;
   im_Impuesto: number;
   im_Total: number;
   de_Genero: string;

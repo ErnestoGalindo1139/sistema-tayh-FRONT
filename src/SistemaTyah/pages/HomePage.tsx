@@ -7,6 +7,37 @@ import { Card, Badge } from 'flowbite-react';
 import { getEstadisticasDashboard } from '../helpers/apiDashboard';
 import { IDashboard } from '../interfaces/interfacesDashboard';
 import { WaitScreen } from '../components/WaitScreen';
+import {
+  FaUsers,
+  FaTruck,
+  FaShoppingCart,
+  FaDollarSign,
+  FaBoxes,
+} from 'react-icons/fa';
+
+const obtenerIcono = (id: string | number, color: string) => {
+  const className = `text-2xl text-${color}-700`;
+
+  switch (id) {
+    case '1':
+    case 1:
+      return <FaUsers className={className} />; // Clientes
+    case '2':
+    case 2:
+      return <FaTruck className={className} />; // Envíos
+    case '3':
+    case 3:
+      return <FaShoppingCart className={className} />; // Pedidos
+    case '4':
+    case 4:
+      return <FaDollarSign className={className} />; // Ventas
+    case '5':
+    case 5:
+      return <FaBoxes className={className} />; // Inventario
+    default:
+      return null;
+  }
+};
 
 export const HomePage = (): React.JSX.Element => {
   // Estado para manejar la carga de la página
@@ -150,7 +181,7 @@ export const HomePage = (): React.JSX.Element => {
             estadisticas?.map((estadistica, index) => (
               <Card key={index} className="text-center">
                 <h2 className="text-xl font-semibold flex items-center justify-center gap-2">
-                  <span>{estadistica.icono}</span>
+                  <span>{obtenerIcono(estadistica.id, estadistica.color)}</span>
                   {estadistica.titulo}
                 </h2>
                 <p
