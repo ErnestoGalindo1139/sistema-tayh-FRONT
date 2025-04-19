@@ -1,5 +1,6 @@
 // Interfaces Dashboard
 export interface IDashboard {
+  id: string;
   titulo: string;
   valor: string;
   variacion: string;

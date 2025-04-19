@@ -211,6 +211,24 @@ export const DataTable = <T,>({
                       );
                     }
 
+                    if (
+                      typeof column.id === 'string' &&
+                      column.id.startsWith('pj_')
+                    ) {
+                      return (
+                        <Table.Cell
+                          key={String(column.id)}
+                          className="border-b border-gray-300 text-center text-[1.5rem] p-0"
+                          style={{ width: column.width || 'auto' }} // Asignar el width aquí
+                        >
+                          <span className="inline-block w-[80%] py-[0.7rem] font-bold text-gray-800">
+                            {Number(cellValue).toFixed(2)}%
+                            {/* Formatear como dinero */}
+                          </span>
+                        </Table.Cell>
+                      );
+                    }
+
                     return (
                       <Table.Cell
                         key={String(column.id)}
