@@ -75,7 +75,7 @@ export const ModalInventariosAgregar = ({
   const id_TallaRef = useRef<HTMLSelectElement>(null);
   const id_ColorRef = useRef<HTMLSelectElement>(null);
   const id_TipoPrendaRef = useRef<HTMLSelectElement>(null);
-  const nu_CantidadRef = useRef<HTMLInputElement>(null);
+  const nu_ExistenciaFisicaRef = useRef<HTMLInputElement>(null);
 
   const [generoValido, setGeneroValido] = useState(true);
   const [modeloValido, setModeloValido] = useState(true);
@@ -105,7 +105,7 @@ export const ModalInventariosAgregar = ({
     de_TipoPrenda: '',
     de_Genero: '',
     de_GeneroCompleto: '',
-    nu_Cantidad: '',
+    nu_ExistenciaFisica: '',
     sn_Activo: false,
     fh_Registro: '',
     fh_Actualizacion: '',
@@ -314,8 +314,8 @@ export const ModalInventariosAgregar = ({
         'Color'
       ) ||
       !validarCampo(
-        formInventarios.nu_Cantidad,
-        nu_CantidadRef,
+        formInventarios.nu_ExistenciaFisica,
+        nu_ExistenciaFisicaRef,
         setCantidadValida,
         'Cantidad'
       )
@@ -558,14 +558,14 @@ export const ModalInventariosAgregar = ({
                 <Label className="text-[1.6rem] font-bold">Cantidad</Label>
                 <TextInput
                   disabled={sn_Visualizar}
-                  ref={nu_CantidadRef}
+                  ref={nu_ExistenciaFisicaRef}
                   color={`${cantidadValida ? '' : 'failure'}`}
                   type="number"
                   placeholder="Cantidad"
                   className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${cantidadValida ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
-                  value={formInventarios.nu_Cantidad}
-                  id="nu_Cantidad"
-                  name="nu_Cantidad"
+                  value={formInventarios.nu_ExistenciaFisica}
+                  id="nu_ExistenciaFisica"
+                  name="nu_ExistenciaFisica"
                   onChange={onInputChange}
                   style={{
                     fontSize: '1.4rem',
@@ -573,7 +573,7 @@ export const ModalInventariosAgregar = ({
                     backgroundColor: '#ffffff',
                   }}
                   onBlur={() => setCantidadValida(true)}
-                  onFocus={() => seleccionarTextoInput(nu_CantidadRef)}
+                  onFocus={() => seleccionarTextoInput(nu_ExistenciaFisicaRef)}
                   sizing="lg"
                   min="1"
                 />

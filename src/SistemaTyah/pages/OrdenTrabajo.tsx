@@ -281,6 +281,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                 de_Genero: '',
                 id_ModeloImagen: 0,
                 sn_ActivoImagen: 0,
+                id_Pedido: 0,
               }
         }
       />
@@ -308,6 +309,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                 de_Genero: '',
                 id_ModeloImagen: 0,
                 sn_ActivoImagen: 0,
+                id_Pedido: 0,
               }
         }
         sn_PantallaOrdenTrabajo={true}

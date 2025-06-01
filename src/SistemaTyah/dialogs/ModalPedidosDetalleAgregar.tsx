@@ -218,16 +218,22 @@ export const ModalPedidosDetalleAgregar = ({
   }, []);
 
   useEffect(() => {
-    // Calcular el SubTotal
-    const im_SubTotal =
-      Number(formPedidosDetalle.nu_Cantidad) *
-      Number(formPedidosDetalle.im_PrecioUnitario);
+    const cantidad = Number(formPedidosDetalle.nu_Cantidad);
+    const precio = Number(formPedidosDetalle.im_PrecioUnitario);
+    const descuento = Number(formPedidosDetalle.pj_Descuento) / 100;
+
+    const totalSinDescuento = cantidad * precio;
+    const totalConDescuento = totalSinDescuento - totalSinDescuento * descuento;
 
     setFormPedidosDetalle({
       ...formPedidosDetalle,
-      im_SubTotal,
+      im_SubTotal: parseFloat(totalConDescuento.toFixed(2)), // redondeo opcional
     });
-  }, [formPedidosDetalle.nu_Cantidad, formPedidosDetalle.im_PrecioUnitario]);
+  }, [
+    formPedidosDetalle.nu_Cantidad,
+    formPedidosDetalle.im_PrecioUnitario,
+    formPedidosDetalle.pj_Descuento,
+  ]);
 
   const obtenerPrecioUnitario = async (
     target: HTMLSelectElement
@@ -777,6 +783,42 @@ export const ModalPedidosDetalleAgregar = ({
                   onBlur={() => setPrecioValido(true)}
                   sizing="lg"
                 />
+              </div>
+
+              <div className="dark:text-white col-start-2">
+                <Label className="text-[1.6rem] dark:text-white font-semibold">
+                  Descuento
+                </Label>
+                <Select
+                  disabled={sn_Visualizar}
+                  // ref={id_TipoTelaRef}
+                  value={formPedidosDetalle.pj_Descuento}
+                  // color={`${tipoTelaValida ? '' : 'failure'}`}
+                  className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+                  id="pj_Descuento"
+                  name="pj_Descuento"
+                  onChange={onInputChange}
+                  sizing="lg"
+                  style={{
+                    fontSize: '1.4rem',
+                    border: '1px solid #b9b9b9',
+                    backgroundColor: '#ffffff',
+                  }}
+                >
+                  <option value="">Ninguno</option>
+                  {[
+                    { id: 1, valor: 5, texto: '5%' },
+                    { id: 2, valor: 10, texto: '10%' },
+                    { id: 3, valor: 15, texto: '15%' },
+                    { id: 4, valor: 20, texto: '20%' },
+                    { id: 5, valor: 25, texto: '25%' },
+                    { id: 6, valor: 50, texto: '50%' },
+                  ].map((impuesto) => (
+                    <option key={impuesto.id} value={impuesto.valor}>
+                      {impuesto.texto}
+                    </option>
+                  ))}
+                </Select>
               </div>
 
               <div className="dark:text-white col-start-3">

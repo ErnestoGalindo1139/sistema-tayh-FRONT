@@ -63,6 +63,7 @@ export interface IEspecificacionesOrdenTrabajo {
   totalModeloPerspectiva: number;
   de_Ruta: string;
   sn_ActivoImagen: number;
+  id_Pedido: number;
 }
 
 export interface IFormFinalizarOrdenTrabajo {

@@ -115,6 +115,7 @@ export const ModalFinalizarOrdenTrabajo = ({
 
     const payload = {
       id_OrdenTrabajo: row.id_OrdenTrabajo,
+      id_Pedido: row.id_Pedido,
       nu_CantidadPendiente: Number(formState.nu_CantidadPendiente),
       sn_OrdenFinalizada: Number(formState.sn_OrdenFinalizada),
     };

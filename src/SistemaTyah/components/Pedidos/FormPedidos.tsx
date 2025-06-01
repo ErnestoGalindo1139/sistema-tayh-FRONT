@@ -123,7 +123,9 @@ export const FormPedidos = ({
   const id_EstatusRef = useRef<HTMLSelectElement>(null);
   const id_ViaContactoRef = useRef<HTMLSelectElement>(null);
   const de_ViaContactoRef = useRef<HTMLInputElement>(null);
-  const im_ImpuestoRef = useRef<HTMLSelectElement>(null);
+  // const im_ImpuestoRef = useRef<HTMLSelectElement>(null);
+  const im_IVARef = useRef<HTMLSelectElement>(null);
+  const im_ISRRef = useRef<HTMLSelectElement>(null);
   const im_TotalRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -162,7 +164,9 @@ export const FormPedidos = ({
   const [viaContactoValida, setViaContactoValida] = useState(true);
   const [DescripcionContactoValida, setDescripcionContactoValida] =
     useState(true);
-  const [impuestoValido, setImpuestoValido] = useState(true);
+  // const [impuestoValido, setImpuestoValido] = useState(true);
+  const [ivaValido, setIvaValido] = useState(true);
+  const [isrValido, setIsrValido] = useState(true);
   const [totalValido, setTotalValido] = useState(true);
 
   useEffect(() => {
@@ -193,17 +197,11 @@ export const FormPedidos = ({
       return acc + item.im_SubTotal;
     }, 0);
 
-    const im_TotalImpuesto = parseFloat(
-      (total * Number(formPedidos.im_Impuesto)).toFixed(2)
-    );
-
-    // Actualizar ambos el SubTotal y el Total Importe de Impuesto
     setFormPedidos({
       ...formPedidos,
       im_SubTotal: total,
-      im_TotalImpuesto: im_TotalImpuesto,
     });
-  }, [pedidosDetalles, formPedidos.im_Impuesto]); // Este hook depende de ambos cambios
+  }, [pedidosDetalles]);
 
   useEffect(() => {
     const im_EnvioDomicilio = formPedidos.sn_EnvioDomicilio == 1 ? 100 : 0;
@@ -214,25 +212,28 @@ export const FormPedidos = ({
   }, [formPedidos.sn_EnvioDomicilio]);
 
   useEffect(() => {
-    // Calcular el impuesto y redondearlo a 2 decimales
-    const im_TotalImpuesto = parseFloat(
-      (formPedidos.im_SubTotal * Number(formPedidos.im_Impuesto)).toFixed(2)
-    );
+    const { im_SubTotal = 0, im_IVA = 0, im_ISR = 0 } = formPedidos;
 
-    setFormPedidos({
-      ...formPedidos,
-      im_TotalImpuesto,
-    });
-  }, [formPedidos.im_SubTotal, formPedidos.im_Impuesto]);
+    const totalIVA = parseFloat((im_SubTotal * im_IVA).toFixed(2));
+    const totalISR = parseFloat((im_SubTotal * im_ISR).toFixed(2));
+
+    setFormPedidos((prev) => ({
+      ...prev,
+      im_TotalIVA: totalIVA,
+      im_TotalISR: totalISR,
+    }));
+  }, [formPedidos.im_SubTotal, formPedidos.im_IVA, formPedidos.im_ISR]);
 
   useEffect(() => {
-    // Calcular el Total a pagar y redondearlo a 2 decimales
+    const {
+      im_SubTotal = 0,
+      im_TotalIVA = 0,
+      im_TotalISR = 0,
+      im_EnvioDomicilio = 0,
+    } = formPedidos;
+
     const im_TotalPedido = parseFloat(
-      (
-        (formPedidos.im_SubTotal ?? 0) +
-        (formPedidos.im_TotalImpuesto ?? 0) +
-        (formPedidos.im_EnvioDomicilio ?? 0)
-      ).toFixed(2)
+      (im_SubTotal + im_TotalIVA - im_TotalISR + im_EnvioDomicilio).toFixed(2)
     );
 
     setFormPedidos({
@@ -241,7 +242,8 @@ export const FormPedidos = ({
     });
   }, [
     formPedidos.im_SubTotal,
-    formPedidos.im_TotalImpuesto,
+    formPedidos.im_TotalIVA,
+    formPedidos.im_TotalISR,
     formPedidos.im_EnvioDomicilio,
   ]);
 
@@ -263,11 +265,12 @@ export const FormPedidos = ({
     { id: 'de_GeneroCompleto', texto: 'Genero', visible: true, width: '10%' },
     { id: 'de_Modelo', texto: 'Modelo', visible: true, width: '10%' },
     { id: 'de_TipoPrenda', texto: 'Tipo Prenda', visible: true, width: '10%' },
-    { id: 'de_Talla', texto: 'Talla', visible: true, width: '10%' },
+    { id: 'de_Talla', texto: 'Talla', visible: true, width: '5%' },
     { id: 'de_Color', texto: 'Color', visible: true, width: '10%' },
     { id: 'de_TipoTela', texto: 'Tipo Tela', visible: true, width: '10%' },
     { id: 'nu_Cantidad', texto: 'Cantidad', visible: true, width: '10%' },
     { id: 'im_PrecioUnitario', texto: 'Precio', visible: true, width: '10%' },
+    { id: 'pj_Descuento', texto: 'Descuento', visible: true, width: '10%' },
     { id: 'im_SubTotal', texto: 'SubTotal', visible: true, width: '10%' },
   ];
 
@@ -450,6 +453,7 @@ export const FormPedidos = ({
       nu_Cantidad: 0,
       im_PrecioUnitario: 0,
       im_SubTotal: 0,
+      pj_Descuento: 0,
       im_Impuesto: 0,
       im_Total: 0,
       de_Genero: '',
@@ -526,12 +530,14 @@ export const FormPedidos = ({
         setViaContactoValida,
         'Via de Contacto'
       ) ||
-      !validarCampo(
-        formPedidos.im_Impuesto,
-        im_ImpuestoRef,
-        setImpuestoValido,
-        'Impuesto'
-      )
+      // !validarCampo(
+      //   formPedidos.im_Impuesto,
+      //   im_ImpuestoRef,
+      //   setImpuestoValido,
+      //   'Impuesto'
+      // ) ||
+      !validarCampo(formPedidos.im_IVA, im_IVARef, setIvaValido, 'IVA') ||
+      !validarCampo(formPedidos.im_ISR, im_ISRRef, setIsrValido, 'ISR')
       // !validarCampo(formPedidos.im_Total, im_TotalRef, setTotalValido, 'Total')
     ) {
       return;
@@ -703,7 +709,11 @@ export const FormPedidos = ({
         id_Estatus: '',
         de_Estatus: '',
         im_Impuesto: 0,
+        im_IVA: 0,
+        im_ISR: 0,
         im_TotalImpuesto: 0,
+        im_TotalIVA: 0,
+        im_TotalISR: 0,
         im_TotalPedido: 0,
         im_SubTotal: 0,
         pedidosDetalles: [],
@@ -1455,7 +1465,7 @@ export const FormPedidos = ({
           </div>
 
           {/* Impuesto */}
-          <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
             <Label className="sm:text-[2rem] text-[1.6rem] font-bold col-span-3 sm:text-right text-left">
               Impuesto
             </Label>
@@ -1500,6 +1510,122 @@ export const FormPedidos = ({
                 id="im_TotalImpuesto"
                 name="im_TotalImpuesto"
                 value={formPedidos.im_TotalImpuesto}
+                onChange={onInputChange}
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#F5F5F5',
+                }}
+                sizing="lg"
+              />
+            </div>
+          </div> */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
+            <Label className="sm:text-[2rem] text-[1.6rem] font-bold col-span-3 sm:text-right text-left">
+              IVA:
+            </Label>
+            <div className="col-span-2 flex gap-6">
+              <Select
+                color={`${ivaValido ? '' : 'failure'}`}
+                ref={im_IVARef}
+                disabled={sn_Visualizar}
+                value={formPedidos.im_IVA}
+                onChange={onInputChange}
+                // onChange={(e) => {
+                //   const porcentaje = parseFloat(e.target.value);
+                //   setFormPedidos((prev) => ({
+                //     ...prev,
+                //     ivaPorcentaje: porcentaje,
+                //     // im_IVA: calcularPorcentaje(prev.im_Subtotal, porcentaje),
+                //   }));
+                // }}
+                className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${ivaValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                id="im_IVA"
+                name="im_IVA"
+                onBlur={() => setIvaValido(true)}
+                sizing="lg"
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#ffffff',
+                }}
+              >
+                <option value="" disabled={!!formPedidos.im_Impuesto}>
+                  Seleccione un Impuesto
+                </option>
+                {[
+                  { id: 0.16, texto: '16%' },
+                  { id: 0.8, texto: '8%' },
+                ].map((impuesto) => (
+                  <option key={impuesto.id} value={impuesto.id}>
+                    {impuesto.texto}
+                  </option>
+                ))}
+              </Select>
+              <TextInput
+                disabled={sn_Visualizar}
+                readOnly
+                type="number"
+                addon="$"
+                className="dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black"
+                id="im_TotalIVA"
+                name="im_TotalIVA"
+                value={formPedidos.im_TotalIVA}
+                onChange={onInputChange}
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#F5F5F5',
+                }}
+                sizing="lg"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-5 sm:gap-6 gap-2 items-center">
+            <Label className="sm:text-[2rem] text-[1.6rem] font-bold col-span-3 sm:text-right text-left">
+              RETISR:
+            </Label>
+            <div className="col-span-2 flex gap-6">
+              <Select
+                color={`${isrValido ? '' : 'failure'}`}
+                ref={im_ISRRef}
+                disabled={sn_Visualizar}
+                value={formPedidos.im_ISR}
+                onChange={onInputChange}
+                className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${isrValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                id="im_ISR"
+                name="im_ISR"
+                onBlur={() => setIsrValido(true)}
+                sizing="lg"
+                style={{
+                  fontSize: '1.4rem',
+                  border: '1px solid #b9b9b9',
+                  backgroundColor: '#ffffff',
+                }}
+              >
+                <option value="" disabled={!!formPedidos.im_ISR}>
+                  Seleccione un Impuesto
+                </option>
+                {[
+                  { id: 0.0125, texto: '1.25%' },
+                  { id: 0.1, texto: '10%' },
+                ].map((impuesto) => (
+                  <option key={impuesto.id} value={impuesto.id}>
+                    {impuesto.texto}
+                  </option>
+                ))}
+              </Select>
+              <TextInput
+                disabled={sn_Visualizar}
+                readOnly
+                type="number"
+                addon="$"
+                className="dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black"
+                id="im_TotalISR"
+                name="im_TotalISR"
+                value={formPedidos.im_TotalISR}
                 onChange={onInputChange}
                 style={{
                   fontSize: '1.4rem',
@@ -1657,6 +1783,7 @@ export const FormPedidos = ({
                 de_Concepto: '',
                 nu_Cantidad: 0,
                 im_PrecioUnitario: 0,
+                pj_Descuento: 0,
                 im_SubTotal: 0,
                 im_Impuesto: 0,
                 im_Total: 0,
