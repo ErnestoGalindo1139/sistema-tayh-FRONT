@@ -2,17 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { IApiError } from '../interfaces/interfacesApi';
 import Toast from '../components/Toast';
 import { getEspecificacionesOrdenTrabajo } from '../helpers/ordenTrabajo/apiOrdenTrabajo';
-import {
-  IEspecificacionesOrdenTrabajo,
-  IFormFinalizarOrdenTrabajo,
-} from '../interfaces/interfacesOrdenTrabajo';
+import { IEspecificacionesOrdenTrabajo } from '../interfaces/interfacesOrdenTrabajo';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Pagination } from 'flowbite-react';
 import { customPaginationOrdenTrabajoTheme } from '../themes/customPaginationOrdenTrabajoTheme';
 import { useDisclosure } from '@chakra-ui/react';
 import { ModalFinalizarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalFinalizarOrdenTrabajo';
-import { ModalConfirmarCancelarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalConfirmarCancelarOrdenTrabajo';
-import { cancelarOrdenTrabajoHelper } from '../helpers/ordenTrabajo/cancelarOrdenTrabajoHelper';
 import { ModalCancelarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalCancelarOrdenTrabajo';
 
 export const OrdenTrabajo = (): React.JSX.Element => {
