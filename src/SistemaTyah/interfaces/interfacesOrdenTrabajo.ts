@@ -12,6 +12,7 @@ export interface IFiltrosOrdenTrabajo {
 export interface IOrdenesTrabajo {
   id_OrdenTrabajo: number;
   id_Pedido: number;
+  id_DetallePedido: number;
   id_Estatus: number;
   pedidos: string;
   estatus: string;
@@ -45,6 +46,8 @@ export interface IEspecificacionesOrdenTrabajoParams {
 
 export interface IEspecificacionesOrdenTrabajo {
   id_OrdenTrabajo: number;
+  id_Pedido: number;
+  id_DetallePedido: number;
   de_ColorTela: string;
   nu_Cantidad: number;
   nu_CantidadPendiente: number;
@@ -70,5 +73,7 @@ export interface IFormFinalizarOrdenTrabajo {
 
 export interface IFormCancelarOrdenTrabajo {
   id_OrdenTrabajo: number;
+  id_Pedido: number;
+  id_DetallePedido: number;
   de_ComentarioCancelacion: string;
 }

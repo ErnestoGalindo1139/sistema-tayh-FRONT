@@ -25,6 +25,8 @@ import { CustomInput } from '../components/custom/CustomInput';
 import { ModalConfirmacionAgregar } from './ModalConfirmacionAgregar';
 import { IEstatus } from '../interfaces/interfacesEstatus';
 import { getEstatus } from '../helpers/apiEstatus';
+import { buscarClienteInfoHelper } from '../helpers/clientes/buscarClienteInfoHelper';
+import { log } from 'console';
 
 interface ModalEnviosProps {
   isOpen: boolean;
@@ -146,6 +148,55 @@ export const ModalEnvios = ({
     }
   }, [isOpen, row]);
 
+  const { formState, setFormState, onInputChange, onResetForm } = useForm<{
+    id_Envio: number;
+    id_Cliente: number;
+    de_Direccion: string;
+    de_CorreoElectronico: string;
+    nu_TelefonoCelular: string;
+    nu_TelefonoRedLocal: string;
+    de_FolioGuia: string;
+    id_Estatus: number;
+  }>({
+    id_Envio: 0,
+    id_Cliente: 0,
+    de_Direccion: '',
+    de_CorreoElectronico: '',
+    nu_TelefonoCelular: '',
+    nu_TelefonoRedLocal: '',
+    de_FolioGuia: '',
+    id_Estatus: 0,
+  });
+
+  // Cagar informacion del cliente al seleccionar uno
+  useEffect(() => {
+    if (!formState.id_Cliente) return;
+
+    const getInfoCliente = async (): Promise<void> => {
+      try {
+        const filtros = {
+          id_Cliente: formState.id_Cliente,
+        };
+
+        const clienteInfoData = await buscarClienteInfoHelper(filtros);
+
+        setFormState((prevState) => ({
+          ...prevState,
+          de_Direccion: clienteInfoData.body[0].de_Direccion,
+          de_CorreoElectronico: clienteInfoData.body[0].de_CorreoElectronico,
+          nu_TelefonoCelular: clienteInfoData.body[0].nu_TelefonoCelular,
+          nu_TelefonoRedLocal: clienteInfoData.body[0].nu_TelefonoRedLocal,
+        }));
+
+        console.log(clienteInfoData);
+      } catch (error) {
+        console.error('Error al obtener la información del cliente:', error);
+      }
+    };
+
+    getInfoCliente();
+  }, [formState.id_Cliente]);
+
   const guardarEnvio = async (): Promise<void> => {
     const payload = {
       ...formState,
@@ -201,26 +252,6 @@ export const ModalEnvios = ({
       }
     }
   };
-
-  const { formState, setFormState, onInputChange, onResetForm } = useForm<{
-    id_Envio: number;
-    id_Cliente: number;
-    de_Direccion: string;
-    de_CorreoElectronico: string;
-    nu_TelefonoCelular: string;
-    nu_TelefonoRedLocal: string;
-    de_FolioGuia: string;
-    id_Estatus: number;
-  }>({
-    id_Envio: 0,
-    id_Cliente: 0,
-    de_Direccion: '',
-    de_CorreoElectronico: '',
-    nu_TelefonoCelular: '',
-    nu_TelefonoRedLocal: '',
-    de_FolioGuia: '',
-    id_Estatus: 0,
-  });
 
   const validarCampo = (
     campo: string | number,
