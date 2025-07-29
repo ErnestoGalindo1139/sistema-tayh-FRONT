@@ -82,4 +82,22 @@ export interface ICumpleanosClientes {
   nb_Cliente?: string;
   nu_DiasParaCumpleanos: number;
   mensaje: string;
+  de_Direccion: string;
+  de_CorreoElectronico: string;
+  de_FolioCliente: string;
+  nb_Atendio: string;
+  id_UsuarioRegistra: string;
+  id_UsuarioModifica: string;
+  id_UsuarioElimina: string;
+  fh_Cumpleanos: string;
+  fh_CumpleanosEmpresa: string;
+  fh_CumpleanosFormat?: string;
+  fh_CumpleanosEmpresaFormat?: string;
+  nu_TelefonoRedLocal: string;
+  nu_TelefonoCelular: string;
+  nu_TelefonoWhatsApp: string;
+  fh_Registro: string;
+  fh_Modificacion: string;
+  fh_Eliminacion: string;
+  sn_Activo: boolean | null;
 }

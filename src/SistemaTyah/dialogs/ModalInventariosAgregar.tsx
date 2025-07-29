@@ -106,6 +106,7 @@ export const ModalInventariosAgregar = ({
     de_Genero: '',
     de_GeneroCompleto: '',
     nu_ExistenciaFisica: '',
+    nu_CantidadComprometida: '',
     sn_Activo: false,
     fh_Registro: '',
     fh_Actualizacion: '',
@@ -194,7 +195,8 @@ export const ModalInventariosAgregar = ({
   }, []);
 
   // Hook para manejar todas las validaciones generales
-  const { validarCampo } = useValidations();
+  const { validarCampo, validarNumeroMayorQue, validarNumeroNegativo } =
+    useValidations();
 
   const seleccionarTextoInput = useInputsInteraction();
 
@@ -317,10 +319,38 @@ export const ModalInventariosAgregar = ({
         formInventarios.nu_ExistenciaFisica,
         nu_ExistenciaFisicaRef,
         setCantidadValida,
-        'Cantidad'
+        'Existencia Fisica'
       )
     ) {
       return;
+    }
+
+    if (
+      !validarNumeroNegativo(
+        formInventarios.nu_ExistenciaFisica,
+        nu_ExistenciaFisicaRef,
+        setCantidadValida,
+        'Existencia Fisica',
+        true
+      )
+    ) {
+      return;
+    }
+
+    if (Number(formInventarios.nu_CantidadComprometida) > 0) {
+      if (
+        !validarNumeroMayorQue(
+          Number(formInventarios.nu_ExistenciaFisica),
+          Number(formInventarios.nu_CantidadComprometida),
+          nu_ExistenciaFisicaRef,
+          setCantidadValida,
+          'Existencia Fisica',
+          'Cantidad Comprometida',
+          true
+        )
+      ) {
+        return;
+      }
     }
 
     setCerrarFormulario(cerrarForm);
@@ -555,7 +585,9 @@ export const ModalInventariosAgregar = ({
               </div>
 
               <div className="dark:text-white">
-                <Label className="text-[1.6rem] font-bold">Cantidad</Label>
+                <Label className="text-[1.6rem] font-bold">
+                  Existencia Fisica
+                </Label>
                 <TextInput
                   disabled={sn_Visualizar}
                   ref={nu_ExistenciaFisicaRef}
@@ -576,6 +608,31 @@ export const ModalInventariosAgregar = ({
                   onFocus={() => seleccionarTextoInput(nu_ExistenciaFisicaRef)}
                   sizing="lg"
                   min="1"
+                />
+              </div>
+
+              <div
+                className="dark:text-white col-span-2"
+                hidden={Number(formInventarios.nu_CantidadComprometida) == 0}
+              >
+                <Label className="text-[1.6rem] font-bold">
+                  Cantidad Comprometida
+                </Label>
+                <TextInput
+                  // disabled
+                  readOnly
+                  type="number"
+                  className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
+                  value={formInventarios.nu_CantidadComprometida}
+                  id="nu_CantidadComprometida"
+                  name="nu_CantidadComprometida"
+                  onChange={onInputChange}
+                  style={{
+                    fontSize: '1.4rem',
+                    // border: '1px solid #b9b9b9',
+                    // backgroundColor: '#ffffff',
+                  }}
+                  sizing="lg"
                 />
               </div>
             </FormControl>
