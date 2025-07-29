@@ -4,6 +4,7 @@ import {
   IClientesCombo,
   IFormClientes,
   ICumpleanosClientes,
+  IClienteInfo,
 } from '../interfaces/interfacesClientes';
 import { ApiResponse } from '../interfaces/interfacesApi';
 import { CustomSelectValue } from '../interfaces/interfacesGlobales';
@@ -189,6 +190,26 @@ export const getFechaCumpleanosClientes = async (): Promise<
       'Error al obtener las fechas de cumpleaños de los clientes',
       error
     );
+    throw error;
+  }
+};
+
+export const getInfoCliente = async (
+  filtros: Partial<IFiltrosClientes>
+): Promise<ApiResponse<IClienteInfo[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getClienteInfoById`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(filtros), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IClienteInfo[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener la info del Cliente:', error);
     throw error;
   }
 };

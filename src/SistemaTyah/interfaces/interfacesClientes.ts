@@ -101,3 +101,13 @@ export interface ICumpleanosClientes {
   fh_Eliminacion: string;
   sn_Activo: boolean | null;
 }
+
+export interface IClienteInfo {
+  id_Cliente: number;
+  nb_Cliente: string;
+  de_Direccion: string;
+  de_CorreoElectronico: string;
+  nu_TelefonoRedLocal: string;
+  nu_TelefonoCelular: string;
+  nu_TelefonoWhatsApp: string;
+}

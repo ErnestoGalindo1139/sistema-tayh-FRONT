@@ -14,6 +14,7 @@ import {
 import { useForm } from '../../hooks/useForm';
 import {
   IEspecificacionesOrdenTrabajo,
+  IFormCancelarOrdenTrabajo,
   IOrdenesTrabajo,
 } from '../../interfaces/interfacesOrdenTrabajo';
 import { useNavigate } from 'react-router-dom';
@@ -97,11 +98,15 @@ export const ModalCancelarOrdenTrabajo = ({
     abrirModalCancelarOrdenTrabajo();
   };
 
-  const cancelarOrdenTrabajo = async (ordenTrabajo: number): Promise<void> => {
+  const cancelarOrdenTrabajo = async (
+    ordenTrabajo: IFormCancelarOrdenTrabajo
+  ): Promise<void> => {
     // setIsLoading(true);
 
     const params = {
-      id_OrdenTrabajo: ordenTrabajo,
+      id_OrdenTrabajo: ordenTrabajo.id_OrdenTrabajo,
+      id_Pedido: ordenTrabajo.id_Pedido,
+      id_DetallePedido: ordenTrabajo.id_DetallePedido,
       de_ComentarioCancelacion: formState.de_ComentarioCancelacion,
     };
 
@@ -212,7 +217,14 @@ export const ModalCancelarOrdenTrabajo = ({
       <ModalConfirmarCancelarOrdenTrabajo
         isOpen={isModalOpen}
         onClose={cerrarModalCancelarOrdenTrabajo}
-        onConfirm={() => cancelarOrdenTrabajo(row.id_OrdenTrabajo)}
+        onConfirm={() =>
+          cancelarOrdenTrabajo({
+            id_OrdenTrabajo: row.id_OrdenTrabajo,
+            id_Pedido: row.id_Pedido,
+            id_DetallePedido: row.id_DetallePedido,
+            de_ComentarioCancelacion: formState.de_ComentarioCancelacion,
+          })
+        }
         objeto="Orden de Trabajo"
       />
     </>
