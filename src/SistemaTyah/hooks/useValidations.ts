@@ -27,7 +27,8 @@ interface UseValidations {
     numero: string | number,
     ref: React.RefObject<HTMLElement>,
     setValido: React.Dispatch<React.SetStateAction<boolean>>,
-    campoNombre: string
+    campoNombre: string,
+    permitirCero?: boolean
   ) => boolean;
 
   validarRangoFechas: (
@@ -38,6 +39,16 @@ interface UseValidations {
     setValido: React.Dispatch<React.SetStateAction<boolean>>,
     nombreFechaInicio: string,
     nombreFechaFin: string
+  ) => boolean;
+
+  validarNumeroMayorQue: (
+    numeroBase: number,
+    numeroComparar: number,
+    ref: React.RefObject<HTMLElement>,
+    setValido: React.Dispatch<React.SetStateAction<boolean>>,
+    campoBase: string,
+    campoComparar: string,
+    incluirIgual?: boolean
   ) => boolean;
 }
 
@@ -103,7 +114,7 @@ export const useValidations = (): UseValidations => {
 
   const validarNumeroNegativo = useCallback<
     UseValidations['validarNumeroNegativo']
-  >((numero, ref, setValido, campoNombre) => {
+  >((numero, ref, setValido, campoNombre, permitirCero = false) => {
     const valor = Number(numero);
     if (isNaN(valor)) {
       ref.current?.focus();
@@ -116,7 +127,7 @@ export const useValidations = (): UseValidations => {
       return false;
     }
 
-    if (valor == 0) {
+    if (!permitirCero && valor === 0) {
       ref.current?.focus();
       setValido(false);
       Toast.fire({
@@ -188,11 +199,57 @@ export const useValidations = (): UseValidations => {
     []
   );
 
+  const validarNumeroMayorQue = useCallback<
+    UseValidations['validarNumeroMayorQue']
+  >(
+    (
+      numeroBase,
+      numeroComparar,
+      ref,
+      setValido,
+      campoBase,
+      campoComparar,
+      incluirIgual = false // por defecto es false (mayor estricto)
+    ) => {
+      const base = Number(numeroBase);
+      const comparar = Number(numeroComparar);
+
+      if (isNaN(base) || isNaN(comparar)) {
+        ref.current?.focus();
+        setValido(false);
+        Toast.fire({
+          icon: 'error',
+          title: `Valores inválidos`,
+          text: `Ambos campos deben contener números válidos.`,
+        });
+        return false;
+      }
+
+      const esValido = incluirIgual ? base >= comparar : base > comparar;
+
+      if (!esValido) {
+        ref.current?.focus();
+        setValido(false);
+        Toast.fire({
+          icon: 'error',
+          title: `${campoBase} debe ser ${incluirIgual ? 'mayor o igual' : 'mayor'} que ${campoComparar}`,
+          text: `Revisa los valores ingresados.`,
+        });
+        return false;
+      }
+
+      setValido(true);
+      return true;
+    },
+    []
+  );
+
   return {
     validarCorreo,
     validarTelefono,
     validarCampo,
     validarNumeroNegativo,
     validarRangoFechas,
+    validarNumeroMayorQue,
   };
 };

@@ -3,7 +3,7 @@ import { getFechaCumpleanosClientes } from '../helpers/apiClientes';
 import { ICumpleanosClientes } from '../interfaces/interfacesClientes';
 import Toast from '../components/Toast';
 import { IApiError } from '../interfaces/interfacesApi';
-import { Card, Badge } from 'flowbite-react';
+import { Card, Badge, Tooltip } from 'flowbite-react';
 import { getEstadisticasDashboard } from '../helpers/apiDashboard';
 import { IDashboard } from '../interfaces/interfacesDashboard';
 import { WaitScreen } from '../components/WaitScreen';
@@ -14,6 +14,7 @@ import {
   FaDollarSign,
   FaBoxes,
 } from 'react-icons/fa';
+import { ModalInfoCliente } from '../dialogs/ModalInfoCliente';
 
 const obtenerIcono = (id: string | number, color: string) => {
   const className = `text-2xl text-${color}-700`;
@@ -48,6 +49,10 @@ export const HomePage = (): React.JSX.Element => {
   const [estadisticas, setEstadisticas] = useState<IDashboard[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const [clienteSeleccionado, setClienteSeleccionado] =
+    useState<ICumpleanosClientes | null>(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
@@ -210,7 +215,11 @@ export const HomePage = (): React.JSX.Element => {
               {cumpleanosClientes.map((cliente, index) => (
                 <li
                   key={index}
-                  className="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50"
+                  onClick={() => {
+                    setClienteSeleccionado(cliente);
+                    setMostrarModal(true);
+                  }}
+                  className="cursor-pointer flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-blue-50 hover:rounded-lg"
                 >
                   <div>
                     <p className="text-2xl font-semibold mt-1">
@@ -245,6 +254,12 @@ export const HomePage = (): React.JSX.Element => {
           <></>
         )}
       </div>
+
+      <ModalInfoCliente
+        open={mostrarModal}
+        onClose={() => setMostrarModal(false)}
+        cliente={clienteSeleccionado}
+      />
     </>
   );
 };

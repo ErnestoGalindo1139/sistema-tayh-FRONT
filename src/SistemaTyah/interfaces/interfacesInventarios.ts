@@ -22,6 +22,7 @@ export interface IFormInventarios {
   de_Genero: string;
   de_GeneroCompleto: string;
   nu_ExistenciaFisica: string;
+  nu_CantidadComprometida: string;
   sn_Activo: boolean;
   fh_Registro: string;
   fh_Actualizacion: string;
