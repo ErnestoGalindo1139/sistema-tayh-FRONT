@@ -26,7 +26,8 @@ import { ModalConfirmacionAgregar } from './ModalConfirmacionAgregar';
 import { IEstatus } from '../interfaces/interfacesEstatus';
 import { getEstatus } from '../helpers/apiEstatus';
 import { buscarClienteInfoHelper } from '../helpers/clientes/buscarClienteInfoHelper';
-import { log } from 'console';
+import { IPedidosCombo } from '../interfaces/interfacesPedidos';
+import { getPedidosCombo } from '../helpers/apiPedidos';
 
 interface ModalEnviosProps {
   isOpen: boolean;
@@ -53,6 +54,7 @@ export const ModalEnvios = ({
   const nu_TelefonoRedLocalRef = useRef<HTMLInputElement>(null);
   const de_FolioGuiaRef = useRef<HTMLInputElement>(null);
   const id_EstatusRef = useRef<HTMLSelectElement>(null);
+  const id_PedidoRef = useRef<HTMLSelectElement>(null);
 
   // Manejar Validaciones para los Iputs
   const [clienteValido, setClienteValido] = useState(true);
@@ -63,11 +65,35 @@ export const ModalEnvios = ({
   const [folioGuiaValido, setFolioGuiaValido] = useState(true);
   const [estatusEnvios, setEstatusEnvios] = useState<IEstatus[]>([]);
   const [estatusValido, setEstatusValido] = useState(true);
+  const [pedidoValido, setPedidoValido] = useState(true);
 
   const [isLoading, setIsLoading] = useState(false);
   const [clientesCombo, setClientesCombo] = useState<IClientesCombo[]>([]);
+  const [pedidosCombo, setPedidosCombo] = useState<IPedidosCombo[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { formState, setFormState, onInputChange, onResetForm } = useForm<{
+    id_Envio: number;
+    id_Cliente: number;
+    de_Direccion: string;
+    de_CorreoElectronico: string;
+    nu_TelefonoCelular: string;
+    nu_TelefonoRedLocal: string;
+    de_FolioGuia: string;
+    id_Estatus: number;
+    id_Pedido: number;
+  }>({
+    id_Envio: 0,
+    id_Cliente: 0,
+    de_Direccion: '',
+    de_CorreoElectronico: '',
+    nu_TelefonoCelular: '',
+    nu_TelefonoRedLocal: '',
+    de_FolioGuia: '',
+    id_Estatus: 0,
+    id_Pedido: 0,
+  });
 
   const abrirModalConfirmacion = (): void => {
     setIsModalOpen(true);
@@ -129,6 +155,27 @@ export const ModalEnvios = ({
     fetchEstatusEnvios();
   }, []);
 
+  useEffect(() => {
+    if (!formState.id_Cliente || formState.id_Cliente == 0) return;
+
+    const fetchPedidosCombo = async (): Promise<void> => {
+      try {
+        const arregloCombo = await getPedidosCombo(formState.id_Cliente);
+        setPedidosCombo(arregloCombo.body);
+      } catch (error) {
+        const errorMessage =
+          (error as IApiError).message || 'Ocurrió un error desconocido';
+        Toast.fire({
+          icon: 'error',
+          title: 'Ocurrió un Error',
+          text: errorMessage,
+        });
+      }
+    };
+
+    fetchPedidosCombo();
+  }, [formState.id_Cliente]);
+
   // Limpiar Formulario
   useEffect(() => {
     if (isOpen) {
@@ -136,37 +183,19 @@ export const ModalEnvios = ({
         setFormState({
           ...row,
           id_Cliente: Number(row.id_Cliente),
+          id_Pedido: row.id_Pedido ?? 0,
         });
       } else if (sn_Visualizar) {
         setFormState({
           ...row,
           id_Cliente: Number(row.id_Cliente),
+          id_Pedido: row.id_Pedido ?? 0,
         });
       } else {
         onResetForm();
       }
     }
   }, [isOpen, row]);
-
-  const { formState, setFormState, onInputChange, onResetForm } = useForm<{
-    id_Envio: number;
-    id_Cliente: number;
-    de_Direccion: string;
-    de_CorreoElectronico: string;
-    nu_TelefonoCelular: string;
-    nu_TelefonoRedLocal: string;
-    de_FolioGuia: string;
-    id_Estatus: number;
-  }>({
-    id_Envio: 0,
-    id_Cliente: 0,
-    de_Direccion: '',
-    de_CorreoElectronico: '',
-    nu_TelefonoCelular: '',
-    nu_TelefonoRedLocal: '',
-    de_FolioGuia: '',
-    id_Estatus: 0,
-  });
 
   // Cagar informacion del cliente al seleccionar uno
   useEffect(() => {
@@ -361,7 +390,13 @@ export const ModalEnvios = ({
           id_EstatusRef,
           setEstatusValido,
           'Ingrese un estatus'
-        ))
+        )) ||
+      !validarCampo(
+        formState.id_Pedido,
+        id_PedidoRef,
+        setClienteValido,
+        'Seleccione un Pedido'
+      )
     ) {
       return;
     }
@@ -558,6 +593,26 @@ export const ModalEnvios = ({
                   style={{ fontSize: '1.4rem' }}
                   sizing="lg"
                 />
+              </div>
+              <div className="w-full">
+                <Label className="text-[1.6rem]">Pedido</Label>
+                <CustomSelect
+                  disabled={sn_Visualizar}
+                  color={`${pedidoValido ? '' : 'failure'}`}
+                  onBlur={() => setPedidoValido(true)}
+                  className={`dark:text-white mt-2 mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black focus:${pedidoValido ? 'ring-[#656ed3e1]' : 'ring-red-500'}`}
+                  ref={id_PedidoRef}
+                  name="id_Pedido"
+                  value={formState.id_Pedido}
+                  onChange={onInputChange}
+                >
+                  <option value="">Seleccionar</option>
+                  {pedidosCombo.map((pedido) => (
+                    <option key={pedido.id_Pedido} value={pedido.id_Pedido}>
+                      {pedido.de_Pedido}
+                    </option>
+                  ))}
+                </CustomSelect>
               </div>
             </FormControl>
 

@@ -207,3 +207,10 @@ export interface IPedidosExcel {
   sn_EnvioDomicilio: string;
   im_EnvioDomicilio: number;
 }
+
+export interface IPedidosCombo {
+  id_Pedido: number;
+  id_Cliente: number;
+  nb_Cliente: number;
+  de_Pedido: string;
+}

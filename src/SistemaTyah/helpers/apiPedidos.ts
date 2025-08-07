@@ -5,6 +5,7 @@ import {
   IFormPedidos,
   IModelos,
   IPedidos,
+  IPedidosCombo,
   IPedidosDetalles,
   IPedidosDisponiblesCombo,
   IPedidosDisponiblesComboParams,
@@ -337,6 +338,27 @@ export const getViasContactoClientes = async (
     return data;
   } catch (error) {
     console.error('Error al obtener Las vias de contacto del cliente:', error);
+    throw error;
+  }
+};
+
+// Obtener pedidos
+export const getPedidosCombo = async (
+  id_Cliente?: number
+): Promise<ApiResponse<IPedidosCombo[]>> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getPedidosCombo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_Cliente }), // Mandar los filtros en la petición
+    });
+
+    const data: ApiResponse<IPedidosCombo[]> = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener el combo de pedidos:', error);
     throw error;
   }
 };
