@@ -544,6 +544,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
                     nu_TelefonoRedLocal: '',
                     de_FolioGuia: '',
                     id_Estatus: 0,
+                    id_Pedido: 0,
                   }
             }
             sn_Editar={sn_Editar}
