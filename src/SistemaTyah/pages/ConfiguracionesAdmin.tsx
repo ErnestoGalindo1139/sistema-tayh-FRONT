@@ -26,12 +26,12 @@ const items = [
     icon: <FaUsers size={30} className="m-auto" />,
     color: 'bg-blue-500',
   },
-  {
-    title: 'Reportes',
-    path: '/reportes',
-    icon: <FaChartBar size={30} className="m-auto" />,
-    color: 'bg-pink-500',
-  },
+  // {
+  //   title: 'Reportes',
+  //   path: '/reportes',
+  //   icon: <FaChartBar size={30} className="m-auto" />,
+  //   color: 'bg-pink-500',
+  // },
 ];
 
 export const ConfiguracionesAdmin = (): React.JSX.Element => {
@@ -39,7 +39,7 @@ export const ConfiguracionesAdmin = (): React.JSX.Element => {
 
   return (
     <div className="p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
           <Card
             key={item.title}

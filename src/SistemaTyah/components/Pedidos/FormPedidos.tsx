@@ -76,6 +76,15 @@ export const FormPedidos = ({
     // onResetForm: limpiarFormulario,
   } = useForm<IFormPedidos>({
     ...row,
+    fh_Pedido: row.fh_Pedido
+      ? row.fh_Pedido
+      : new Date().toISOString().split('T')[0],
+    fh_EnvioProduccion: row.fh_EnvioProduccion
+      ? row.fh_EnvioProduccion
+      : new Date().toISOString().split('T')[0],
+    fh_EntregaEstimada: row.fh_EntregaEstimada
+      ? row.fh_EntregaEstimada
+      : new Date().toISOString().split('T')[0],
   });
 
   // const {
@@ -847,13 +856,13 @@ export const FormPedidos = ({
             <Label className="text-[1.6rem]">Fecha Pedido</Label>
             <Datepicker
               disabled={sn_Visualizar}
-              key={formPedidos.fh_Pedido}
+              key={formPedidos.fh_Pedido || 'fh_Pedido'} // Cambia la clave cuando el valor cambia
               color={`${fechaPedidoValida ? '' : 'failure'}`}
               ref={fh_PedidoRef}
               placeholder="Fecha Pedido"
               id="fh_Pedido"
               name="fh_Pedido"
-              value={getDateForPicker(formPedidos.fh_Pedido)} // Convertimos el string a Date ajustado a UTC
+              value={getDateForPicker(formPedidos.fh_Pedido)}
               onChange={(date) => {
                 handleDateChange(date, 'fh_Pedido');
               }}
