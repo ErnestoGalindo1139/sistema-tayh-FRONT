@@ -23,6 +23,7 @@ import { ModalOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalOrdenTrabajo';
 import { useDisclosure } from '@chakra-ui/react';
 import { customPaginationTheme } from '../themes/customPaginationTheme';
 import { ModalConfirmarIniciarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalConfirmarIniciarOrdenTrabajo';
+import { getFinMesActual, getInicioMesActual } from '../utils/fechas';
 
 export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
   const [ordenesTrabajo, setOrdenesTrabajo] = useState<IOrdenesTrabajo[]>([]);
@@ -54,8 +55,8 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
       id_Estatus: '',
       // fh_Inicio: fh_InicioDefault,
       // fh_Fin: fh_FinDefault,
-      fh_Inicio: '',
-      fh_Fin: '',
+      fh_Inicio: getInicioMesActual(),
+      fh_Fin: getFinMesActual(),
       pedidos: '',
       estatus: '',
     });

@@ -33,6 +33,7 @@ import { eliminarFacturaHelper } from '../helpers/facturacion/eliminarFacturaHel
 import { FacturasExcel } from '../excel/FacturasExcel';
 import { useFormDate } from '../hooks/useFormDate';
 import { customDatePickerTheme } from '../themes/customDatePickerTheme';
+import { getFinMesActual, getInicioMesActual } from '../utils/fechas';
 
 export const FacturacionAdmin = (): React.JSX.Element => {
   const [facturas, setFacturas] = useState<IFacturacion[]>([]);
@@ -52,8 +53,8 @@ export const FacturacionAdmin = (): React.JSX.Element => {
       de_Uso: '',
       sn_ConstanciaFiscal: null,
       sn_Activo: null,
-      fh_Inicio: '',
-      fh_Fin: '',
+      fh_Inicio: getInicioMesActual(),
+      fh_Fin: getFinMesActual(),
     });
 
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);

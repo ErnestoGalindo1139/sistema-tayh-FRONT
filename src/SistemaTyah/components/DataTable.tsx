@@ -17,6 +17,7 @@ interface DataTableProps<T> {
     icono: React.JSX.Element;
     onClick: (row: T) => void;
     width?: string;
+    isVisible?: (row: T) => boolean; // Función para determinar si la acción es visible
   }[];
   initialRowsPerPage?: number;
 }
@@ -263,21 +264,23 @@ export const DataTable = <T,>({
                     style={{ width: actions[0].width || 'auto' }}
                   >
                     <div className="flex justify-center gap-2">
-                      {actions.map((action, actionIndex) => (
-                        <Tooltip
-                          key={actionIndex}
-                          content={action.texto}
-                          placement="bottom"
-                          className="w-auto text-center text-[1.5rem] leading-[2rem]"
-                        >
-                          <button
-                            onClick={() => action.onClick(row)}
-                            className="p-2 hover:bg-gray-100 rounded-full"
+                      {actions
+                        .filter((a) => (a.isVisible ? a.isVisible(row) : true))
+                        .map((action, actionIndex) => (
+                          <Tooltip
+                            key={actionIndex}
+                            content={action.texto}
+                            placement="bottom"
+                            className="w-auto text-center text-[1.5rem] leading-[2rem]"
                           >
-                            {action.icono}
-                          </button>
-                        </Tooltip>
-                      ))}
+                            <button
+                              onClick={() => action.onClick(row)}
+                              className="p-2 hover:bg-gray-100 rounded-full"
+                            >
+                              {action.icono}
+                            </button>
+                          </Tooltip>
+                        ))}
                     </div>
                   </Table.Cell>
                 )}

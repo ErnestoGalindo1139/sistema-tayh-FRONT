@@ -23,6 +23,7 @@ import { FiltrosPedidos } from '../components/Pedidos/FiltrosPedidos';
 import { useForm } from '../hooks/useForm';
 import { ModalCambiarEstatus } from '../dialogs/ModalCambiarEstatus';
 import { PedidosExcel } from '../excel/PedidosExcel';
+import { getFinMesActual, getInicioMesActual } from '../utils/fechas';
 
 export const PedidosAdmin = (): React.JSX.Element => {
   const [pedidos, setPedidos] = useState<IPedidos[]>([]);
@@ -43,8 +44,8 @@ export const PedidosAdmin = (): React.JSX.Element => {
   } = useForm<IFiltrosPedidos>({
     id_Pedido: '',
     id_Cliente: '',
-    fh_InicioPedido: '',
-    fh_FinPedido: '',
+    fh_InicioPedido: getInicioMesActual(),
+    fh_FinPedido: getFinMesActual(),
     fh_InicioEnvioProduccion: '',
     fh_FinEnvioProduccion: '',
     fh_InicioEntregaEstimada: '',
@@ -142,6 +143,9 @@ export const PedidosAdmin = (): React.JSX.Element => {
     },
   ];
 
+  const esFinalizado = (row: IPedidos): boolean =>
+    Number(row.id_Estatus) === 14;
+
   const actions = [
     {
       icono: <EyeIcon className="text-blue-500" />,
@@ -155,6 +159,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
         });
       },
       width: '20%',
+      isVisible: (): boolean => true, // siempre visible
     },
     {
       icono: <EditIcon className="text-[#a22694]" />,
@@ -167,6 +172,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
           ...row,
         });
       },
+      isVisible: (row: IPedidos): boolean => !esFinalizado(row), // ocultar si está finalizado
     },
     {
       icono: <RetweetIcon className="text-black" />,
@@ -177,6 +183,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
         setPedido({ ...row });
         abrirModalCambiarEstatus();
       },
+      isVisible: (row: IPedidos): boolean => !esFinalizado(row), // ocultar si está finalizado
     },
   ];
 
@@ -189,7 +196,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
       fh_EntregaEstimada: '',
       id_ViaContacto: 0,
       de_ViaContacto: '',
-      id_Estatus: '1',
+      id_Estatus: '12',
       de_Estatus: '',
       im_Impuesto: 0,
       im_IVA: 0,
@@ -248,7 +255,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
                   fh_EntregaEstimada: '',
                   id_ViaContacto: 0,
                   de_ViaContacto: '',
-                  id_Estatus: 1,
+                  id_Estatus: 12,
                   de_Estatus: '',
                   im_Impuesto: 0,
                   im_IVA: 0,
@@ -337,7 +344,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
                 fh_EntregaEstimada: '',
                 id_ViaContacto: 0,
                 de_ViaContacto: '',
-                id_Estatus: 1,
+                id_Estatus: 12,
                 de_Estatus: '',
                 im_Impuesto: 0,
                 im_IVA: 0,

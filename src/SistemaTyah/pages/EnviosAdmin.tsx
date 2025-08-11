@@ -32,6 +32,7 @@ import { getEstatus } from '../helpers/apiEstatus';
 import { EnviosExcel } from '../excel/EnviosExcel';
 import { useFormDate } from '../hooks/useFormDate';
 import { customDatePickerTheme } from '../themes/customDatePickerTheme';
+import { getFinMesActual, getInicioMesActual } from '../utils/fechas';
 
 export const EnviosAdmin = (): React.JSX.Element => {
   const [envios, setEnvios] = useState<IEnvios[]>([]);
@@ -47,8 +48,8 @@ export const EnviosAdmin = (): React.JSX.Element => {
     nu_TelefonoRedLocal: '',
     de_FolioGuia: '',
     id_Estatus: '',
-    fh_Inicio: '',
-    fh_Fin: '',
+    fh_Inicio: getInicioMesActual(),
+    fh_Fin: getFinMesActual(),
   });
 
   const [sn_Editar, setSn_Editar] = useState<boolean>(false);

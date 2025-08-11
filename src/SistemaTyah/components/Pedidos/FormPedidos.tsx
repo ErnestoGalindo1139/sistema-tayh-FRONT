@@ -43,6 +43,7 @@ import { EditIcon } from '../../icons/EditIcon';
 import { AddIcon } from '../../icons/AddIcon';
 import { ModalPedidosDetalleAgregar } from '../../dialogs/ModalPedidosDetalleAgregar';
 import { FaTrash } from 'react-icons/fa';
+import { getFechaActual } from '../../utils/fechas';
 
 interface IFormPedidosProps {
   setSn_Agregar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -76,15 +77,13 @@ export const FormPedidos = ({
     // onResetForm: limpiarFormulario,
   } = useForm<IFormPedidos>({
     ...row,
-    fh_Pedido: row.fh_Pedido
-      ? row.fh_Pedido
-      : new Date().toISOString().split('T')[0],
+    fh_Pedido: row.fh_Pedido ? row.fh_Pedido : getFechaActual(),
     fh_EnvioProduccion: row.fh_EnvioProduccion
       ? row.fh_EnvioProduccion
-      : new Date().toISOString().split('T')[0],
+      : getFechaActual(),
     fh_EntregaEstimada: row.fh_EntregaEstimada
       ? row.fh_EntregaEstimada
-      : new Date().toISOString().split('T')[0],
+      : getFechaActual(),
   });
 
   // const {
