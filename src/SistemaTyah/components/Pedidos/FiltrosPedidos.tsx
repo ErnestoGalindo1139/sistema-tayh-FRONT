@@ -32,14 +32,8 @@ export const FiltrosPedidos = ({
   const buscarPedidos = async (filtros: IFiltrosPedidos): Promise<void> => {
     setIsLoading(true);
     const pedidosData = await buscarPedidosHelper(filtros);
-
-    if (pedidosData.success) {
-      actualizarPedidos(pedidosData.body);
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
-      return;
-    }
+    actualizarPedidos(pedidosData.body);
+    setIsLoading(false);
   };
 
   return (
