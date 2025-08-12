@@ -138,6 +138,9 @@ export const ModalEnvios = ({
     const fetchEstatusEnvios = async (): Promise<void> => {
       try {
         const estatusData = await getEstatus(3); // Modulo de Pedidos
+        estatusData.body = estatusData.body.filter((estatus) => {
+          return estatus.id_Estatus != 5;
+        });
         setEstatusEnvios(estatusData.body);
       } catch (error) {
         const errorMessage =
@@ -161,6 +164,21 @@ export const ModalEnvios = ({
     const fetchPedidosCombo = async (): Promise<void> => {
       try {
         const arregloCombo = await getPedidosCombo(formState.id_Cliente);
+        if (row.id_Pedido) {
+          // Busca si el pedido ya está en el arreglo
+          const existe = arregloCombo.body.some(
+            (pedido: IPedidosCombo) => pedido.id_Pedido === row.id_Pedido
+          );
+          if (!existe) {
+            // Inserta el pedido actual al inicio si no existe
+            arregloCombo.body.unshift({
+              id_Pedido: row.id_Pedido,
+              de_Pedido: row.de_Pedido ?? `Pedido ${row.id_Pedido}`,
+              // Agrega aquí otras propiedades requeridas por IPedidosCombo si existen
+            } as IPedidosCombo);
+          }
+        }
+
         setPedidosCombo(arregloCombo.body);
       } catch (error) {
         const errorMessage =
@@ -199,7 +217,7 @@ export const ModalEnvios = ({
 
   // Cagar informacion del cliente al seleccionar uno
   useEffect(() => {
-    if (!formState.id_Cliente) return;
+    if (!formState.id_Cliente || sn_Editar) return;
 
     const getInfoCliente = async (): Promise<void> => {
       try {
@@ -594,6 +612,9 @@ export const ModalEnvios = ({
                   sizing="lg"
                 />
               </div>
+            </FormControl>
+
+            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-[2rem]">
               <div className="w-full">
                 <Label className="text-[1.6rem]">Pedido</Label>
                 <CustomSelect
@@ -614,9 +635,7 @@ export const ModalEnvios = ({
                   ))}
                 </CustomSelect>
               </div>
-            </FormControl>
 
-            <FormControl className="grid grid-cols-1 md:grid-cols-3 gap-[2rem]">
               <div className="w-full">
                 <Label className={`text-[1.6rem] ${sn_Editar ? '' : 'hidden'}`}>
                   Estatus
