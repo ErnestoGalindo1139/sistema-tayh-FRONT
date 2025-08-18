@@ -789,36 +789,26 @@ export const ModalPedidosDetalleAgregar = ({
                 <Label className="text-[1.6rem] dark:text-white font-semibold">
                   Descuento
                 </Label>
-                <Select
+                <TextInput
                   disabled={sn_Visualizar}
-                  // ref={id_TipoTelaRef}
+                  // ref={im_PrecioUnitarioRef}
                   value={formPedidosDetalle.pj_Descuento}
-                  // color={`${tipoTelaValida ? '' : 'failure'}`}
+                  // color={`${precioValido ? '' : 'failure'}`}
+                  type="number"
+                  placeholder="Ingrese un descuento"
                   className={`dark:text-white mb-2 w-full rounded-lg py-2 bg-transparent focus:outline-none focus:ring-1 focus:ring-[#656ed3e1] text-black`}
                   id="pj_Descuento"
                   name="pj_Descuento"
+                  addon="%"
+                  required
                   onChange={onInputChange}
-                  sizing="lg"
                   style={{
                     fontSize: '1.4rem',
                     border: '1px solid #b9b9b9',
                     backgroundColor: '#ffffff',
                   }}
-                >
-                  <option value="">Ninguno</option>
-                  {[
-                    { id: 1, valor: 5, texto: '5%' },
-                    { id: 2, valor: 10, texto: '10%' },
-                    { id: 3, valor: 15, texto: '15%' },
-                    { id: 4, valor: 20, texto: '20%' },
-                    { id: 5, valor: 25, texto: '25%' },
-                    { id: 6, valor: 50, texto: '50%' },
-                  ].map((impuesto) => (
-                    <option key={impuesto.id} value={impuesto.valor}>
-                      {impuesto.texto}
-                    </option>
-                  ))}
-                </Select>
+                  sizing="lg"
+                />
               </div>
 
               <div className="dark:text-white col-start-3">
