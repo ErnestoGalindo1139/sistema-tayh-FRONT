@@ -357,6 +357,7 @@ export const SeleccionarOrdenTrabajo = (): React.JSX.Element => {
             : {
                 id_OrdenTrabajo: 0,
                 id_Pedido: 0,
+                id_DetallePedido: 0,
                 id_Estatus: 0,
                 pedidos: '',
                 estatus: '',
