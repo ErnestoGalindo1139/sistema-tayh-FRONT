@@ -176,6 +176,12 @@ export const EnviosAdmin = (): React.JSX.Element => {
       width: '',
     },
     {
+      id: 'fh_Registro',
+      texto: 'Fecha',
+      visible: true,
+      width: '7%',
+    },
+    {
       id: 'de_Estatus',
       texto: 'Estatus',
       bgColor: 'color_Estatus',
