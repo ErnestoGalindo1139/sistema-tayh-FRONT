@@ -212,7 +212,7 @@ export const FormPedidos = ({
   }, [pedidosDetalles]);
 
   useEffect(() => {
-    const im_EnvioDomicilio = formPedidos.sn_EnvioDomicilio == 1 ? 100 : 0;
+    const im_EnvioDomicilio = formPedidos.sn_EnvioDomicilio == 1 ? 98 : 0;
     setFormPedidos({
       ...formPedidos,
       im_EnvioDomicilio,

@@ -193,7 +193,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
 
   const actions = [
     {
-      icono: <EyeIcon className="text-blue-500" />,
+      icono: <EyeIcon className="text-[#007BFF]" />,
       texto: 'Visualizar',
       onClick: (row: IEnvios): void => {
         setSn_Editar(false);
@@ -207,7 +207,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
       width: '8%',
     },
     {
-      icono: <EditIcon className="text-green-500" />,
+      icono: <EditIcon className="text-[#a22694]" />,
       texto: 'Editar',
       onClick: (row: IEnvios): void => {
         setSn_Editar(true);
