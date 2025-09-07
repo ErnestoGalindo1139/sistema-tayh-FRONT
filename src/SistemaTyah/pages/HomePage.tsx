@@ -40,6 +40,13 @@ const obtenerIcono = (id: string | number, color: string) => {
   }
 };
 
+const formatCurrencyMXN = (v: unknown) =>
+  new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: 'MXN',
+    maximumFractionDigits: 2,
+  }).format(Number(v ?? 0));
+
 export const HomePage = (): React.JSX.Element => {
   // Estado para manejar la carga de la página
   const [cumpleanosClientes, setCumpleanosClientes] = useState<
@@ -192,7 +199,9 @@ export const HomePage = (): React.JSX.Element => {
                 <p
                   className={`text-4xl font-bold text-${estadistica.color}-600`}
                 >
-                  {estadistica.valor}
+                  {Number(estadistica.id) === 4
+                    ? formatCurrencyMXN(estadistica.valor)
+                    : estadistica.valor}
                 </p>
                 <Badge
                   color={estadistica.color}

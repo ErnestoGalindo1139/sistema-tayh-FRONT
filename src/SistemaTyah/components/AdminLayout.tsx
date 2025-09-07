@@ -1,5 +1,5 @@
 // AdminLayout.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Image } from '@chakra-ui/react';
 
@@ -23,22 +23,34 @@ export default function AdminLayout(): React.JSX.Element {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const { getUser, setIsAuthenticated } = useAuth();
+  const usuario = getUser();
+  const roleId = usuario?.id_Rol ?? null;
+
+  // ✅ Filtrado SOLO por rol:
+  // Rol 1 -> todo; Rol 2 -> solo Orden de Trabajo
+  const modulosVisibles = useMemo(() => {
+    if (roleId == 1) return modulosData;
+    if (roleId == 2)
+      return modulosData.filter((m) => m.ruta === '/seleccionarOrdenTrabajo');
+    return [];
+  }, [roleId]);
+
   const handleMenuClick = (ruta: string): void => {
+    // Seguridad extra: navega solo si está visible para su rol
+    const permitido = modulosVisibles.some((m) => m.ruta === ruta);
+    if (!permitido) return;
     navigate(ruta);
     setIsSidebarOpen(false);
   };
 
-  const { getUser, setIsAuthenticated } = useAuth();
-
   // Función para manejar el cierre de sesión
   const handleLogout = async (): Promise<void> => {
     const usuario = getUser();
-
     if (usuario) {
-      const response = await cerrarSesion({ id_Usuario: usuario.id }); // Aquí se debe llamar a la función de cerrar sesión
-
+      const response = await cerrarSesion({ id_Usuario: usuario.id });
       if (response.success) {
-        setIsAuthenticated(false); // Cambia el estado de autenticación
+        setIsAuthenticated(false);
         navigate('/login');
       }
     }
@@ -78,13 +90,8 @@ export default function AdminLayout(): React.JSX.Element {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
   };
 
-  const abrirModalCerraSesion = (): void => {
-    setIsModalOpen(true);
-  };
-
-  const cerrarModalCerraSesion = (): void => {
-    setIsModalOpen(false);
-  };
+  const abrirModalCerraSesion = (): void => setIsModalOpen(true);
+  const cerrarModalCerraSesion = (): void => setIsModalOpen(false);
 
   return (
     <div className={`admin-container ${isDarkMode ? 'dark' : ''}`}>
@@ -98,10 +105,7 @@ export default function AdminLayout(): React.JSX.Element {
       <aside
         ref={sidebarRef}
         className={`sidebar ${isSidebarOpen ? 'open' : ''} z-10`}
-        style={{
-          backgroundColor: sidebarColor,
-          color: sidebarTextColor,
-        }}
+        style={{ backgroundColor: sidebarColor, color: sidebarTextColor }}
       >
         <div
           className="sidebar-header"
@@ -120,20 +124,21 @@ export default function AdminLayout(): React.JSX.Element {
             mt={4}
           />
         </div>
+
         <nav className="sidebar-nav">
           <ul>
-            {modulosData.map((modulo) => (
+            {modulosVisibles.map((modulo) => (
               <li
                 key={modulo.id}
                 style={{ color: sidebarTextColor }}
-                className="font-semibold text-[1.8rem] flex items-center gap-3"
+                className="font-semibold text-[1.8rem] flex items-center gap-3 cursor-pointer"
                 onClick={() => handleMenuClick(modulo.ruta)}
               >
                 <img
                   width="24"
                   height="24"
                   src={modulo.icono.url}
-                  alt="dashboard-layout"
+                  alt={modulo.icono.alt ?? 'icon'}
                 />
                 {modulo.texto}
               </li>
