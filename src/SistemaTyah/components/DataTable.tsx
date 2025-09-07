@@ -194,6 +194,64 @@ export const DataTable = <T,>({
                         </Table.Cell>
                       );
                     }
+                    if (column.id === 'nu_TelefonoWhatsApp') {
+                      const phoneNumber = displayValue?.replace(/\D/g, ''); // limpia número
+                      const whatsappUrl = `https://wa.me/${phoneNumber}`;
+
+                      return (
+                        <Table.Cell
+                          key={String(column.id)}
+                          className="text-[1.5rem] text-gray-600 leading-[2rem] px-6"
+                          style={{ width: column.width || 'auto' }}
+                        >
+                          <Tooltip
+                            content={displayValue}
+                            placement="bottom"
+                            className="text-[1.2rem] leading-[2rem]"
+                          >
+                            <a
+                              href={whatsappUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`leading-[2rem] ${textAlignRow ? classTextAlign : ''} text-blue-600 underline cursor-pointer`}
+                              style={{
+                                backgroundColor: bgColorRow
+                                  ? `${bgColorRow}`
+                                  : '',
+                                color: bgColorRow ? '#FFF' : '',
+                                padding: bgColorRow ? '.6rem' : '',
+                                borderRadius: bgColorRow ? '.4rem' : '',
+                              }}
+                            >
+                              {displayValue}
+                            </a>
+                          </Tooltip>
+                        </Table.Cell>
+                      );
+                    }
+
+                    if (column.id === 'de_Estatus') {
+                      return (
+                        <Table.Cell
+                          key={String(column.id)}
+                          className="border-b border-gray-300 text-center text-[1.5rem] p-0"
+                          style={{ width: column.width || 'auto' }} // Asignar el width aquí
+                        >
+                          <span
+                            className={`inline-block w-[80%] py-[0.7rem] rounded-[0.3rem]`}
+                            style={{
+                              backgroundColor: `${bgColorRow ? `${bgColorRow}` : ''}`,
+                              color: `${bgColorRow ? '#FFF' : ''}`,
+                              padding: `${bgColorRow ? '.6rem' : ''}`,
+                              borderRadius: `${bgColorRow ? '.4rem' : ''}`,
+                              lineHeight: '1.6rem',
+                            }}
+                          >
+                            {String(cellValue)}
+                          </span>
+                        </Table.Cell>
+                      );
+                    }
                     if (
                       typeof column.id === 'string' &&
                       column.id.startsWith('im_')

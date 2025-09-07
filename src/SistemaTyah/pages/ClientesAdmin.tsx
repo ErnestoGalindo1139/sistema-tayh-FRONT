@@ -135,8 +135,8 @@ export const ClientesAdmin = (): React.JSX.Element => {
       width: '10%',
     },
     {
-      id: 'fh_Registro',
-      texto: 'Fecha Registro',
+      id: 'nu_TelefonoWhatsApp',
+      texto: 'WhatsApp',
       visible: true,
       width: '10%',
     },

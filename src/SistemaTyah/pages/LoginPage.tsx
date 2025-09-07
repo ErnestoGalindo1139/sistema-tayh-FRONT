@@ -15,9 +15,13 @@ export const LoginPage = (): React.JSX.Element => {
   const navigate = useNavigate();
 
   const auth = useAuth();
+  const user = auth.getUser();
 
   if (auth.isAuthenticated) {
-    return <Navigate to="/dashboard" />;
+    if (user?.id_Rol === 2) {
+      return <Navigate to="/seleccionarOrdenTrabajo" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
   }
 
   const BASE_URL = import.meta.env.VITE_API_URL;
@@ -45,7 +49,11 @@ export const LoginPage = (): React.JSX.Element => {
           auth.saveUser(json);
         }
 
-        navigate('/dashboard');
+        if (json.body.user.id_Rol == 2) {
+          navigate('/seleccionarOrdenTrabajo');
+        } else {
+          navigate('/dashboard');
+        }
 
         // Mostrar mensaje de éxito
         Toast.fire({
