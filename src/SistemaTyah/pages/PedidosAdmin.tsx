@@ -135,7 +135,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
     },
     {
       id: 'de_Estatus',
-      texto: 'Estatus',
+      texto: 'Estado del Pedido',
       visible: true,
       width: '10%',
       bgColor: 'color_Estatus',
@@ -333,6 +333,7 @@ export const PedidosAdmin = (): React.JSX.Element => {
         isOpen={isModalOpen}
         onClose={cerrarModalCambiarEstatus}
         actualizarPedidos={setPedidos}
+        filtros={filtros}
         row={
           pedido
             ? pedido

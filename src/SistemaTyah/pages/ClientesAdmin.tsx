@@ -152,7 +152,7 @@ export const ClientesAdmin = (): React.JSX.Element => {
       visible: false,
       width: '10%',
     },
-    { id: 'sn_Activo', texto: 'Estatus', visible: true, width: '10%' },
+    { id: 'sn_Activo', texto: 'Estado Cliente', visible: true, width: '10%' },
   ];
 
   const actions = [

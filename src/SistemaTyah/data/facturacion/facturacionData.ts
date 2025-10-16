@@ -66,7 +66,7 @@ export const columns: {
   },
   {
     id: 'sn_Activo',
-    texto: 'Estatus',
+    texto: 'Estado de la Factura',
     visible: true,
     width: '6%',
   },
