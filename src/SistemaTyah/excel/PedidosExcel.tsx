@@ -170,7 +170,7 @@ const columnas = [
     width: { wpx: 140 },
   },
   {
-    title: 'Estatus',
+    title: 'Estado del Pedido',
     style: { ...style.title, ...style.borderLBR },
     width: { wpx: 140 },
   },

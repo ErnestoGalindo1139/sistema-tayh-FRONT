@@ -183,7 +183,7 @@ export const EnviosAdmin = (): React.JSX.Element => {
     },
     {
       id: 'de_Estatus',
-      texto: 'Estatus',
+      texto: 'Estado del Envío',
       bgColor: 'color_Estatus',
       textAlign: 'center',
       visible: true,

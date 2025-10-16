@@ -1,6 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { IFormPedidos, IPedidos } from '../interfaces/interfacesPedidos';
+import {
+  IFiltrosPedidos,
+  IFormPedidos,
+  IPedidos,
+} from '../interfaces/interfacesPedidos';
 import { IEstatus } from '../interfaces/interfacesEstatus';
 import { getEstatus, updateEstatus } from '../helpers/apiEstatus';
 import { IApiError } from '../interfaces/interfacesApi';
@@ -27,6 +31,7 @@ interface ModalCambiarEstatusProps {
   actualizarPedidos: (pedidos: IPedidos[]) => void;
   row: IFormPedidos;
   id_Modulo: number;
+  filtros: Partial<IFiltrosPedidos>;
 }
 
 export const ModalCambiarEstatus = ({
@@ -35,6 +40,7 @@ export const ModalCambiarEstatus = ({
   actualizarPedidos,
   row,
   id_Modulo,
+  filtros,
 }: ModalCambiarEstatusProps): React.JSX.Element => {
   // Llenar los combos
   const [estatusPedidos, setEstatusPedidos] = useState<IEstatus[]>([]);
@@ -43,7 +49,7 @@ export const ModalCambiarEstatus = ({
     formState: formPedidos,
     setFormState: setFormPedidos,
     onInputChange,
-    onResetForm: limpiarFormulario,
+    // onResetForm: limpiarFormulario,
   } = useForm<IFormPedidos>({
     ...row,
   });
@@ -106,7 +112,7 @@ export const ModalCambiarEstatus = ({
       onClose();
 
       // Actualizar los clientes
-      const pedidosData = await getPedidos({});
+      const pedidosData = await getPedidos(filtros);
       actualizarPedidos(pedidosData.body);
     } catch (error: unknown) {
       const errorMessage =

@@ -1563,8 +1563,9 @@ export const FormPedidos = ({
                   Seleccione un Impuesto
                 </option>
                 {[
+                  { id: 0.0, texto: '0%' },
+                  { id: 0.08, texto: '8%' },
                   { id: 0.16, texto: '16%' },
-                  { id: 0.8, texto: '8%' },
                 ].map((impuesto) => (
                   <option key={impuesto.id} value={impuesto.id}>
                     {impuesto.texto}
@@ -1617,6 +1618,7 @@ export const FormPedidos = ({
                   Seleccione un Impuesto
                 </option>
                 {[
+                  { id: 0.0, texto: '0%' },
                   { id: 0.0125, texto: '1.25%' },
                   { id: 0.1, texto: '10%' },
                 ].map((impuesto) => (

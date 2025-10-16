@@ -112,7 +112,7 @@ const columnas = [
     width: { wpx: 140 },
   },
   {
-    title: 'Estatus',
+    title: 'Estado del Envío',
     style: { ...style.title, ...style.borderLBR },
     width: { wpx: 140 },
   },

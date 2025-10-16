@@ -95,7 +95,7 @@ const columnas = [
     width: { wpx: 270 },
   },
   {
-    title: 'Estatus',
+    title: 'Estato de la Factura',
     style: { ...style.title, ...style.borderLBR },
     width: { wpx: 270 },
   },
