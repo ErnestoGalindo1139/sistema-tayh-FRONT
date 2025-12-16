@@ -73,6 +73,29 @@ const temasPorColorTela: Record<string, TemaColorTela> = {
     chipTexto: '#4b214f',
     titulo: '#5e2a6a',
   },
+  /* 🟢 NUEVO — VERDE MILITAR */
+  'VERDE MILITAR': {
+    primario: '#3B4F3F', // verde oliva/militar
+    primarioSuave: '#DDE6DF',
+    fondoSuave: '#F2F6F3',
+    textoClaro: '#ffffff',
+    textoOscuro: '#1F2933',
+    chipFondo: '#E3ECE5',
+    chipTexto: '#2F3E34',
+    titulo: '#3B4F3F',
+  },
+
+  /* 🟤 NUEVO — BEIGE */
+  BEIGE: {
+    primario: '#D6C6A5', // beige principal
+    primarioSuave: '#F3EBDD',
+    fondoSuave: '#FAF7F2',
+    textoClaro: '#111827',
+    textoOscuro: '#3F3A2F',
+    chipFondo: '#EFE6D8',
+    chipTexto: '#5C5342',
+    titulo: '#5C5342',
+  },
   DEFAULT: {
     primario: '#1E3A8A',
     primarioSuave: '#E3ECFF',
@@ -97,6 +120,9 @@ export const OrdenTrabajo = (): React.JSX.Element => {
   const [totalPerspectivas, setTotalPerspectivas] = useState(0);
   const [finOrdenTrabajo, setFinOrdenTrabajo] = useState(0);
   const [key, setKey] = useState(0);
+
+  const [autoPlayDelay, setAutoPlayDelay] = useState(10000); // 10s por defecto
+  const [autoPlayPaused, setAutoPlayPaused] = useState(false);
 
   const intervalRef = useRef<number | null>(null);
 
@@ -123,7 +149,12 @@ export const OrdenTrabajo = (): React.JSX.Element => {
   const tema = temasPorColorTela[colorTela] || temasPorColorTela.DEFAULT;
 
   const resetAutoChange = (): void => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    if (autoPlayPaused || totalPerspectivas <= 1) return;
 
     intervalRef.current = window.setInterval(() => {
       setPerspectivaActual((prev) => {
@@ -131,7 +162,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
         onPageChange(nextPage);
         return nextPage;
       });
-    }, 10000);
+    }, autoPlayDelay);
   };
 
   useEffect(() => {
@@ -169,10 +200,19 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
   useEffect(() => {
     resetAutoChange();
+
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [totalPerspectivas, especificacionesPedidos]);
+  }, [
+    totalPerspectivas,
+    especificacionesPedidos,
+    autoPlayDelay,
+    autoPlayPaused,
+  ]);
 
   const onPageChange = (page: number): void => {
     const pedidosFiltrados = especificacionesPedidos.filter(
@@ -349,6 +389,30 @@ export const OrdenTrabajo = (): React.JSX.Element => {
             theme={customPaginationOrdenTrabajoTheme}
             className="ml-[2rem]"
           />
+
+          {/* ⏱ CONTROLES AUTOPLAY */}
+          <div className="flex items-center gap-4 ml-[2rem]">
+            <button
+              className="text-[1.8rem] px-[1.2rem] py-[.6rem] font-bold rounded-xl text-white"
+              style={{
+                backgroundColor: autoPlayPaused ? '#16a34a' : '#6b7280',
+              }}
+              onClick={() => setAutoPlayPaused((prev) => !prev)}
+            >
+              {autoPlayPaused ? '▶ Reanudar' : '⏸ Pausar'}
+            </button>
+
+            <select
+              value={autoPlayDelay}
+              onChange={(e) => setAutoPlayDelay(Number(e.target.value))}
+              className="text-[1.6rem] p-2 rounded-xl border"
+            >
+              <option value={5000}>5 s</option>
+              <option value={10000}>10 s</option>
+              <option value={15000}>15 s</option>
+              <option value={30000}>30 s</option>
+            </select>
+          </div>
 
           <div className="w-[100%] text-end mr-[4rem]">
             <button
