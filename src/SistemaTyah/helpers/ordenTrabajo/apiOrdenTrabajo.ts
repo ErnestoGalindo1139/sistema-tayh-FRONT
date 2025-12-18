@@ -8,6 +8,7 @@ import {
   IFormFinalizarOrdenTrabajo,
   IOrdenesTrabajo,
   IOrdenTrabajoCombo,
+  ITemaColorTela,
 } from '../../interfaces/interfacesOrdenTrabajo';
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -156,6 +157,30 @@ export const cancelarOrdenTrabajo = async (
     };
   } catch (error) {
     console.error('Error al cancelar / reanudar pedido:', error);
+    throw error;
+  }
+};
+
+export const getTemasColorTela = async (): Promise<
+  ApiResponse<ITemaColorTela[]>
+> => {
+  try {
+    const response = await fetch(`${BASE_URL}/getTemasColor`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data: ApiResponse<ITemaColorTela[]> = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || 'Error obteniendo temas de color');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error al obtener temas de color:', error);
     throw error;
   }
 };
