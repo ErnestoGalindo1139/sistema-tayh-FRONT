@@ -77,3 +77,18 @@ export interface IFormCancelarOrdenTrabajo {
   id_DetallePedido: number;
   de_ComentarioCancelacion: string;
 }
+
+// ================================
+// 🎨 Obtener temas de color de tela
+// ================================
+export interface ITemaColorTela {
+  de_ColorTela: string;
+  primario: string;
+  primarioSuave: string;
+  fondoSuave: string;
+  textoClaro: string;
+  textoOscuro: string;
+  chipFondo: string;
+  chipTexto: string;
+  titulo: string;
+}

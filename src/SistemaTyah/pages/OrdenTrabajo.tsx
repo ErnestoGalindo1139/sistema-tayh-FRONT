@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IApiError } from '../interfaces/interfacesApi';
 import Toast from '../components/Toast';
-import { getEspecificacionesOrdenTrabajo } from '../helpers/ordenTrabajo/apiOrdenTrabajo';
+import {
+  getEspecificacionesOrdenTrabajo,
+  getTemasColorTela,
+} from '../helpers/ordenTrabajo/apiOrdenTrabajo';
 import { IEspecificacionesOrdenTrabajo } from '../interfaces/interfacesOrdenTrabajo';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Pagination } from 'flowbite-react';
@@ -22,92 +25,6 @@ type TemaColorTela = {
   titulo: string;
 };
 
-const temasPorColorTela: Record<string, TemaColorTela> = {
-  BLANCO: {
-    primario: '#e5e7eb',
-    primarioSuave: '#f5f5f5',
-    fondoSuave: '#ffffff',
-    textoClaro: '#111827',
-    textoOscuro: '#111827',
-    chipFondo: '#f3f4f6',
-    chipTexto: '#111827',
-    titulo: '#111827',
-  },
-  'AZUL ACERO': {
-    primario: '#4a6274',
-    primarioSuave: '#d8e0e6',
-    fondoSuave: '#eef2f6',
-    textoClaro: '#ffffff',
-    textoOscuro: '#1f2933',
-    chipFondo: '#e0e7ef',
-    chipTexto: '#243b53',
-    titulo: '#4a6274',
-  },
-  'AZUL MARINO': {
-    primario: '#1E3A8A',
-    primarioSuave: '#E3ECFF',
-    fondoSuave: '#F1F5FF',
-    textoClaro: '#ffffff',
-    textoOscuro: '#111827',
-    chipFondo: '#DBEAFE',
-    chipTexto: '#1E40AF',
-    titulo: '#1E3A8A',
-  },
-  NEGRO: {
-    primario: '#000000',
-    primarioSuave: '#27272a',
-    fondoSuave: '#18181b',
-    textoClaro: '#f9fafb',
-    textoOscuro: '#f9fafb',
-    chipFondo: '#27272a',
-    chipTexto: '#f9fafb',
-    titulo: '#f9fafb',
-  },
-  UVA: {
-    primario: '#5e2a6a',
-    primarioSuave: '#e8d6ef',
-    fondoSuave: '#f4e9f8',
-    textoClaro: '#ffffff',
-    textoOscuro: '#3b2a3e',
-    chipFondo: '#f1d9ff',
-    chipTexto: '#4b214f',
-    titulo: '#5e2a6a',
-  },
-  /* 🟢 NUEVO — VERDE MILITAR */
-  'VERDE MILITAR': {
-    primario: '#3B4F3F', // verde oliva/militar
-    primarioSuave: '#DDE6DF',
-    fondoSuave: '#F2F6F3',
-    textoClaro: '#ffffff',
-    textoOscuro: '#1F2933',
-    chipFondo: '#E3ECE5',
-    chipTexto: '#2F3E34',
-    titulo: '#3B4F3F',
-  },
-
-  /* 🟤 NUEVO — BEIGE */
-  BEIGE: {
-    primario: '#D6C6A5', // beige principal
-    primarioSuave: '#F3EBDD',
-    fondoSuave: '#FAF7F2',
-    textoClaro: '#111827',
-    textoOscuro: '#3F3A2F',
-    chipFondo: '#EFE6D8',
-    chipTexto: '#5C5342',
-    titulo: '#5C5342',
-  },
-  DEFAULT: {
-    primario: '#1E3A8A',
-    primarioSuave: '#E3ECFF',
-    fondoSuave: '#F3F4FF',
-    textoClaro: '#ffffff',
-    textoOscuro: '#111827',
-    chipFondo: '#DBEAFE',
-    chipTexto: '#1E40AF',
-    titulo: '#1E3A8A',
-  },
-};
-
 export const OrdenTrabajo = (): React.JSX.Element => {
   const [especificacionesPedidos, setEspecificacionesPedidos] = useState<
     IEspecificacionesOrdenTrabajo[]
@@ -120,6 +37,10 @@ export const OrdenTrabajo = (): React.JSX.Element => {
   const [totalPerspectivas, setTotalPerspectivas] = useState(0);
   const [finOrdenTrabajo, setFinOrdenTrabajo] = useState(0);
   const [key, setKey] = useState(0);
+
+  const [temasPorColorTela, setTemasPorColorTela] = useState<
+    Record<string, TemaColorTela>
+  >({});
 
   const [autoPlayDelay, setAutoPlayDelay] = useState(10000); // 10s por defecto
   const [autoPlayPaused, setAutoPlayPaused] = useState(false);
@@ -214,6 +135,37 @@ export const OrdenTrabajo = (): React.JSX.Element => {
     autoPlayPaused,
   ]);
 
+  useEffect(() => {
+    const fetchTemas = async (): Promise<void> => {
+      try {
+        const res = await getTemasColorTela();
+
+        const temasMap = res.body.reduce(
+          (acc: Record<string, TemaColorTela>, item) => {
+            acc[item.de_ColorTela.trim().toUpperCase()] = {
+              primario: item.primario,
+              primarioSuave: item.primarioSuave,
+              fondoSuave: item.fondoSuave,
+              textoClaro: item.textoClaro,
+              textoOscuro: item.textoOscuro,
+              chipFondo: item.chipFondo,
+              chipTexto: item.chipTexto,
+              titulo: item.titulo,
+            };
+            return acc;
+          },
+          {}
+        );
+
+        setTemasPorColorTela(temasMap);
+      } catch (error) {
+        console.error('Error cargando temas de color', error);
+      }
+    };
+
+    fetchTemas();
+  }, []);
+
   const onPageChange = (page: number): void => {
     const pedidosFiltrados = especificacionesPedidos.filter(
       (item) => item.id_ModeloPerspectiva === page
@@ -236,13 +188,13 @@ export const OrdenTrabajo = (): React.JSX.Element => {
       <div
         key={key}
         className="flex flex-col min-h-screen pt-[2rem]"
-        style={{ backgroundColor: tema.primarioSuave }}
+        style={{ backgroundColor: tema?.primarioSuave }}
       >
         {/* 🔵 TÍTULO PRINCIPAL */}
         <div className="text-center mb-8 animate-fade-down animate-duration-700">
           <h1
             className="text-[4rem] font-bold tracking-wide"
-            style={{ color: tema.titulo }}
+            style={{ color: tema?.titulo }}
           >
             {especificacionesPedidosPerspectivas[0]?.de_Modelo?.toUpperCase()} -{' '}
             {especificacionesPedidosPerspectivas[0]?.de_ColorTela?.toUpperCase()}
@@ -255,11 +207,11 @@ export const OrdenTrabajo = (): React.JSX.Element => {
             <div className="pl-[3rem]">
               <div
                 className="p-[1.5rem] animate-fade-right animate-duration-1000 animate-ease-in rounded-2xl"
-                style={{ backgroundColor: tema.primario }}
+                style={{ backgroundColor: tema?.primario }}
               >
                 <h2
                   className="text-[3rem] font-bold"
-                  style={{ color: tema.textoClaro }}
+                  style={{ color: tema?.textoClaro }}
                 >
                   Orden de Trabajo - #
                   {especificacionesPedidosPerspectivas[0]?.id_OrdenTrabajo}
@@ -268,7 +220,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                 <div>
                   <p
                     className="text-[2.5rem]"
-                    style={{ color: tema.textoClaro }}
+                    style={{ color: tema?.textoClaro }}
                   >
                     Color de tela:{' '}
                     {especificacionesPedidosPerspectivas[0]?.de_ColorTela}
@@ -276,7 +228,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
                   <p
                     className="text-[2.5rem]"
-                    style={{ color: tema.textoClaro }}
+                    style={{ color: tema?.textoClaro }}
                   >
                     Cantidad Total:{' '}
                     {especificacionesPedidosPerspectivas[0]?.nu_Cantidad}
@@ -284,7 +236,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
                   <p
                     className="text-[2.5rem]"
-                    style={{ color: tema.textoClaro }}
+                    style={{ color: tema?.textoClaro }}
                   >
                     Cantidad Pendiente:{' '}
                     {
@@ -295,14 +247,14 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
                   <p
                     className="text-[2.5rem]"
-                    style={{ color: tema.textoClaro }}
+                    style={{ color: tema?.textoClaro }}
                   >
                     Modelo: {especificacionesPedidosPerspectivas[0]?.de_Modelo}
                   </p>
 
                   <p
                     className="text-[2.5rem]"
-                    style={{ color: tema.textoClaro }}
+                    style={{ color: tema?.textoClaro }}
                   >
                     Tipo de tela:{' '}
                     {especificacionesPedidosPerspectivas[0]?.de_TipoTela}
@@ -310,7 +262,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
                   <p
                     className="text-[2.5rem]"
-                    style={{ color: tema.textoClaro }}
+                    style={{ color: tema?.textoClaro }}
                   >
                     Talla: {especificacionesPedidosPerspectivas[0]?.de_Talla}
                   </p>
@@ -324,7 +276,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                 src={`${especificacionesPedidosPerspectivas[0]?.de_Ruta}`}
                 alt="Imagen Editada"
                 className="w-3/4 h-auto m-auto rounded-[18rem]"
-                style={{ backgroundColor: tema.primarioSuave }}
+                style={{ backgroundColor: tema?.primarioSuave }}
               />
             </div>
 
@@ -334,8 +286,8 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                 <h2
                   className="text-[3rem] font-semibold text-center rounded-t-2xl"
                   style={{
-                    backgroundColor: tema.primario,
-                    color: tema.textoClaro,
+                    backgroundColor: tema?.primario,
+                    color: tema?.textoClaro,
                   }}
                 >
                   Especificaciones
@@ -343,7 +295,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
                 <div
                   className="space-y-4 p-4 rounded-b-2xl"
-                  style={{ backgroundColor: tema.fondoSuave }}
+                  style={{ backgroundColor: tema?.fondoSuave }}
                 >
                   {especificacionesPedidosPerspectivas.length > 0 &&
                     especificacionesPedidosPerspectivas.map(
@@ -354,12 +306,12 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                         >
                           <li
                             className="font-bold mr-4 text-4xl"
-                            style={{ color: tema.chipTexto }}
+                            style={{ color: tema?.chipTexto }}
                           >
                             {especificacion.nu_Especificacion}.{' '}
                             <span
                               className="font-normal text-[2.4rem]"
-                              style={{ color: tema.textoOscuro }}
+                              style={{ color: tema?.textoOscuro }}
                             >
                               {especificacion.de_Especificacion}
                             </span>
