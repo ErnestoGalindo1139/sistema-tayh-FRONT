@@ -537,15 +537,15 @@ export const FormPedidos = ({
         id_ViaContactoRef,
         setViaContactoValida,
         'Via de Contacto'
-      ) ||
+      ) //||
       // !validarCampo(
       //   formPedidos.im_Impuesto,
       //   im_ImpuestoRef,
       //   setImpuestoValido,
       //   'Impuesto'
       // ) ||
-      !validarCampo(formPedidos.im_IVA, im_IVARef, setIvaValido, 'IVA') ||
-      !validarCampo(formPedidos.im_ISR, im_ISRRef, setIsrValido, 'ISR')
+      // !validarCampo(formPedidos.im_IVA, im_IVARef, setIvaValido, 'IVA') ||
+      // !validarCampo(formPedidos.im_ISR, im_ISRRef, setIsrValido, 'ISR')
       // !validarCampo(formPedidos.im_Total, im_TotalRef, setTotalValido, 'Total')
     ) {
       return;
