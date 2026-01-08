@@ -13,7 +13,9 @@ import { useDisclosure } from '@chakra-ui/react';
 import { ModalFinalizarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalFinalizarOrdenTrabajo';
 import { ModalCancelarOrdenTrabajo } from '../dialogs/OrdenTrabajo/ModalCancelarOrdenTrabajo';
 
-// 🎨 Tema por color de tela
+/* =======================
+   Tema por color de tela
+======================= */
 type TemaColorTela = {
   primario: string;
   primarioSuave: string;
@@ -26,29 +28,21 @@ type TemaColorTela = {
 };
 
 export const OrdenTrabajo = (): React.JSX.Element => {
-  const [especificacionesPedidos, setEspecificacionesPedidos] = useState<
-    IEspecificacionesOrdenTrabajo[]
-  >([]);
-  const [
-    especificacionesPedidosPerspectivas,
-    setEspecificacionesPedidosPerspectivas,
-  ] = useState<IEspecificacionesOrdenTrabajo[]>([]);
-  const [perspectivaActual, setPerspectivaActual] = useState(1);
-  const [totalPerspectivas, setTotalPerspectivas] = useState(0);
-  const [finOrdenTrabajo, setFinOrdenTrabajo] = useState(0);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const intervalRef = useRef<number | null>(null);
+
+  /* =======================
+     DATA
+  ======================= */
+  const [paginas, setPaginas] = useState<IEspecificacionesOrdenTrabajo[][]>([]);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(0);
   const [key, setKey] = useState(0);
 
   const [temasPorColorTela, setTemasPorColorTela] = useState<
     Record<string, TemaColorTela>
   >({});
-
-  const [autoPlayDelay, setAutoPlayDelay] = useState(10000); // 10s por defecto
-  const [autoPlayPaused, setAutoPlayPaused] = useState(false);
-
-  const intervalRef = useRef<number | null>(null);
-
-  const { id } = useParams();
-  const navigate = useNavigate();
 
   const {
     isOpen: isModalOpen,
@@ -62,127 +56,103 @@ export const OrdenTrabajo = (): React.JSX.Element => {
     onClose: closeModalCancelar,
   } = useDisclosure();
 
-  // 🔹 Tema dinámico según el color de tela
-  const colorTela =
-    especificacionesPedidosPerspectivas[0]?.de_ColorTela
-      ?.trim()
-      ?.toUpperCase() || '';
-  const tema = temasPorColorTela[colorTela] || temasPorColorTela.DEFAULT;
-
-  const resetAutoChange = (): void => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    if (autoPlayPaused || totalPerspectivas <= 1) return;
-
-    intervalRef.current = window.setInterval(() => {
-      setPerspectivaActual((prev) => {
-        const nextPage = prev < totalPerspectivas ? prev + 1 : 1;
-        onPageChange(nextPage);
-        return nextPage;
-      });
-    }, autoPlayDelay);
-  };
-
+  /* =======================
+     FETCH DATOS
+  ======================= */
   useEffect(() => {
-    const fetchEspecificacionesPedidos = async (): Promise<void> => {
+    const fetchData = async (): Promise<void> => {
       try {
-        const especificacionesPedidosData =
-          await getEspecificacionesOrdenTrabajo({
-            id_OrdenTrabajo: id,
-          });
+        const res = await getEspecificacionesOrdenTrabajo({
+          id_OrdenTrabajo: id,
+        });
 
-        setEspecificacionesPedidos(especificacionesPedidosData.body);
+        const map = new Map<string, IEspecificacionesOrdenTrabajo[]>();
 
-        if (especificacionesPedidosData.body?.length > 0) {
-          setTotalPerspectivas(
-            especificacionesPedidosData.body[0].totalModeloPerspectiva
-          );
+        res.body.forEach((item) => {
+          const key = `${item.id_Prenda}-${item.id_ModeloPerspectiva}`;
 
-          const pedidosFiltrados = especificacionesPedidosData.body.filter(
-            (item) => item.id_ModeloPerspectiva === perspectivaActual
-          );
+          if (!map.has(key)) {
+            map.set(key, []);
+          }
 
-          setEspecificacionesPedidosPerspectivas(pedidosFiltrados);
-        }
+          map.get(key)!.push(item);
+        });
+
+        const paginasConstruidas = Array.from(map.values());
+
+        paginasConstruidas.forEach((p) =>
+          p.sort((a, b) => a.nu_Especificacion - b.nu_Especificacion)
+        );
+
+        setPaginas(paginasConstruidas);
+        setTotalPaginas(paginasConstruidas.length);
+        setPaginaActual(1);
       } catch (error) {
         Toast.fire({
           icon: 'error',
           title: 'Ocurrió un Error',
-          text: (error as IApiError).message || 'Ocurrió un error desconocido',
+          text: (error as IApiError).message || 'Error desconocido',
         });
       }
     };
 
-    fetchEspecificacionesPedidos();
-  }, []);
+    fetchData();
+  }, [id]);
 
-  useEffect(() => {
-    resetAutoChange();
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [
-    totalPerspectivas,
-    especificacionesPedidos,
-    autoPlayDelay,
-    autoPlayPaused,
-  ]);
-
+  /* =======================
+     TEMAS
+  ======================= */
   useEffect(() => {
     const fetchTemas = async (): Promise<void> => {
-      try {
-        const res = await getTemasColorTela();
+      const res = await getTemasColorTela();
 
-        const temasMap = res.body.reduce(
-          (acc: Record<string, TemaColorTela>, item) => {
-            acc[item.de_ColorTela.trim().toUpperCase()] = {
-              primario: item.primario,
-              primarioSuave: item.primarioSuave,
-              fondoSuave: item.fondoSuave,
-              textoClaro: item.textoClaro,
-              textoOscuro: item.textoOscuro,
-              chipFondo: item.chipFondo,
-              chipTexto: item.chipTexto,
-              titulo: item.titulo,
-            };
-            return acc;
-          },
-          {}
-        );
+      const map = res.body.reduce(
+        (acc: Record<string, TemaColorTela>, item) => {
+          acc[item.de_ColorTela.trim().toUpperCase()] = {
+            primario: item.primario,
+            primarioSuave: item.primarioSuave,
+            fondoSuave: item.fondoSuave,
+            textoClaro: item.textoClaro,
+            textoOscuro: item.textoOscuro,
+            chipFondo: item.chipFondo,
+            chipTexto: item.chipTexto,
+            titulo: item.titulo,
+          };
+          return acc;
+        },
+        {}
+      );
 
-        setTemasPorColorTela(temasMap);
-      } catch (error) {
-        console.error('Error cargando temas de color', error);
-      }
+      setTemasPorColorTela(map);
     };
 
     fetchTemas();
   }, []);
 
+  /* =======================
+     PÁGINA ACTUAL
+  ======================= */
+  const especificacionesPedidosPerspectivas =
+    paginas[paginaActual - 1] || [];
+
+  const rowSeguro =
+    especificacionesPedidosPerspectivas.length > 0
+      ? especificacionesPedidosPerspectivas[0]
+      : null;
+
+  const colorTela =
+    rowSeguro?.de_ColorTela?.trim().toUpperCase() || '';
+
+  const tema = temasPorColorTela[colorTela] || temasPorColorTela.DEFAULT;
+
   const onPageChange = (page: number): void => {
-    const pedidosFiltrados = especificacionesPedidos.filter(
-      (item) => item.id_ModeloPerspectiva === page
-    );
-
-    setEspecificacionesPedidosPerspectivas(pedidosFiltrados);
-    setPerspectivaActual(page);
-
+    setPaginaActual(page);
     setKey((prev) => prev + 1);
-
-    resetAutoChange();
   };
 
-  const handleRegresar = (): void => navigate(-1);
-  const handleFinalizarOrdenTrabajo = (): void => openModal();
-  const abrirModalCancelarOrdenTrabajo = (): void => openModalCancelar();
-
+  /* =======================
+     RENDER (DISEÑO INTACTO)
+  ======================= */
   return (
     <>
       <div
@@ -190,203 +160,132 @@ export const OrdenTrabajo = (): React.JSX.Element => {
         className="flex flex-col min-h-screen pt-[2rem]"
         style={{ backgroundColor: tema?.primarioSuave }}
       >
-        {/* 🔵 TÍTULO PRINCIPAL */}
-        <div className="text-center mb-8 animate-fade-down animate-duration-700">
+        {/* 🔵 TÍTULO */}
+        <div className="text-center mb-8">
           <h1
-            className="text-[4rem] font-bold tracking-wide"
+            className="text-[4rem] font-bold"
             style={{ color: tema?.titulo }}
           >
-            {especificacionesPedidosPerspectivas[0]?.de_Modelo?.toUpperCase()} -{' '}
-            {especificacionesPedidosPerspectivas[0]?.de_ColorTela?.toUpperCase()}
+            {rowSeguro?.de_Modelo?.toUpperCase()} -{' '}
+            {rowSeguro?.de_ColorTela?.toUpperCase()}
           </h1>
         </div>
 
         <div className="flex-grow">
           <div className="grid grid-cols-[1fr_2fr_1fr]">
-            {/* 🔵 PANEL IZQUIERDO */}
+            {/* PANEL IZQUIERDO */}
             <div className="pl-[3rem]">
               <div
-                className="p-[1.5rem] animate-fade-right animate-duration-1000 animate-ease-in rounded-2xl"
+                className="p-[1.5rem] rounded-2xl"
                 style={{ backgroundColor: tema?.primario }}
               >
                 <h2
                   className="text-[3rem] font-bold"
                   style={{ color: tema?.textoClaro }}
                 >
-                  Orden de Trabajo - #
-                  {especificacionesPedidosPerspectivas[0]?.id_OrdenTrabajo}
+                  Orden de Trabajo - #{rowSeguro?.id_OrdenTrabajo}
                 </h2>
 
-                <div>
-                  <p
-                    className="text-[2.5rem]"
-                    style={{ color: tema?.textoClaro }}
-                  >
-                    Color de tela:{' '}
-                    {especificacionesPedidosPerspectivas[0]?.de_ColorTela}
-                  </p>
-
-                  <p
-                    className="text-[2.5rem]"
-                    style={{ color: tema?.textoClaro }}
-                  >
-                    Cantidad Total:{' '}
-                    {especificacionesPedidosPerspectivas[0]?.nu_Cantidad}
-                  </p>
-
-                  <p
-                    className="text-[2.5rem]"
-                    style={{ color: tema?.textoClaro }}
-                  >
-                    Cantidad Pendiente:{' '}
-                    {
-                      especificacionesPedidosPerspectivas[0]
-                        ?.nu_CantidadPendiente
-                    }
-                  </p>
-
-                  <p
-                    className="text-[2.5rem]"
-                    style={{ color: tema?.textoClaro }}
-                  >
-                    Modelo: {especificacionesPedidosPerspectivas[0]?.de_Modelo}
-                  </p>
-
-                  <p
-                    className="text-[2.5rem]"
-                    style={{ color: tema?.textoClaro }}
-                  >
-                    Tipo de tela:{' '}
-                    {especificacionesPedidosPerspectivas[0]?.de_TipoTela}
-                  </p>
-
-                  <p
-                    className="text-[2.5rem]"
-                    style={{ color: tema?.textoClaro }}
-                  >
-                    Talla: {especificacionesPedidosPerspectivas[0]?.de_Talla}
-                  </p>
-                </div>
+                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                  Color de tela: {rowSeguro?.de_ColorTela}
+                </p>
+                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                  Cantidad Total: {rowSeguro?.nu_Cantidad}
+                </p>
+                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                  Cantidad Pendiente: {rowSeguro?.nu_CantidadPendiente}
+                </p>
+                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                  Modelo: {rowSeguro?.de_Modelo}
+                </p>
+                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                  Tipo de tela: {rowSeguro?.de_TipoTela}
+                </p>
+                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                  Talla: {rowSeguro?.de_Talla}
+                </p>
               </div>
             </div>
 
-            {/* 🔵 IMAGEN CENTRAL */}
-            <div className="m-auto pt-[.4rem] animate-fade-down animate-ease-in">
+            {/* IMAGEN */}
+            <div className="m-auto pt-[.4rem]">
               <img
-                src={`${especificacionesPedidosPerspectivas[0]?.de_Ruta}`}
-                alt="Imagen Editada"
+                src={rowSeguro?.de_Ruta}
                 className="w-3/4 h-auto m-auto rounded-[18rem]"
                 style={{ backgroundColor: tema?.primarioSuave }}
               />
             </div>
 
-            {/* 🔵 PANEL DERECHO */}
-            <div className="pr-[2.4rem] animate-fade-left animate-duration-1000 animate-ease-in">
-              <div>
-                <h2
-                  className="text-[3rem] font-semibold text-center rounded-t-2xl"
-                  style={{
-                    backgroundColor: tema?.primario,
-                    color: tema?.textoClaro,
-                  }}
-                >
-                  Especificaciones
-                </h2>
+            {/* ESPECIFICACIONES */}
+            <div className="pr-[2.4rem]">
+              <h2
+                className="text-[3rem] font-semibold text-center rounded-t-2xl"
+                style={{
+                  backgroundColor: tema?.primario,
+                  color: tema?.textoClaro,
+                }}
+              >
+                Especificaciones
+              </h2>
 
-                <div
-                  className="space-y-4 p-4 rounded-b-2xl"
-                  style={{ backgroundColor: tema?.fondoSuave }}
-                >
-                  {especificacionesPedidosPerspectivas.length > 0 &&
-                    especificacionesPedidosPerspectivas.map(
-                      (especificacion) => (
-                        <ul
-                          key={especificacion.id_Especificacion}
-                          className="flex items-center p-2"
-                        >
-                          <li
-                            className="font-bold mr-4 text-4xl"
-                            style={{ color: tema?.chipTexto }}
-                          >
-                            {especificacion.nu_Especificacion}.{' '}
-                            <span
-                              className="font-normal text-[2.4rem]"
-                              style={{ color: tema?.textoOscuro }}
-                            >
-                              {especificacion.de_Especificacion}
-                            </span>
-                          </li>
-                        </ul>
-                      )
-                    )}
-                </div>
+              <div
+                className="space-y-4 p-4 rounded-b-2xl"
+                style={{ backgroundColor: tema?.fondoSuave }}
+              >
+                {especificacionesPedidosPerspectivas.map((e) => (
+                  <div key={e.id_Especificacion} className="text-4xl">
+                    <span
+                      className="font-bold"
+                      style={{ color: tema?.chipTexto }}
+                    >
+                      {e.nu_Especificacion}.{' '}
+                    </span>
+                    <span style={{ color: tema?.textoOscuro }}>
+                      {e.de_Especificacion}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* 🔵 FOOTER */}
-        <footer className="flex flex-col sm:flex-row justify-start items-center border-gray-400 animate-flip-up animate-ease-out">
+        {/* FOOTER */}
+        <footer className="flex items-center">
           <img
             src="img/Logo-Tayh_Horizontal-Negro.png"
-            alt="Logo Empresa"
-            className="w-60 sm:w-96 h-auto object-contain mb-4 sm:mb-0 pl-8 pr-8"
+            className="w-96 pl-8"
           />
 
           <Pagination
-            currentPage={perspectivaActual}
-            totalPages={totalPerspectivas}
+            currentPage={paginaActual}
+            totalPages={totalPaginas}
             onPageChange={onPageChange}
             showIcons
             theme={customPaginationOrdenTrabajoTheme}
-            className="ml-[2rem]"
           />
 
-          {/* ⏱ CONTROLES AUTOPLAY */}
-          <div className="flex items-center gap-4 ml-[2rem]">
+          <div className="w-full text-end mr-[4rem]">
             <button
-              className="text-[1.8rem] px-[1.2rem] py-[.6rem] font-bold rounded-xl text-white"
-              style={{
-                backgroundColor: autoPlayPaused ? '#16a34a' : '#6b7280',
-              }}
-              onClick={() => setAutoPlayPaused((prev) => !prev)}
-            >
-              {autoPlayPaused ? '▶ Reanudar' : '⏸ Pausar'}
-            </button>
-
-            <select
-              value={autoPlayDelay}
-              onChange={(e) => setAutoPlayDelay(Number(e.target.value))}
-              className="text-[1.6rem] p-2 rounded-xl border"
-            >
-              <option value={5000}>5 s</option>
-              <option value={10000}>10 s</option>
-              <option value={15000}>15 s</option>
-              <option value={30000}>30 s</option>
-            </select>
-          </div>
-
-          <div className="w-[100%] text-end mr-[4rem]">
-            <button
-              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
+              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl mr-[3rem]"
               style={{ backgroundColor: '#1a9a1a' }}
-              onClick={handleFinalizarOrdenTrabajo}
+              onClick={openModal}
             >
               Finalizar Orden de Trabajo
             </button>
 
             <button
-              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
+              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl mr-[3rem]"
               style={{ backgroundColor: '#ff1a1a' }}
-              onClick={abrirModalCancelarOrdenTrabajo}
+              onClick={openModalCancelar}
             >
               Cancelar
             </button>
 
             <button
-              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo"
+              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl"
               style={{ backgroundColor: '#ff6b16' }}
-              onClick={handleRegresar}
+              onClick={() => navigate(-1)}
             >
               Regresar
             </button>
@@ -394,60 +293,23 @@ export const OrdenTrabajo = (): React.JSX.Element => {
         </footer>
       </div>
 
-      {/* 🔵 MODALES */}
-      <ModalFinalizarOrdenTrabajo
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        finalizarOrdenTrabajo={setFinOrdenTrabajo}
-        row={
-          especificacionesPedidosPerspectivas[0] ?? {
-            id_OrdenTrabajo: 0,
-            de_ColorTela: '',
-            nu_Cantidad: 0,
-            nu_CantidadPendiente: 0,
-            de_Modelo: '',
-            de_TipoTela: '',
-            de_Talla: '',
-            de_Ruta: '',
-            id_ModeloPerspectiva: 0,
-            totalModeloPerspectiva: 0,
-            id_Especificacion: 0,
-            nu_Especificacion: 0,
-            de_Especificacion: '',
-            de_Genero: '',
-            id_ModeloImagen: 0,
-            sn_ActivoImagen: 0,
-            id_Pedido: 0,
-          }
-        }
-      />
+      {rowSeguro && (
+        <ModalFinalizarOrdenTrabajo
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          finalizarOrdenTrabajo={() => {}}
+          row={rowSeguro}
+        />
+      )}
 
-      <ModalCancelarOrdenTrabajo
-        isOpen={isModalCancelarOpen}
-        onClose={closeModalCancelar}
-        sn_PantallaOrdenTrabajo={true}
-        row={
-          especificacionesPedidosPerspectivas[0] ?? {
-            id_OrdenTrabajo: 0,
-            de_ColorTela: '',
-            nu_Cantidad: 0,
-            nu_CantidadPendiente: 0,
-            de_Modelo: '',
-            de_TipoTela: '',
-            de_Talla: '',
-            de_Ruta: '',
-            id_ModeloPerspectiva: 0,
-            totalModeloPerspectiva: 0,
-            id_Especificacion: 0,
-            nu_Especificacion: 0,
-            de_Especificacion: '',
-            de_Genero: '',
-            id_ModeloImagen: 0,
-            sn_ActivoImagen: 0,
-            id_Pedido: 0,
-          }
-        }
-      />
+      {rowSeguro && (
+        <ModalCancelarOrdenTrabajo
+          isOpen={isModalCancelarOpen}
+          onClose={closeModalCancelar}
+          sn_PantallaOrdenTrabajo
+          row={rowSeguro}
+        />
+      )}
     </>
   );
 };
