@@ -56,6 +56,99 @@ export const OrdenTrabajo = (): React.JSX.Element => {
     onClose: closeModalCancelar,
   } = useDisclosure();
 
+  const [autoPlayDelay, setAutoPlayDelay] = useState(15000); // 15s por defecto
+  const [autoPlayPaused, setAutoPlayPaused] = useState(false);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const resetAutoChange = (): void => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    if (autoPlayPaused || totalPaginas <= 1) return;
+
+    intervalRef.current = window.setInterval(() => {
+      setPaginaActual((prev) => {
+        const nextPage = prev < totalPaginas ? prev + 1 : 1;
+        onPageChange(nextPage);
+        return nextPage;
+      });
+    }, autoPlayDelay);
+  };
+
+  useEffect(() => {
+    resetAutoChange();
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [totalPaginas, paginas, autoPlayDelay, autoPlayPaused]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let interval: any;
+    let timeout: any;
+    let isHovering = false; // 👈 Detecta hover
+
+    // 🛑 Eventos hover
+    const onMouseEnter = () => {
+      isHovering = true;
+    };
+
+    const onMouseLeave = () => {
+      isHovering = false;
+    };
+
+    el.addEventListener('mouseenter', onMouseEnter);
+    el.addEventListener('mouseleave', onMouseLeave);
+
+    const startScroll = () => {
+      interval = setInterval(() => {
+        // 🛑 Si está hover, no hacer scroll
+        if (isHovering) return;
+
+        // 📌 Si llega al final
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight) {
+          clearInterval(interval);
+
+          // ⏳ Esperar 2 segundos al final
+          timeout = setTimeout(() => {
+            // 🔁 Volver arriba
+            el.scrollTop = 0;
+
+            // ⏳ Esperar 2 segundos antes de volver a bajar
+            timeout = setTimeout(() => {
+              startScroll();
+            }, 2000);
+          }, 2000);
+        } else {
+          el.scrollTop += 1; // velocidad
+        }
+      }, 30);
+    };
+
+    // ⏳ Espera inicial
+    timeout = setTimeout(() => {
+      startScroll();
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+
+      // 🧹 Limpiar listeners
+      el.removeEventListener('mouseenter', onMouseEnter);
+      el.removeEventListener('mouseleave', onMouseLeave);
+    };
+  }, [paginaActual]);
+
   /* =======================
      FETCH DATOS
   ======================= */
@@ -132,16 +225,14 @@ export const OrdenTrabajo = (): React.JSX.Element => {
   /* =======================
      PÁGINA ACTUAL
   ======================= */
-  const especificacionesPedidosPerspectivas =
-    paginas[paginaActual - 1] || [];
+  const especificacionesPedidosPerspectivas = paginas[paginaActual - 1] || [];
 
   const rowSeguro =
     especificacionesPedidosPerspectivas.length > 0
       ? especificacionesPedidosPerspectivas[0]
       : null;
 
-  const colorTela =
-    rowSeguro?.de_ColorTela?.trim().toUpperCase() || '';
+  const colorTela = rowSeguro?.de_ColorTela?.trim().toUpperCase() || '';
 
   const tema = temasPorColorTela[colorTela] || temasPorColorTela.DEFAULT;
 
@@ -162,10 +253,7 @@ export const OrdenTrabajo = (): React.JSX.Element => {
       >
         {/* 🔵 TÍTULO */}
         <div className="text-center mb-8">
-          <h1
-            className="text-[4rem] font-bold"
-            style={{ color: tema?.titulo }}
-          >
+          <h1 className="text-[4rem] font-bold" style={{ color: tema?.titulo }}>
             {rowSeguro?.de_Modelo?.toUpperCase()} -{' '}
             {rowSeguro?.de_ColorTela?.toUpperCase()}
           </h1>
@@ -186,22 +274,40 @@ export const OrdenTrabajo = (): React.JSX.Element => {
                   Orden de Trabajo - #{rowSeguro?.id_OrdenTrabajo}
                 </h2>
 
-                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                <p
+                  className="text-[2.5rem]"
+                  style={{ color: tema?.textoClaro }}
+                >
                   Color de tela: {rowSeguro?.de_ColorTela}
                 </p>
-                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                <p
+                  className="text-[2.5rem]"
+                  style={{ color: tema?.textoClaro }}
+                >
                   Cantidad Total: {rowSeguro?.nu_Cantidad}
                 </p>
-                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                <p
+                  className="text-[2.5rem]"
+                  style={{ color: tema?.textoClaro }}
+                >
                   Cantidad Pendiente: {rowSeguro?.nu_CantidadPendiente}
                 </p>
-                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                <p
+                  className="text-[2.5rem]"
+                  style={{ color: tema?.textoClaro }}
+                >
                   Modelo: {rowSeguro?.de_Modelo}
                 </p>
-                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                <p
+                  className="text-[2.5rem]"
+                  style={{ color: tema?.textoClaro }}
+                >
                   Tipo de tela: {rowSeguro?.de_TipoTela}
                 </p>
-                <p className="text-[2.5rem]" style={{ color: tema?.textoClaro }}>
+                <p
+                  className="text-[2.5rem]"
+                  style={{ color: tema?.textoClaro }}
+                >
                   Talla: {rowSeguro?.de_Talla}
                 </p>
               </div>
@@ -229,7 +335,9 @@ export const OrdenTrabajo = (): React.JSX.Element => {
               </h2>
 
               <div
-                className="space-y-4 p-4 rounded-b-2xl"
+                ref={scrollRef}
+                className="space-y-4 p-4 rounded-b-2xl 
+               overflow-y-auto max-h-[600px] scrollbar-colorful"
                 style={{ backgroundColor: tema?.fondoSuave }}
               >
                 {especificacionesPedidosPerspectivas.map((e) => (
@@ -251,11 +359,8 @@ export const OrdenTrabajo = (): React.JSX.Element => {
         </div>
 
         {/* FOOTER */}
-        <footer className="flex items-center">
-          <img
-            src="img/Logo-Tayh_Horizontal-Negro.png"
-            className="w-96 pl-8"
-          />
+        {/* <footer className="flex items-center">
+          <img src="img/Logo-Tayh_Horizontal-Negro.png" className="w-96 pl-8" />
 
           <Pagination
             currentPage={paginaActual}
@@ -284,6 +389,74 @@ export const OrdenTrabajo = (): React.JSX.Element => {
 
             <button
               className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl"
+              style={{ backgroundColor: '#ff6b16' }}
+              onClick={() => navigate(-1)}
+            >
+              Regresar
+            </button>
+          </div>
+        </footer> */}
+
+        {/* 🔵 FOOTER */}
+        <footer className="flex flex-col sm:flex-row justify-start items-center border-gray-400 animate-flip-up animate-ease-out">
+          <img
+            src="img/Logo-Tayh_Horizontal-Negro.png"
+            alt="Logo Empresa"
+            className="w-60 sm:w-96 h-auto object-contain mb-4 sm:mb-0 pl-8 pr-8"
+          />
+
+          <Pagination
+            currentPage={paginaActual}
+            totalPages={totalPaginas}
+            onPageChange={onPageChange}
+            showIcons
+            theme={customPaginationOrdenTrabajoTheme}
+            className="ml-[2rem]"
+          />
+
+          {/* ⏱ CONTROLES AUTOPLAY */}
+          <div className="flex items-center gap-4 ml-[2rem]">
+            <button
+              className="text-[1.8rem] px-[1.2rem] py-[.6rem] font-bold rounded-xl text-white"
+              style={{
+                backgroundColor: autoPlayPaused ? '#16a34a' : '#6b7280',
+              }}
+              onClick={() => setAutoPlayPaused((prev) => !prev)}
+            >
+              {autoPlayPaused ? '▶ Reanudar' : '⏸ Pausar'}
+            </button>
+
+            <select
+              value={autoPlayDelay}
+              onChange={(e) => setAutoPlayDelay(Number(e.target.value))}
+              className="text-[1.6rem] p-2 rounded-xl border"
+            >
+              <option value={5000}>5 s</option>
+              <option value={10000}>10 s</option>
+              <option value={15000}>15 s</option>
+              <option value={30000}>30 s</option>
+            </select>
+          </div>
+
+          <div className="w-[100%] text-end mr-[4rem]">
+            <button
+              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
+              style={{ backgroundColor: '#1a9a1a' }}
+              onClick={openModal}
+            >
+              Finalizar Orden de Trabajo
+            </button>
+
+            <button
+              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo mr-[3rem]"
+              style={{ backgroundColor: '#ff1a1a' }}
+              onClick={openModalCancelar}
+            >
+              Cancelar
+            </button>
+
+            <button
+              className="text-[2.2rem] p-[1rem] text-white font-bold rounded-2xl shadowBotonRegresarOrdenTrabajo"
               style={{ backgroundColor: '#ff6b16' }}
               onClick={() => navigate(-1)}
             >
