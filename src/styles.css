@@ -272,3 +272,24 @@ th {
 .shadowBotonRegresarOrdenTrabajo {
 	box-shadow: 0px 8px 23px 0px rgba(158,158,158,1);
 }
+
+/* 🌈 Scrollbar personalizada Azul + Rosa */
+.scrollbar-colorful::-webkit-scrollbar {
+  width: 9px; /* grosor */
+}
+
+.scrollbar-colorful::-webkit-scrollbar-track {
+  background: #ec4899; /* Rosa (thumb) */
+  border-radius: 999px;
+}
+
+.scrollbar-colorful::-webkit-scrollbar-thumb {
+	background: #3b82f6; /* Azul (track) */
+  border-radius: 999px;
+}
+
+.scrollbar-colorful::-webkit-scrollbar-thumb:hover {
+  background: #3d7add; /* Azul (track) */
+}
+
+
