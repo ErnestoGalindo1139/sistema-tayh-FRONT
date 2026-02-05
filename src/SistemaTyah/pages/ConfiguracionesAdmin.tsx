@@ -3,6 +3,7 @@ import { Card } from 'flowbite-react';
 import { FaDollarSign, FaTshirt, FaUsers, FaChartBar } from 'react-icons/fa';
 import { PreciosAdmin } from './PreciosAdmin';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthProvider';
 // import { ModelosAdmin } from './ModelosAdmin';
 // import { UsuariosAdmin } from './UsuariosAdmin';
 // import { ReportesAdmin } from './ReportesAdmin';
@@ -37,10 +38,22 @@ const items = [
 export const ConfiguracionesAdmin = (): React.JSX.Element => {
   const navigate = useNavigate();
 
+  const { getUser } = useAuth();
+  const usuario = getUser();
+  const roleId = usuario?.id_Rol ?? null;
+
+  const itemsFiltrados = items.filter((item) => {
+    if (roleId != 5) return items; // Admin tiene acceso a todo
+    if (roleId === 5) {
+      // Rol de Inventario
+      return item.title === 'Inventario';
+    }
+  });
+
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((item) => (
+        {itemsFiltrados.map((item) => (
           <Card
             key={item.title}
             className={`cursor-pointer hover:shadow-lg text-white flex flex-col items-center justify-center p-5 rounded-lg ${item.color}`}

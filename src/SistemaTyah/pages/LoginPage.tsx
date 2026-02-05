@@ -21,6 +21,9 @@ export const LoginPage = (): React.JSX.Element => {
     if (user?.id_Rol === 2) {
       return <Navigate to="/seleccionarOrdenTrabajo" replace />;
     }
+    if (user?.id_Rol === 5) {
+      return <Navigate to="/inventario" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -51,6 +54,8 @@ export const LoginPage = (): React.JSX.Element => {
 
         if (json.body.user.id_Rol == 2) {
           navigate('/seleccionarOrdenTrabajo');
+        } else if (json.body.user.id_Rol == 5) {
+          navigate('/inventario');
         } else {
           navigate('/dashboard');
         }
@@ -63,7 +68,7 @@ export const LoginPage = (): React.JSX.Element => {
         });
       } else {
         console.log('Inicio de Sesion Fallido');
-        // Mostrar mensaje de éxito
+        // Mostrar mensaje de error
         Toast.fire({
           icon: 'error',
           title: 'Inicio de Sesion Fallido',
