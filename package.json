@@ -11,6 +11,9 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
     "@chakra-ui/icons": "^2.2.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.3",

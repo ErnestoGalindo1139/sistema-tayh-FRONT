@@ -33,6 +33,8 @@ export default function AdminLayout(): React.JSX.Element {
     if (roleId == 1) return modulosData;
     if (roleId == 2)
       return modulosData.filter((m) => m.ruta === '/seleccionarOrdenTrabajo');
+    if (roleId == 5)
+      return modulosData.filter((m) => m.ruta === '/configuraciones');
     return [];
   }, [roleId]);
 
